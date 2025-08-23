@@ -1,13 +1,32 @@
 <!DOCTYPE html>
 <html lang="">
-  <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.ico">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 禁止缩放的关键： -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-dplayer2@latest/dist/vue-dplayer2.css">
+  <title>91 Pron</title>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script type="module" src="/src/main.ts"></script>
+  <script>
+    // 1) 双指捏合：阻止多指触控开始
+    document.addEventListener('touchstart', function (e) {
+      if (e.touches && e.touches.length > 1) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+  </script>
+</body>
+
 </html>

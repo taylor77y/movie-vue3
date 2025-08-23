@@ -4,13 +4,22 @@
 :root {
   --background-color:  #000000;
   --text-color: #ffffff;
-  --primary-color:rgb(255, 150, 12);
+  --primary-color:#FF960C;
+    --br-color:#333333
 }
 
 body[data-theme='dark'] {
-    --primary-color:rgb(255, 150, 12);
+  --primary-color:#FF960C;
   --background-color:  #000000;
   --text-color: #ffffff;
+  --br-color:#333333;
+  font-family: PingFang SC;
+  font-weight: 400;
+  font-style: Regular;
+  overflow: hidden;
+}
+html,body{
+ background-color:#000000;
 }
 
 /* ================= 全局样式 ================= */

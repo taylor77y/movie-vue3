@@ -11,9 +11,9 @@ const service = axios.create({
 service.interceptors.request.use(
   (config) => {
     // 这里可以统一加 token
-    const token = '586e55dc6188484c8aebb13d9f552292'
+    const token = localStorage.getItem('token')
     if (token) {
-      config.headers['token'] = `${token}`
+      config.headers['Token'] = `${token}`
     }
     return config
   },
