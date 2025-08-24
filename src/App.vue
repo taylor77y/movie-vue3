@@ -37,8 +37,11 @@
 </template>
 <script setup lang="ts">
 import {ref,onMounted} from "vue"
+
+ 
 const showGuanggao = ref<any>(false)
 const showOverlay = ref(false)
+
 const onDowloand =()=>{
   	window.location.href = 'https://91porn.hk/download/apk/kanbei14.apk';
 }
@@ -48,9 +51,12 @@ const onShowAppleTutorial =()=>{
 const closeOverlay=()=>{
   showOverlay.value = !showOverlay.value
 }
-onMounted(() => {
+onMounted(async() => {
   // 首页加载时弹出广告
   showGuanggao.value = true
+  console.log(window,"windows");
+  
+  
 })
 </script>
 <style lang="less" scoped>
