@@ -85,75 +85,75 @@ watch(
 onMounted(async () => {
   active.value = route.path
   // localStorage.setItem('token', 'befe57f384e34c01b5c17b24d1bb12f5')
-  const data = {
-    androidUuid
-      :
-      null,
-    balance
-      :
-      0,
-    createTime
-      :
-      "2025-08-24 01:09:14",
-    h5Uuid
-      :
-      "be651573-9678-4212-bb6e-b64f05b2b7a0",
-    hasAccount
-      :
-      null,
-    iosUuid
-      :
-      null,
-    memberAvatar
-      :
-      null,
-    memberCion
-      :
-      0,
-    memberCode
-      :
-      "95534",
-    memberName
-      :
-      "28050384896",
-    memberNichen
-      :
-      "28050384896",
-    memberPwdTemp
-      :
-      "0xA3lT",
-    memberSignature
-      :
-      null,
-    memberVip
-      :
-      0,
-    memberViptime
-      :
-      0,
-    mobile
-      :
-      null,
-    pid
-      :
-      null,
-    token
-      :
-      'befe57f384e34c01b5c17b24d1bb12f5',
-    vipDate
-      :
-      "2025-08-24 01:09:14",
-    vipPeriod
-      :
-      0,
-    wxOpenid
-      :
-      null,
-    wxUnionid
-      :
-      null
-  }
-  localStorage.setItem('memberInfo', JSON.stringify(data))
+  // const data = {
+  //   androidUuid
+  //     :
+  //     null,
+  //   balance
+  //     :
+  //     0,
+  //   createTime
+  //     :
+  //     "2025-08-24 01:09:14",
+  //   h5Uuid
+  //     :
+  //     "be651573-9678-4212-bb6e-b64f05b2b7a0",
+  //   hasAccount
+  //     :
+  //     null,
+  //   iosUuid
+  //     :
+  //     null,
+  //   memberAvatar
+  //     :
+  //     null,
+  //   memberCion
+  //     :
+  //     0,
+  //   memberCode
+  //     :
+  //     "95534",
+  //   memberName
+  //     :
+  //     "28050384896",
+  //   memberNichen
+  //     :
+  //     "28050384896",
+  //   memberPwdTemp
+  //     :
+  //     "0xA3lT",
+  //   memberSignature
+  //     :
+  //     null,
+  //   memberVip
+  //     :
+  //     0,
+  //   memberViptime
+  //     :
+  //     0,
+  //   mobile
+  //     :
+  //     null,
+  //   pid
+  //     :
+  //     null,
+  //   token
+  //     :
+  //     'befe57f384e34c01b5c17b24d1bb12f5',
+  //   vipDate
+  //     :
+  //     "2025-08-24 01:09:14",
+  //   vipPeriod
+  //     :
+  //     0,
+  //   wxOpenid
+  //     :
+  //     null,
+  //   wxUnionid
+  //     :
+  //     null
+  // }
+  // localStorage.setItem('memberInfo', JSON.stringify(data))
   if (localStorage.getItem('memberInfo') === null) {
     await onGetUserInfo()
   } else {
