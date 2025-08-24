@@ -12,19 +12,19 @@ import OO2 from "./../assets/tabbar/002.svg"
 import OO3 from "./../assets/tabbar/003.svg"
 import OO4 from "./../assets/tabbar/004.svg"
 import OO5 from "./../assets/tabbar/darknet_active.svg"
-import { ref, onMounted, computed, KeepAlive,watch } from 'vue'
-import { useRouter,useRoute } from 'vue-router'
+import { ref, onMounted, computed, KeepAlive, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useHomeStore } from '@/store/home'
 const store = useHomeStore()
 const timer = ref<any>(null)
 const router = useRouter()
 const active = ref("/")
 const route = useRoute()
-const memberInfo= ref<any>({})
+const memberInfo = ref<any>({})
 // 计算属性判断是否显示 Tabbar
 // 根据路由 meta 判断是否显示 Tabbar
 const showTabbar = computed(() => route.meta.showTabbar !== false)
-const show= ref<any>(false)
+const show = ref<any>(false)
 
 const goPublish = () => {
   console.log('点击发布')
@@ -56,10 +56,10 @@ const onRfUserInfo = async () => {
     localStorage.setItem('token', res.data.token)
   }
 }
-const onGo=(path:any)=>{
-  show.value =false
+const onGo = (path: any) => {
+  show.value = false
   active.value = '/'
-   router.push({
+  router.push({
     path: path
   })
 }
@@ -73,10 +73,10 @@ watch(
   () => route.path,
   (val) => {
     if (val === '/publish') {
-      if(memberInfo.value.memberVip === 3){
-        show.value =false
-      }else{
-        show.value =true
+      if (memberInfo.value.memberVip === 3) {
+        show.value = false
+      } else {
+        show.value = true
       }
     }
   },
@@ -85,12 +85,81 @@ watch(
 onMounted(async () => {
   active.value = route.path
   // localStorage.setItem('token', 'befe57f384e34c01b5c17b24d1bb12f5')
+  const data = {
+    androidUuid
+      :
+      null,
+    balance
+      :
+      0,
+    createTime
+      :
+      "2025-08-24 01:09:14",
+    h5Uuid
+      :
+      "be651573-9678-4212-bb6e-b64f05b2b7a0",
+    hasAccount
+      :
+      null,
+    iosUuid
+      :
+      null,
+    memberAvatar
+      :
+      null,
+    memberCion
+      :
+      0,
+    memberCode
+      :
+      "95534",
+    memberName
+      :
+      "28050384896",
+    memberNichen
+      :
+      "28050384896",
+    memberPwdTemp
+      :
+      "0xA3lT",
+    memberSignature
+      :
+      null,
+    memberVip
+      :
+      0,
+    memberViptime
+      :
+      0,
+    mobile
+      :
+      null,
+    pid
+      :
+      null,
+    token
+      :
+      'befe57f384e34c01b5c17b24d1bb12f5',
+    vipDate
+      :
+      "2025-08-24 01:09:14",
+    vipPeriod
+      :
+      0,
+    wxOpenid
+      :
+      null,
+    wxUnionid
+      :
+      null
+  }
+  localStorage.setItem('memberInfo', JSON.stringify(data))
   if (localStorage.getItem('memberInfo') === null) {
     await onGetUserInfo()
-  }else{
+  } else {
     timer.value = setInterval(onRfUserInfo, 10000)
   }
-  
+
 })
 </script>
 
@@ -145,23 +214,23 @@ onMounted(async () => {
 
   </div>
 
-   <van-overlay :show="show" >
+  <van-overlay :show="show">
     <div class="g-wrapper aw">
       <div class="block">
-         <div class="conta">
-          <img src="./../assets/pub/1.svg" style="width: 160px;height: 160px;"/>
+        <div class="conta">
+          <img src="./../assets/pub/1.svg" style="width: 160px;height: 160px;" />
           <div class="pd5">此板块都是暗网禁片真实解密的内容，</div>
           <div class="pd5">只对少量需求用户开放，</div>
           <div class="pd5">无承受能力者勿入！！</div>
           <div class="ac">开通VIP</div>
-           <div class="ac">解锁进入暗网</div>
-           <div class="govip" @click="onGo('/vip')">会员解锁</div>
-            <div class="pd5" style="font-size: 10px;margin-bottom: 20px;margin-top: 10px;">开通者，严禁分享传播！</div>
-           <div class="live" @click="onGo('/')">点击离开</div>
-         </div>
+          <div class="ac">解锁进入暗网</div>
+          <div class="govip" @click="onGo('/vip')">会员解锁</div>
+          <div class="pd5" style="font-size: 10px;margin-bottom: 20px;margin-top: 10px;">开通者，严禁分享传播！</div>
+          <div class="live" @click="onGo('/')">点击离开</div>
+        </div>
       </div>
     </div>
- </van-overlay>
+  </van-overlay>
 </template>
 
 <style scoped>
@@ -294,24 +363,27 @@ nav a:first-of-type {
 }
 </style>
 <style lang="less" scoped>
-.g-wrapper{
+.g-wrapper {
   height: 100%;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  .block{
+
+  .block {
     width: 100%;
     display: flex;
     align-items: center;
     flex-direction: column;
-    .conta{
+
+    .conta {
       display: flex;
       align-items: center;
       flex-direction: column;
       font-size: 16px;
       font-weight: bold;
-      .govip{
+
+      .govip {
         background: linear-gradient(180deg, #FFBE00 0%, #FF960C 104.01%);
         color: black;
         font-weight: bold;
@@ -321,26 +393,28 @@ nav a:first-of-type {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-top:20px;
+        margin-top: 20px;
       }
-      .live{
 
-      }
-      .ac{
+      .live {}
+
+      .ac {
         font-size: 18px;
         color: var(--primary-color);
       }
-      .pd5{
+
+      .pd5 {
         padding-bottom: 5px;
       }
-      .pd{
+
+      .pd {
         padding: 20px 0;
       }
     }
-    .top{
 
-    }
-    .cont{
+    .top {}
+
+    .cont {
       width: 70%;
       display: flex;
       flex-direction: column;
@@ -349,16 +423,18 @@ nav a:first-of-type {
       color: #000000;
       text-align: center;
       position: relative;
-      .posicon{
+
+      .posicon {
         position: absolute;
         right: 10px;
         top: 10px;
       }
-      .cont-title{
-        padding:50px 0 ;
+
+      .cont-title {
+        padding: 50px 0;
       }
-      
-      .cont-bottom{
+
+      .cont-bottom {
         width: 100%;
         height: 60px;
         background-color: rgb(238, 238, 238);
@@ -369,34 +445,39 @@ nav a:first-of-type {
         border-top: 1px solid rgb(204, 204, 204);
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
-        .l{
+
+        .l {
           color: var(--primary-color);
         }
       }
     }
   }
 }
-.aw{
+
+.aw {
   background: #00000073;
 }
-.outer-content{
+
+.outer-content {
   height: 100%;
   width: 100%;
   display: flex;
-    align-items: end;
-    justify-content: end;
-  .inner-overlay{
-        height: 100%;
-      width: 100%;
-     display: flex;
+  align-items: end;
+  justify-content: end;
+
+  .inner-overlay {
+    height: 100%;
+    width: 100%;
+    display: flex;
     align-items: center;
     flex-direction: column-reverse;
-  .custom-content{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: #000000;
-  }
+
+    .custom-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #000000;
+    }
   }
 }
 </style>

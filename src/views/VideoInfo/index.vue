@@ -323,10 +323,10 @@ const onGetVideoInfo = async (id: string | number) => {
     recommend.value = data.recommend
     srcList.value = data.srcList
     danmuList.value = data.danmuList
-    onCreatedVideo()
     addToHistory(videoInfo.value)
-    await onLookOk(id)
     await onGetConfig()
+    await onLookOk(id)
+    await onCreatedVideo()
   }
 }
 
@@ -352,11 +352,26 @@ const addToHistory = (video: any) => {
 }
 // ----- 创建播放器 -----
 const onCreatedVideo = () => {
+  if (!PlayVideo.value || !srcList.value.length) return;
 
-  if (!PlayVideo.value || !srcList.value.length) return
-  if (dp.value) dp.value.destroy()
-  if (hls.value) hls.value.destroy()
+  // 销毁旧的 DPlayer
+  if (dp.value) {
+    dp.value.destroy();
+    dp.value = null;
+  }
 
+  // 安全销毁旧的 HLS（注意：不再调用 stopLoad）
+  if (hls.value) {
+    try {
+      hls.value.off?.(); // 移除所有监听
+      hls.value.destroy?.();
+    } catch (e) {
+      console.warn("HLS destroy error", e);
+    }
+    hls.value = null;
+  }
+ console.log("执行到这里了","player");
+  // 创建新的 DPlayer
   dp.value = new DPlayer({
     container: PlayVideo.value,
     autoplay: true,
@@ -369,33 +384,68 @@ const onCreatedVideo = () => {
       type: "customHls",
       customType: {
         customHls: (video: HTMLVideoElement, player: any) => {
+          console.log(player.options.video.url,"player");
+          const url = player.options.video.url;
+
           if (Hls.isSupported()) {
-            hls.value = new Hls()
-            hls.value.loadSource(player.options.video.url)
-            hls.value.attachMedia(video)
-            video.muted = true
+           hls.value = new Hls(
+          );
+
+            // 加载流
+            hls.value.loadSource(url);
+            hls.value.attachMedia(video);
+            video.muted = true;
+
+            // 解析完成后自动播放
             hls.value.on(Hls.Events.MANIFEST_PARSED, () => {
               video.play().catch(() => {
-                video.addEventListener("click", () => video.play(), { once: true })
-              })
-              setupTimeUpdate(video)
-            })
-            player.hlsInstance = hls.value
+                video.addEventListener("click", () => video.play(), { once: true });
+              });
+              setupTimeUpdate(video);
+            });
+
+            // 错误监听，避免黑屏/死循环 loading
+            hls.value.on(Hls.Events.ERROR, (event, data) => {
+              console.warn("HLS Error:", event, data);
+              if (data.fatal) {
+                switch (data.type) {
+                  case Hls.ErrorTypes.NETWORK_ERROR:
+                    console.warn("尝试恢复网络错误");
+                    hls.value?.startLoad();
+                    break;
+                  case Hls.ErrorTypes.MEDIA_ERROR:
+                    console.warn("尝试恢复媒体错误");
+                    hls.value?.recoverMediaError();
+                    break;
+                  default:
+                    console.error("无法恢复，销毁 HLS");
+                    hls.value?.destroy();
+                    hls.value = null;
+                    break;
+                }
+              }
+            });
+
+            player.hlsInstance = hls.value;
           } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-            video.src = player.options.video.url
+            // Safari 原生支持 HLS
+            video.src = url;
             video.addEventListener("loadedmetadata", () => {
-              video.play()
-              setupTimeUpdate(video)
-            })
+              video.play().catch(() => {
+                video.addEventListener("click", () => video.play(), { once: true });
+              });
+              setupTimeUpdate(video);
+            });
           } else {
-            alert("当前浏览器不支持 HLS")
+            alert("当前浏览器不支持 HLS");
           }
-        }
-      }
-    }
-  })
-  console.log(" dp.value", dp.value)
-}
+        },
+      },
+    },
+  });
+};
+
+
 
 const setupTimeUpdate = (video: HTMLVideoElement) => {
   video.addEventListener("timeupdate", () => {
