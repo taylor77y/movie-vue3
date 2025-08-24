@@ -29,7 +29,7 @@ const props = defineProps({
     item: { type: Object, required: true },
 })
 
-const emits = defineEmits(['error'])
+const emits = defineEmits(['error','goVideo'])
 
 const onImgError = (e) => {
     emits('error', e)
@@ -38,14 +38,13 @@ const onOpen = (url) => {
   window.open(url, '_blank')
 }
 const onGoVideoInfo=(item)=>{
-      event.preventDefault()   // 阻止默认行为
-  event.stopPropagation()  // 阻止冒泡
     router.push({
         path:'/videoinfo',
         query:{
             id:item.cartoonCode
         }
     })
+     emits('goVideo', item)
 }
 
 
@@ -71,6 +70,9 @@ const onGoVideoInfo=(item)=>{
     .img-wrapper {
          height: 100px;
         position: relative;
+          background-image: url("./../assets/Image/pl.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
 
         .img {
             height: 100%;
@@ -88,7 +90,7 @@ const onGoVideoInfo=(item)=>{
             right: 0px;
             padding: 0 5px;
             background-color: var(--primary-color);
-            color: black;
+            color: var(--text-color);
             border-top-right-radius: 5px;
             border-bottom-left-radius: 5px;
             font-size: 14px;

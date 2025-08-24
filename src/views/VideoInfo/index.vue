@@ -1,11 +1,12 @@
 <template>
-  <div class="videoinfo">
+  <div class="videoinfo" ref="videoRef">
+    <div class="backicon" @click="onBack()"><van-icon name="arrow-left" color="#FFFFFF" size="22"/></div>
     <div ref="PlayVideo" class="video-container"></div>
     <div class="introduce">
       {{ videoInfo.cartoonIntroduce }}
     </div>
     <div class="list">
-      <div class="item">
+      <div class="item" @click="onSelect()">
         <img src="./../../assets/videoinfo/x.svg" class="item-img" />
         <div class="tit">选集</div>
       </div>
@@ -22,13 +23,29 @@
         <div class="tit" :class="{ 'active': isSaved }">加入收藏</div>
       </div>
     </div>
+    <div style="padding: 0 10px;display: flex;
+    flex-direction: column; ">
+      <div class="title-header">
+        <div class="left">
+          <div class="line"></div>
+          <div class="text">最新更新</div>
+        </div>
+        <div class="right">
+          <div class="r-text">查看更多</div><van-icon name="arrow" />
+        </div>
+      </div>
+      <div class="ranklist">
+        <CartoonItem @goVideo="handleGoVideo" v-for="item in recommend" :key="item.id" :item="item" @error="onImgError" />
+      </div>
+
+    </div>
     <!-- 底部弹出 -->
     <van-popup round v-model:show="showBottom" position="bottom" :style="{ height: '30%' }">
       <div class="pop-bottom">
         <div class="title">付费影视</div>
         <div class="line linetop">购买本集2金币</div>
-        <div class="line">购买VIP</div>
-        <div>取消</div>
+        <div class="line" @click="onVip()">购买VIP</div>
+        <div @click="onCancel()">取消</div>
       </div>
     </van-popup>
     <van-popup v-model:show="showCenter" round
@@ -40,9 +57,7 @@
             <div class="platform-name">91PORN</div>
             <div class="platform-name">最大成人视频平台</div>
           </div>
-
         </div>
-
         <div class="video-preview">
           <div style="position: relative;">
             <img :src="videoInfo.cartoonImage" class="preview-img" />
@@ -54,7 +69,6 @@
               <div class="duration">{{ videoInfo.vodDuration }}</div>
             </div>
           </div>
-
           <div class="video-title">{{ videoInfo.cartoonName }}</div>
         </div>
 
@@ -67,7 +81,8 @@
           <div style="margin-left: 10px;width: 50%;">
             <div class="invite-code-label">邀请码 {{ 12321 }}</div>
             <div class="invite-desc">每邀请1人送1天会员</div>
-            <div class="addres">https://xdv5i7kq.com/#/pages/cartoon/cartoon-player?cartoonCode=30906&shareCode=91796</div>
+            <div class="addres">https://xdv5i7kq.com/#/pages/cartoon/cartoon-player?cartoonCode=30906&shareCode=91796
+            </div>
           </div>
         </div>
 
@@ -80,14 +95,23 @@
 
       </div>
     </van-popup>
+    <!-- 底部弹出 -->
+    <van-popup v-model:show="showSelect" closeable position="bottom" :style="{ height: '30%', backgroundColor: '#333' }">
+      <div v-for="(item, index) in srcList" :key="index" class="srclit">
+        <div class="srtitle">{{ item.channel }}</div>
+        <div class="srbtn" @click="onPlay(item)">{{ item.urlList[0].name }}</div>
+      </div>
+    </van-popup>
+
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, onUnmounted, onActivated, computed } from 'vue'
+import { onMounted, ref, onUnmounted, onActivated, computed ,watch} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { showLoadingToast, closeToast, showFailToast,showSuccessToast } from 'vant'
+import { showLoadingToast, closeToast, showFailToast, showSuccessToast } from 'vant'
 import { post } from '@/utils/request'
+import CartoonItem from "./../../components/CartoonItem.vue"
 import AES from "@/utils/aes1.js"
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
@@ -97,12 +121,21 @@ import star1 from '@/assets/videoinfo/star1.svg'
 import star from '@/assets/videoinfo/star.svg'
 import QRCode from 'qrcode'
 import { copyText } from '@lxf2513/vue3-clipboard';
+import placeholder from "@/assets/Image/pl.png"
+import moment from 'moment'
+const videoRef = ref<HTMLDivElement | null>(null)
+const memberinfo = ref<any>({})
+const scrollTop = () => {
+  if (videoRef.value) {
+    videoRef.value.scrollTop = 0  // 滚动到顶部
+  }
+}
 const qrCodeUrl = ref<any>('')
 const route = useRoute()
 const router = useRouter()
 const showBottom = ref(false)
 const showCenter = ref(false)
-
+const showSelect = ref(false)
 // refs
 const dp = ref<DPlayer | null>(null)
 const PlayVideo = ref<HTMLDivElement | null>(null)
@@ -127,7 +160,8 @@ const isLiked = computed(() => {
 
 // 当前视频是否已收藏
 const isSaved = computed(() => {
-  return videoInfo.value?.cartoonCode ? savedVideos.value.includes(videoInfo.value.cartoonCode) : false
+  if (!videoInfo.value) return false
+  return savedVideos.value.some((v:any) => v.cartoonCode === videoInfo.value.cartoonCode)
 })
 
 // 喜欢/取消喜欢
@@ -164,10 +198,14 @@ const onLike = async () => {
 // 收藏/取消收藏
 const onSave = async () => {
   if (!videoInfo.value) return
-  const code = videoInfo.value.cartoonCode
-  const index = savedVideos.value.indexOf(code)
+
+  const index = savedVideos.value.findIndex((v:any) => v.cartoonCode === videoInfo.value.cartoonCode)
+
   if (index === -1) {
-    savedVideos.value.push(code)
+    // 添加整个对象
+    savedVideos.value.push({ ...videoInfo.value })
+
+    // 调用接口收藏
     const res = await post('/renren-api/api/member/like', {
       collectAuthor: videoInfo.value.cartoonAuthor,
       collectCode: videoInfo.value.cartoonCode,
@@ -179,23 +217,22 @@ const onSave = async () => {
       sortNum: videoInfo.value.dictCode,
       type: 2
     })
+
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-      // 不显示提示
-      console.log("收藏成功", data);
+      console.log("收藏成功", data)
       showSuccessToast('收藏成功')
-      //  await onGetSavelit()
     }
+
   } else {
+    // 取消收藏
     savedVideos.value.splice(index, 1)
+    showSuccessToast('已取消收藏')
   }
+
+  // 更新 localStorage
   localStorage.setItem('savedVideos', JSON.stringify(savedVideos.value))
 }
-
-
-
-
-
 const onGetSavelit = async () => {
   const res = await post('/renren-api/api/member/getCollectList', {})
   if (res.code === 0) {
@@ -203,11 +240,61 @@ const onGetSavelit = async () => {
     // 不显示提示
     console.log('收藏list', data);
   }
+}
+const onCancel=()=>{
+  router.back()
+}
+const onVip=()=>{
+  router.push({
+  path:'/vip'
+  })
+}
+const onPlay = (item: any) => {
+  const url = item.urlList[0].url;
+  if (!dp.value) return;
+  // 清理旧 Hls
+  if (dp.value.hlsInstance) {
+    try {
+      dp.value.hlsInstance.stopLoad?.();
+      dp.value.hlsInstance.detachMedia?.();
+      dp.value.hlsInstance.destroy?.();
+    } catch (e) { }
+    dp.value.hlsInstance = null;
+  }
 
+  // 切换 video 配置
+  dp.value.switchVideo({
+    url,
+    type: "customHls",
+    pic: item.cover || "",
+  });
+
+  // 重新挂载 Hls
+  const customHls = dp.value.options.video.customType?.customHls;
+  if (typeof customHls === "function") {
+    customHls(dp.value.video, dp.value);
+  }
+
+  // 恢复声音
+  dp.value.video.muted = false;
+  onSelect();
+  // 播放
+  dp.value.play().catch((err: any) => {
+    console.warn("播放被阻止:", err);
+  });
+};
+
+
+// 图片错误占位
+const onImgError = (event: any) => {
+  event.target.src = placeholder
 }
 
 const onShare = () => {
   showCenter.value = !showCenter.value
+}
+const onSelect = () => {
+  showSelect.value = !showSelect.value
 }
 // ----- API -----
 const onGetConfig = async () => {
@@ -232,17 +319,40 @@ const onGetVideoInfo = async (id: string | number) => {
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
     videoInfo.value = data.videoInfo
+    
     recommend.value = data.recommend
     srcList.value = data.srcList
     danmuList.value = data.danmuList
     onCreatedVideo()
+    addToHistory(videoInfo.value)
     await onLookOk(id)
     await onGetConfig()
   }
 }
 
+const addToHistory = (video: any) => {
+  const key = 'videoHistory'
+  // 获取本地历史
+  let history: any[] = JSON.parse(localStorage.getItem(key) || '[]')
+
+  // 如果已存在该视频，先移除
+  history = history.filter(item => item.cartoonCode !== video.cartoonCode)
+
+  // 添加到开头
+  history.unshift(video)
+
+  // 保存到 localStorage
+  localStorage.setItem(key, JSON.stringify(history))
+
+  // 可选：限制历史记录条数，比如最多 50 条
+  if (history.length > 50) {
+    history = history.slice(0, 50)
+    localStorage.setItem(key, JSON.stringify(history))
+  }
+}
 // ----- 创建播放器 -----
 const onCreatedVideo = () => {
+
   if (!PlayVideo.value || !srcList.value.length) return
   if (dp.value) dp.value.destroy()
   if (hls.value) hls.value.destroy()
@@ -284,26 +394,30 @@ const onCreatedVideo = () => {
       }
     }
   })
+  console.log(" dp.value", dp.value)
 }
 
 const setupTimeUpdate = (video: HTMLVideoElement) => {
   video.addEventListener("timeupdate", () => {
-    if (video.currentTime >= config.value.shikan) {
-      video.pause()
-      video.currentTime = config.value.shikan
-      video.controls = false
-      showBottom.value = true
-      video.addEventListener("play", () => {
-        if (video.currentTime >= config.value.shikan) {
-          video.pause()
-          showBottom.value = true
-        }
-      })
+    const vipdata = getVipStatus()
+    if(!vipdata.isVip || vipdata.memberVip <= 0){
+      if (video.currentTime >= config.value.shikan) {
+        video.pause()
+        video.currentTime = config.value.shikan
+        video.controls = false
+        showBottom.value = true
+        video.addEventListener("play", () => {
+          if (video.currentTime >= config.value.shikan) {
+            video.pause()
+            showBottom.value = true
+          }
+        })
+      }
     }
   })
 }
-const copyQRCodeLink = async() => {
-  let text ="123132123123123"
+const copyQRCodeLink = async () => {
+  let text = "123132123123123"
   copyText(text, undefined, (success, event) => {
     if (success) {
       showSuccessToast('复制成功');
@@ -312,31 +426,90 @@ const copyQRCodeLink = async() => {
     }
   });
 }
-const downloadQRCode= ()=>{
-   if (!qrCodeUrl.value) return
+const downloadQRCode = () => {
+  if (!qrCodeUrl.value) return
   const a = document.createElement('a')
   a.href = qrCodeUrl.value
   a.download = 'qrcode.png'
   a.click()
 }
-// ----- 生命周期 -----
-let initialized = false
-onMounted(async () => {
- try {
-  const text = 'https://www.example.com'
-  qrCodeUrl.value = await QRCode.toDataURL(text, {
-    width: 108,   // 二维码宽度
-    margin: 1,    
-    padding:2,
-    color: {
-      dark: '#000000',  // 二维码颜色
-      light: '#ffffff'  // 背景颜色
+watch(
+  () => route.query.id,
+  (newId, oldId) => {
+    if (newId !== oldId) {
+     onGetVideoInfo(route.query.id)
     }
-  })
-  console.log(qrCodeUrl.value, "qrCodeUrl.value")
-} catch (err) {
-  console.error(err)
+  }
+)
+const onBack= ()=>{
+  router.back()
 }
+const handleGoVideo=()=>{
+  console.log("子组件通知");
+  scrollTop();
+}
+
+const onGetUserInfo = async () => {
+  // 1. 先尝试从 localStorage 获取
+  const cached = localStorage.getItem('memberInfo')
+  if (cached) {
+    try {
+      const data = JSON.parse(cached)
+      console.log('本地缓存用户信息', data)
+      memberinfo.value =data
+      return data
+    } catch (e) {
+      console.error('解析本地缓存出错', e)
+      // 如果解析出错，继续请求接口
+    }
+  }
+
+  // 2. 如果没有缓存，或者缓存解析失败，则请求接口
+  try {
+    const res = await post('/app-api/member/getEntityByCode', {})
+    if (res.code === 0) {
+      // 假设 res.data 是加密后的字符串
+      const data = AES.decrypt(res.data, 'asdasdsadasdasds', { iv: '5245847584125485' }).toString(AES.enc.Utf8)
+      console.log('用户详情', data)
+      memberinfo.value =data
+      // 3. 存入 localStorage，下次直接使用
+      localStorage.setItem('memberInfo', JSON.stringify(data))
+      return data
+    } else {
+      console.error('接口返回错误', res)
+    }
+  } catch (err) {
+    console.error('获取用户信息失败', err)
+  }
+}
+
+
+function getVipStatus() {
+  const now = moment() // 当前时间
+  const vipStart = moment(memberinfo.value.vipDate, 'YYYY-MM-DD HH:mm:ss') // 解析 vipDate
+
+  if (!vipStart.isValid()) {
+    console.warn('vipDate 无效', memberinfo.value.vipDate)
+    return {
+      memberVip: memberinfo.value.memberVip,
+      isVip: false,
+      vipEndDate: null,
+      remainingDays: 0
+    }
+  }
+  const vipEnd = vipStart.clone().add(memberinfo.value.vipPeriod, 'days') // VIP 到期时间
+  const isVip = memberinfo.value.memberVip > 0 && now.isBefore(vipEnd)
+  const remainingDays = isVip ? vipEnd.diff(now, 'days') : 0
+  return {
+    memberVip: memberinfo.value.memberVip,
+    isVip,
+    vipEndDate: vipEnd.format('YYYY-MM-DD HH:mm:ss'),
+    remainingDays
+  }
+}
+
+// ----- 生命周期 -----
+onMounted(async () => {
   const id: any = route.query.id
   if (!id) {
     let second = 3
@@ -346,19 +519,26 @@ onMounted(async () => {
       if (second > 0) toast.message = `${second} 秒后退出,无携带参数`
       else { clearInterval(timer); closeToast(); router.back() }
     }, 1000)
-  } else if (!initialized) {
+  } else {
     await onGetVideoInfo(id)
-    initialized = true
+    await onGetUserInfo()
   }
-  await onGetSavelit()
-})
-
-// KeepAlive 缓存激活时触发
-onActivated(async () => {
-  const id: any = route.query.id
-  if (!videoInfo.value.cartoonIntroduce && id) {
-    await onGetVideoInfo(id)
+   try {
+    const text = 'https://www.example.com'
+    qrCodeUrl.value = await QRCode.toDataURL(text, {
+      width: 108,   // 二维码宽度
+      margin: 1,
+      padding: 2,
+      color: {
+        dark: '#000000',  // 二维码颜色
+        light: '#ffffff'  // 背景颜色
+      }
+    })
+    console.log(qrCodeUrl.value, "qrCodeUrl.value")
+  } catch (err) {
+    console.error(err)
   }
+  // await onGetSavelit()
 })
 
 onUnmounted(() => {
@@ -375,6 +555,22 @@ defineOptions({
 <style lang="less" scoped>
 .videoinfo {
   height: 100dvh;
+  overflow: auto;
+
+  .backicon {
+    position: fixed;
+    z-index: 9999;
+    ;
+    left: 10px;
+    top: 10px;
+    background-color: rgba(0, 0, 0, .5);
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   .video-container {
     width: 100%;
@@ -383,6 +579,7 @@ defineOptions({
   }
 
   .introduce {
+    margin-top: 10px;
     font-size: 12px;
     padding: 0 10px;
   }
@@ -551,35 +748,80 @@ defineOptions({
     ;
   }
 }
+
 .actions {
-    display: flex
-;
-    justify-content: space-around;
-    margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
 }
+
 .copy-btn {
   width: 43%;
-    height: 39px;
-    background-color: #999;
-      border: none;
-    color: black;
-    border-radius: 39px;
-         font-weight: bold;
-    display: flex
-;
-    align-items: center;
-    justify-content: center;
+  height: 39px;
+  background-color: #999;
+  border: none;
+  color: black;
+  border-radius: 39px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .save-btn {
   width: 43%;
-    height: 39px;
-    background-color: #fc0;
-    border: none;
-        color: black;
-        font-weight: bold;
-    border-radius: 39px;
+  height: 39px;
+  background-color: #fc0;
+  border: none;
+  color: black;
+  font-weight: bold;
+  border-radius: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.srclit {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+
+  .srtitle {
+    color: var(--primary-color);
+    font-weight: bold;
+  }
+
+  .srtitle::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    /* 距离文字底部的距离，可以自己调 */
+    width: 100%;
+    height: 2px;
+    /* 下划线粗细 */
+    background-color: var(--primary-color);
+    border-radius: 2px;
+    /* 下划线圆角，可选 */
+    font-size: 18px;
+  }
+
+  .srbtn {
+    background-color: var(--primary-color);
+    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--text-color);
+    width: 20%;
+    font-weight: bold;
+    font-size: 18px;
+  }
+}
+
+.ranklist {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 </style>

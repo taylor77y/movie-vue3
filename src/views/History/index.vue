@@ -1,36 +1,41 @@
 <template>
     <div class="collent">
         <div class="header">
-            <div></div>
-            <div class="tit">收藏</div>
+            <div @click="onBack()"><van-icon name="arrow-left"  color="white" size="22"/></div>
+            <div class="tit">历史记录</div>
             <div @click="onClear()"><van-icon name="delete-o" size="22"  /></div>
         </div>
-        <Empty v-if="savedVideos.length === 0" description="暂无收藏" />
+        <Empty v-if="videoHistory.length === 0" description="暂无收藏" />
         <div v-else class="list">
-            <CartoonItem @goVideo="handleGoVideo" v-for="item in savedVideos" :key="item.id" :item="item"
+            <CartoonItem @goVideo="handleGoVideo" v-for="item in videoHistory" :key="item.id" :item="item"
                 @error="onImgError" />
         </div>
     </div>
 </template>
 <script lang="ts" setup>
-import CartoonItem from "./../components/CartoonItem.vue"
+import CartoonItem from "./../../components/CartoonItem.vue"
 import { onMounted, ref } from 'vue';
+import { useRouter } from "vue-router";
 import { Empty ,showConfirmDialog,showToast} from 'vant';
-const savedVideos = ref<any>([])
-const onGetSaveList = () => {
-    const data = localStorage.getItem('savedVideos')
+const router = useRouter()
+const videoHistory = ref<any>([])
+const onGetHisList = () => {
+    const data = localStorage.getItem('videoHistory')
     if (data) {
         try {
-            savedVideos.value = JSON.parse(data)
-            // savedVideos.value = [...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value,...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value,...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value,...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value,...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value,...savedVideos.value, ...savedVideos.value, ...savedVideos.value, ...savedVideos.value,]
-            console.log('收藏列表', savedVideos.value)
+            videoHistory.value = JSON.parse(data)
+            // videoHistory.value = [...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value,...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value,...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value,...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value,...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value,...videoHistory.value, ...videoHistory.value, ...videoHistory.value, ...videoHistory.value,]
+            console.log('收藏列表', videoHistory.value)
         } catch (err) {
             console.error('解析收藏列表失败', err)
-            savedVideos.value = []
+            videoHistory.value = []
         }
     } else {
-        savedVideos.value = []
+        videoHistory.value = []
     }
+}
+const onBack =()=>{
+router.back()
 }
 const handleGoVideo = () => {
 
@@ -41,7 +46,7 @@ const onImgError = () => {
 const onClear = () => {
   showConfirmDialog({
     title: '确认清空',
-    message: '确定要清空所有收藏吗？',
+    message: '确定要清空历史记录吗？',
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     confirmButtonColor:"#FF960C",
@@ -49,9 +54,9 @@ const onClear = () => {
   })
     .then(() => {
       // 用户确认清空
-      savedVideos.value = []
-      localStorage.removeItem('savedVideos')
-      showToast('清除成功')
+      videoHistory.value = []
+      localStorage.removeItem('history')
+      showToast('历史记录清除成功')
     })
     .catch(() => {
          showToast('取消')
@@ -59,7 +64,7 @@ const onClear = () => {
     })
 }
 onMounted(() => {
-    onGetSaveList()
+    onGetHisList()
 })
 </script>
 <style lang="less" scoped>

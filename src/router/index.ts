@@ -19,6 +19,38 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/VideoInfo/index.vue'),
     meta: { showTabbar: false } // 不显示 Tabbar
   },
+  {
+    path: '/history',
+    name: 'History',
+    component: () => import('@/views/History/index.vue'),
+    meta: { showTabbar: false } // 不显示 Tabbar
+  },
+  {
+    path: '/vip',
+    name: 'Vip',
+    component: () => import('@/views/Vip/index.vue'),
+    meta: { showTabbar: false } // 不显示 Tabbar
+  },
+  {
+    path: '/cateInfo',
+    name: 'CateInfo',
+    component: () => import('@/views/CateInfo/index.vue'),
+    meta: { showTabbar: false } // 不显示 Tabbar
+  },
+    {
+    path: '/sreinfo',
+    name: 'SreachInfo',
+    component: () => import('@/views/Sreach/info.vue'),
+    meta: { showTabbar: false } // 不显示 Tabbar
+  },
+    {
+    path: '/sreach',
+    name: 'Sreach',
+    component: () => import('@/views/Sreach/index.vue'),
+    meta: { showTabbar: false } // 不显示 Tabbar
+  },
+ 
+  
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 

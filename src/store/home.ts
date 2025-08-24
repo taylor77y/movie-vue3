@@ -15,6 +15,10 @@ export const useHomeStore = defineStore('home', () => {
   const currentPage = ref(1)
   const scrollTop = ref(0) // 保存 scroll 位置
   const randomad = ref<any[]>([])
+  const fenlei= ref<any>({
+    img:''
+  })
+  const user =ref<any[]>([])
   const banner = ref<any[]>([])
   const nottitle = ref('')
   const activeTag = ref(0)
@@ -47,9 +51,14 @@ export const useHomeStore = defineStore('home', () => {
   const getGuangGao = async () => {
     const res = await post('/app-api/ajax/guanggao', {})
     if (res.code === 0) {
+
+      
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+      
       randomad.value = data.randomad.map((item: any) => ({ ...item, adtype: 'ad' }))
       banner.value = data.banner
+      fenlei.value = data.fenlei
+      user.value = data.user
     }
   }
 
@@ -146,6 +155,7 @@ export const useHomeStore = defineStore('home', () => {
     nottitle,
     activeTag,
     initialized,
+    user,
 
     // 方法
     insertAds,

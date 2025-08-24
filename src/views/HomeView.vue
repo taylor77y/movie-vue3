@@ -1,16 +1,17 @@
 
 
 <script setup lang="ts">
-import { onMounted, nextTick, onActivated, ref } from 'vue'
+import { onMounted, nextTick, onActivated, ref ,onBeforeMount} from 'vue'
 import { useHomeStore } from '@/store/home'
 import CartoonItem from "./../components/CartoonItem.vue"
 import CartoonItemO from "./../components/CartoonItemO.vue"
 import placeholder from "@/assets/Image/pl.png"
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
+import router from '@/router'
 
 const store = useHomeStore()
-
+const loadingIndex=ref<any>(false)
 const scrollContainer = ref<HTMLElement | null>(null)
 const tagWrapper = ref<HTMLElement | null>(null)
 const tagList = ref<HTMLElement | null>(null)
@@ -63,6 +64,25 @@ const selectTag = async (id: number, index: number) => {
   }
 }
 
+const handleGoVideo=()=>{
+  console.log("子组件通知");
+}
+const onGo=(path:any)=>{
+  router.push({
+    path:path,
+  })
+}
+const onGoMore=(type:any,title:any)=>{
+  router.push({
+    path:'/sreinfo',
+    query:{
+            type:type,
+            sonType:'',
+            searchStr:'',
+            title:title
+        }
+  })
+}
 
 // 滚动加载
 const handleScroll = (e: Event) => {
@@ -76,17 +96,69 @@ const handleScroll = (e: Event) => {
 }
 
 
+
 // 页面打开
 const onOpen = (url: string) => window.open(url, '_blank')
-
-// 初始化
-onMounted(async () => {
-  await store.initHome()
-  nextTick(() => {
-    if (scrollContainer.value) scrollContainer.value.scrollTop = store.scrollTop
-  })
+let startTime = 0
+// 页面开始渲染前记录时间
+onBeforeMount(() => {
+  startTime = performance.now()
 })
 
+const onRef=async()=>{
+  loadingIndex.value = true
+     const res = await post('/app-api/cartoon/listIndex', {
+       })
+    if(res.code === 0){
+       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+           store.rankList= store.insertAds(data.rankList, store.randomad)
+       store.typelist = store.insertAds(data.typeList.flatMap((item: any) => item.cartoonInfoList), store.randomad)
+    }
+      loadingIndex.value = false
+}
+// 初始化
+
+onMounted(async () => {
+  // 等接口加载完成
+  await store.initHome()
+
+  // 等 DOM 渲染完成
+  await nextTick()
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = store.scrollTop
+  }
+
+  // 等图片加载完成
+  const images = Array.from(document.images || [])
+  let loaded = 0
+  const total = images.length
+
+  const finish = () => {
+    const endTime = performance.now()
+    const loadTime = endTime - startTime
+    console.log(`首页完全加载时间: ${loadTime.toFixed(2)}ms`)
+  }
+
+  if (total === 0) {
+    finish()
+  } else {
+    images.forEach(img => {
+      if (img.complete) {
+        loaded++
+        if (loaded === total) finish()
+      } else {
+        img.addEventListener('load', () => {
+          loaded++
+          if (loaded === total) finish()
+        })
+        img.addEventListener('error', () => {
+          loaded++
+          if (loaded === total) finish()
+        })
+      }
+    })
+  }
+})
 onActivated(() => {
   nextTick(() => {
     if (scrollContainer.value) scrollContainer.value.scrollTop = store.scrollTop
@@ -100,10 +172,9 @@ onActivated(() => {
   <div class="home" >
     <div class="home-header">
       <img src="./../assets/Image/logo.png" style="width: 64px;height: 16px; margin-right: 10px;" />
-      <van-search v-model="store.value" placeholder="影视搜索" @click-input="store.onSearch" style="margin-right: 10px;background-color: #333333;"  />
-
+      <van-search v-model="store.value" placeholder="影视搜索" @focus="onGo('/sreach')" style="margin-right: 10px;background-color: #333333;"  />
       <img src="./../assets/home/fuli.png" style="width: 46px;height: 32px; margin-right: 10px;" />
-      <img src="./../assets/home/Clock.png" style="width: 24px;height: 24px; " />
+      <img src="./../assets/home/Clock.png" style="width: 24px;height: 24px; " @click="onGo('/history')" />
     </div>
     <div class="wrapper">
       <div class="tag-wrapper" ref="tagWrapper">
@@ -133,38 +204,42 @@ onActivated(() => {
           <div class="text">精选视频</div>
         </div>
         <div class="right">
-          <div class="r-text">查看更多</div><van-icon name="arrow" />
+          <div class="r-text" @click="onGoMore(15,'精选视频')">查看更多</div><van-icon name="arrow" />
         </div>
       </div>
       <div v-if="store.activeTag === 0" class="ranklist">
-        <CartoonItemO v-for="(item, index) in store.typelist" :key="item.id" :item="item" :index="index"
+        <CartoonItemO  @goVideo="handleGoVideo" v-for="(item, index) in store.typelist" :key="item.id" :item="item" :index="index"
           @error="onImgError" />
       </div>
-
+        <div class="change-bt" v-if="store.activeTag === 0">
+                    <div class="c-left" @click="onGoMore(15,'精选视频')">查看更多</div>
+                      <div class="c-right" @click="onRef()"><van-icon name="replay" :class="{ spinning: loadingIndex }"  /> 换一批</div>
+                </div>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>
           <div class="text">排行榜</div>
         </div>
         <div class="right">
-          <div class="r-text">查看更多</div><van-icon name="arrow" />
+          <div class="r-text" @click="onGoMore(15,'排行榜')">查看更多</div><van-icon name="arrow" />
         </div>
       </div>
       <div v-if="store.activeTag === 0" class="ranklist">
-            <CartoonItemO v-for="(item, index) in store.rankList" :key="item.id" :item="item" :index="index"
+            <CartoonItemO @goVideo="handleGoVideo" v-for="(item, index) in store.rankList" :key="item.id" :item="item" :index="index"
           @error="onImgError" />
       </div>
+     
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>
           <div class="text">最新更新</div>
         </div>
         <div class="right">
-          <div class="r-text">查看更多</div><van-icon name="arrow" />
+          <div class="r-text" @click="onGoMore(0,'最新更新')">查看更多</div><van-icon name="arrow" />
         </div>
       </div>
       <div class="ranklist">
-        <CartoonItem v-for="item in store.likeList" :key="item.id" :item="item" :cartoon-name="item.cartoonName"
+        <CartoonItem @goVideo="handleGoVideo" v-for="item in store.likeList" :key="item.id" :item="item" :cartoon-name="item.cartoonName"
           @error="onImgError" />
       </div>
       <div style="display: flex;align-items: center;justify-content: center;">
@@ -199,55 +274,9 @@ onActivated(() => {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-
-
   }
 
-  .title-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 0;
-    height: 25px;
-
-    .left {
-      color: rgb(255, 150, 12);
-      display: flex;
-      align-items: center;
-      line-height: 25px;
-
-      .line {
-        width: 3px;
-        height: 16px;
-        background-color: var(--primary-color);
-        margin-right: 5px;
-        border-radius: 3px;
-      }
-
-      .text {
-        color: var(--primary-color);
-        font-size: 16px;
-        font-weight: bold;
-      }
-    }
-
-    .right {
-      color: white;
-      font-size: 13px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 25px;
-
-      .r-text {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 25px;
-      }
-    }
-  }
+ 
 }
 
 /deep/ .van-search {
@@ -326,10 +355,49 @@ onActivated(() => {
     width: 30px;
   }
 }
+.change-bt{
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            .c-left{
+               display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 48%;
+                height: 32px;
+                border-radius: 20px;
+                font-size: 16px;
+                padding-left: 6px;
+                background: linear-gradient(rgb(255, 190, 0) 0%, rgb(255, 150, 12) 104.01%);
+                color: black;
+                font-weight: bold;
+            }
+            .c-right{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 48%;
+                height: 32px;
+                border-radius: 20px;
+                font-size: 16px;
+                padding-left: 6px;
+                background: linear-gradient(rgb(255, 190, 0) 0%, rgb(255, 150, 12) 104.01%);
+                 color: black;
+                   font-weight: bold;
+            }
+        }
+        .spinning {
+  animation: spin 0.2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>
 <style scoped>
 .scroll-container {
- height: calc(100dvh - 200px);
+ height: calc(100vh - 200px);
   overflow-y: auto;
 }
 
