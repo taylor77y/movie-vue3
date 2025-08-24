@@ -50,7 +50,9 @@
     </van-popup>
     <van-popup v-model:show="showCenter" round
       :style="{ backgroundColor: '#272727', width: '85%', padding: '10px 10px 30px 10px', }">
-      <div class="share-card">
+      <div style="position: relative;">
+        <div style="display: flex;align-items: end;justify-content: end;"><van-icon name="cross" @click="showCenter =false"  size="22"/></div>
+        <div class="share-card">
         <div class="header">
           <div class="logo">91PORN</div>
           <div style="margin-left: 10px;display: flex;flex-direction: column;">
@@ -79,9 +81,9 @@
             </div>
           </div>
           <div style="margin-left: 10px;width: 50%;">
-            <div class="invite-code-label">邀请码 {{ 12321 }}</div>
+            <div class="invite-code-label">邀请码 {{ memberinfo.memberCode }}</div>
             <div class="invite-desc">每邀请1人送1天会员</div>
-            <div class="addres">https://xdv5i7kq.com/#/pages/cartoon/cartoon-player?cartoonCode=30906&shareCode=91796
+            <div class="addres">{{ url }}
             </div>
           </div>
         </div>
@@ -92,7 +94,7 @@
             <button class="save-btn" @click="downloadQRCode()">保存图片</button>
           </div>
         </div>
-
+      </div>
       </div>
     </van-popup>
     <!-- 底部弹出 -->
@@ -124,6 +126,7 @@ import { copyText } from '@lxf2513/vue3-clipboard';
 import placeholder from "@/assets/Image/pl.png"
 import moment from 'moment'
 const videoRef = ref<HTMLDivElement | null>(null)
+const url= ref<any>('')
 const memberinfo = ref<any>({})
 const scrollTop = () => {
   if (videoRef.value) {
@@ -467,7 +470,7 @@ const setupTimeUpdate = (video: HTMLVideoElement) => {
   })
 }
 const copyQRCodeLink = async () => {
-  let text = "123132123123123"
+  let text = url.value
   copyText(text, undefined, (success, event) => {
     if (success) {
       showSuccessToast('复制成功');
@@ -480,7 +483,7 @@ const downloadQRCode = () => {
   if (!qrCodeUrl.value) return
   const a = document.createElement('a')
   a.href = qrCodeUrl.value
-  a.download = 'qrcode.png'
+  a.download = '视频分享好友.png'
   a.click()
 }
 watch(
@@ -574,7 +577,8 @@ onMounted(async () => {
     await onGetUserInfo()
   }
    try {
-    const text = 'https://www.example.com'
+    const text = window.location.href+'&'+`share=${memberinfo.value.memberCode}`
+    url.value = text
     qrCodeUrl.value = await QRCode.toDataURL(text, {
       width: 108,   // 二维码宽度
       margin: 1,

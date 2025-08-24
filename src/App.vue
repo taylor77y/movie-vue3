@@ -1,7 +1,7 @@
 <template>
     <RouterView >
     </RouterView>
-    <van-overlay :show="showGuanggao" >
+    <van-overlay  :show="showGuanggao"  :style="{ zIndex: 9998 }">
     <div class="g-wrapper">
       <div class="block">
          <div class="cont">
@@ -14,7 +14,7 @@
          </div>
       </div>
     </div>
-     <van-overlay :show="showOverlay" :style="{ zIndex: 1000 }">
+     <van-overlay :show="showOverlay" :style="{ zIndex: 9999 }">
     <div class="outer-content" @click.stop>
       <!-- 内层遮罩 -->
       <div class="inner-overlay" @click.stop>
@@ -30,7 +30,6 @@
           <img src="./assets/tips.png" style="width: 80%;"/>
         </div>
       </div>
-
     </div>
   </van-overlay>
   </van-overlay>

@@ -35,7 +35,7 @@ const onGetHisList = () => {
     }
 }
 const onBack =()=>{
-router.back()
+    router.back()
 }
 const handleGoVideo = () => {
 

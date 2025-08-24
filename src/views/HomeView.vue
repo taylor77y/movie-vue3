@@ -184,7 +184,7 @@ onActivated(() => {
           </div>
         </div>
       </div>
-      <div class="img">
+      <div class="img" @click="onGo('/taglist')">
         <img src="./../assets/home/menu.png" style="width: 16px;height: 13px;" />
       </div>
     </div>

@@ -3,7 +3,7 @@
         <div class="header">
             <div></div>
             <div class="tit">收藏</div>
-            <div @click="onClear()"><van-icon name="delete-o" size="22"  /></div>
+            <div  ><van-icon name="delete-o" size="22"   v-if="savedVideos.length > 0" @click="onClear()" /></div>
         </div>
         <Empty v-if="savedVideos.length === 0" description="暂无收藏" />
         <div v-else class="list">

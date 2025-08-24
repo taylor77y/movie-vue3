@@ -10,7 +10,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'category', name: 'CategoryView', component: () => import('@/views/CategoryView.vue') },
       { path: 'publish', name: 'PublishView', component: () => import('@/views/PublishView.vue') },
       { path: 'collengt', name: 'CollengtView', component: () => import('@/views/CollengtView.vue') },
-      { path: 'my', name: 'MyView', component: () => import('@/views/MyView.vue') },
+      { path: 'my', name: 'MyView', component: () => import('@/views/MyView.vue')  },
     ]
   },
   {
@@ -48,7 +48,8 @@ const routes: Array<RouteRecordRaw> = [
     path: '/sreach',
     name: 'Sreach',
     component: () => import('@/views/Sreach/index.vue'),
-    meta: { showTabbar: false } // 不显示 Tabbar
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
     {
     path: '/centersetting',
@@ -57,6 +58,56 @@ const routes: Array<RouteRecordRaw> = [
     meta: { showTabbar: false }, // 不显示 Tabbar
     props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
+   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/views/Login/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+  {
+    path: '/setpaw',
+    name: 'Setpaw',
+    component: () => import('@/views/Info/setpaw.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+  {
+    path: '/setinfo',
+    name: 'Setinfo',
+    component: () => import('@/views/Info/setinfo.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+  {
+    path: '/share',
+    name: 'Share',
+    component: () => import('@/views/Share/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+   {
+    path: '/feed',
+    name: 'Feed',
+    component: () => import('@/views/Feedback/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+    {
+    path: '/codelist',
+    name: 'Codelist',
+    component: () => import('@/views/Codelist/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+   {
+    path: '/taglist',
+    name: 'Taglist',
+    component: () => import('@/views/Taglist/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+ 
  
   
   { path: '/:pathMatch(.*)*', redirect: '/' }

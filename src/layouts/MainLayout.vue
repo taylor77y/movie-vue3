@@ -83,7 +83,6 @@ watch(
   { immediate: true } // 页面初次加载也执行一次
 )
 const test = () => {
-  localStorage.setItem('token', 'cd5ce56828234275938f6293dc2df1c2')
   const data = {
     androidUuid
       :
@@ -93,10 +92,10 @@ const test = () => {
       0,
     createTime
       :
-      "2025-08-24 01:09:14",
+      "2025-08-24 19:14:07",
     h5Uuid
       :
-      "be651573-9678-4212-bb6e-b64f05b2b7a0",
+      "27944f23-c238-4cbb-954b-4ff23936b6f7",
     hasAccount
       :
       null,
@@ -111,16 +110,16 @@ const test = () => {
       0,
     memberCode
       :
-      "95534",
+      "98210",
     memberName
       :
-      "28050384896",
+      "28117039104",
     memberNichen
       :
-      "28050384896",
+      "28117039104",
     memberPwdTemp
       :
-      "0xA3lT",
+      "1234567",
     memberSignature
       :
       null,
@@ -135,13 +134,13 @@ const test = () => {
       null,
     pid
       :
-      null,
+      "98999",
     token
       :
-      'cd5ce56828234275938f6293dc2df1c2',
+      '965dc1f6c2a54e25886288df2481c02f',
     vipDate
       :
-      "2025-08-24 01:09:14",
+      "2025-08-24 19:14:07",
     vipPeriod
       :
       0,
@@ -152,19 +151,22 @@ const test = () => {
       :
       null
   }
+  localStorage.setItem('token', 'a17fe50a509b411c8bc71f801a6c2c23')
   localStorage.setItem('memberInfo', JSON.stringify(data))
 }
 onMounted(async () => {
   active.value = route.path
-   // 只在开发环境执行 test
+  // 只在开发环境执行 test
   if (import.meta.env.MODE === 'development') {
     test()
-  }
-  if (localStorage.getItem('memberInfo') === null) {
-    await onGetUserInfo()
   } else {
-    timer.value = setInterval(onRfUserInfo, 10000)
+    if (localStorage.getItem('memberInfo') === null) {
+      await onGetUserInfo()
+    } else {
+      timer.value = setInterval(onRfUserInfo, 10000)
+    }
   }
+
 
 })
 </script>
