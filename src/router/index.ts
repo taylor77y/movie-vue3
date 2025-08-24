@@ -41,13 +41,21 @@ const routes: Array<RouteRecordRaw> = [
     path: '/sreinfo',
     name: 'SreachInfo',
     component: () => import('@/views/Sreach/info.vue'),
-    meta: { showTabbar: false } // 不显示 Tabbar
+    meta: { showTabbar: false }, // 不显示 Tabbar
+      props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
     {
     path: '/sreach',
     name: 'Sreach',
     component: () => import('@/views/Sreach/index.vue'),
     meta: { showTabbar: false } // 不显示 Tabbar
+  },
+    {
+    path: '/centersetting',
+    name: 'Centersetting',
+    component: () => import('@/views/Centersetting/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
  
   

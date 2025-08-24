@@ -18,19 +18,21 @@
                     <div class="info-u">
                         <div>
                             <div style="display: flex;align-items: center;">
-                                <div>{{ memberInfo.memberName }}</div> <img :src="vipac" style="width: 52px;height: 16px;margin-left: 10px;" />
+                                <div>{{ memberInfo.memberName }}</div> <img :src="vipac"
+                                    style="width: 52px;height: 16px;margin-left: 10px;" />
                             </div>
                             <div class="id">ID:{{ memberInfo.memberCode }}</div>
                         </div>
-                        <div class="sign">签名：{{ memberInfo.memberSignature?  memberInfo.memberSignature:'这家伙很懒，什么都没留下'  }}</div>
+                        <div class="sign">签名：{{ memberInfo.memberSignature ? memberInfo.memberSignature : '这家伙很懒，什么都没留下' }}
+                        </div>
                     </div>
                 </div>
                 <div><van-icon name="arrow" color="#FF960C" size="22" /></div>
             </div>
             <div class="go-vip">
                 <div class="go-left">
-                    <img  src="./../assets/proilfe/king.svg" />
-                    <div   class="go-left-text">
+                    <img src="./../assets/proilfe/king.svg" />
+                    <div class="go-left-text">
                         <div class="top">VIP限时特惠 畅享全场</div>
                         <div class="min">开通VIP全场畅看</div>
                     </div>
@@ -47,7 +49,7 @@
                     <div class="btn">充值</div>
                 </div>
                 <div class="line"></div>
-                 <div class="go-count-right">
+                <div class="go-count-right">
                     <div>
                         <div>余额（元）</div>
                         <div class="ac">${{ memberInfo.balance }}</div>
@@ -57,17 +59,17 @@
             </div>
 
             <div style="margin-top: 10px;">
-                 <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
-            <van-swipe-item v-for="(item,index) in store.user" :key="index" @click="onOpen(item.url)">
-            <img :src="item.img" style="height: 125px;width: 100%;border-radius: 5px;object-fit: cover;" />
-            </van-swipe-item>
-        </van-swipe>
+                <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
+                    <van-swipe-item v-for="(item, index) in store.user" :key="index" @click="onOpen(item.url)">
+                        <img :src="item.img" style="height: 125px;width: 100%;border-radius: 5px;object-fit: cover;" />
+                    </van-swipe-item>
+                </van-swipe>
             </div>
             <div class="gn">
                 <div style="padding: 10px 0;">功能中心</div>
-                <div  class="grid">
-                    <div class="grid-item" v-for="(item,index) in listgn" :key="index">
-                        <img  :src="item.icon" style="width: 32px;height: 32px;"/>
+                <div class="grid">
+                    <div class="grid-item" v-for="(item, index) in listgn" :key="index"  @click="onGn(index)">
+                        <img :src="item.icon" style="width: 32px;height: 32px;" />
                         <div>{{ item.label }}</div>
                     </div>
                 </div>
@@ -101,6 +103,7 @@ import o11 from "@/assets/icons/11.png";
 // import oo3 from "@/assets/me/03.png";
 // import oo4 from "@/assets/me/04.png";
 import { useHomeStore } from '@/store/home'
+import router from '@/router';
 
 const store = useHomeStore()
 // let list= [
@@ -125,66 +128,66 @@ const store = useHomeStore()
 // 					src: oo4
 // 				}
 // 			]
-let listgn= [{
-				icon: o1,
-				label: '账户管理'
-			},
-			{
-				icon: o2,
-				label: '身份凭证'
-			},
-			{
-				icon: o3,
-				label: '联系客服'
-			},
-			{
-				icon: o4,
-				label: '推广分享'
-			},
-			{
-				icon: o5,
-				label: '浏览记录'
-			},
-			{
-				icon: o6,
-				label: '资金明细'
-			},
-			{
-				icon: o7,
-				label: '商务合作'
-			},
-			{
-				icon: o8,
-				label: '问题反馈'
-			},
-			{
-				icon: o9,
-				label: '更改密码'
-			},
-			{
-				icon: o11,
-				label: '邀请人列表'
-			},
+let listgn = [{
+    icon: o1,
+    label: '账户管理'
+},
+{
+    icon: o2,
+    label: '身份凭证'
+},
+{
+    icon: o3,
+    label: '联系客服'
+},
+{
+    icon: o4,
+    label: '推广分享'
+},
+{
+    icon: o5,
+    label: '浏览记录'
+},
+{
+    icon: o6,
+    label: '资金明细'
+},
+{
+    icon: o7,
+    label: '商务合作'
+},
+{
+    icon: o8,
+    label: '问题反馈'
+},
+{
+    icon: o9,
+    label: '更改密码'
+},
+{
+    icon: o11,
+    label: '邀请人列表'
+},
 
-			]
-console.log(store,"store");
+]
+console.log(store, "store");
 
-const vipac= ref<any>(V0)
+const vipac = ref<any>(V0)
 const memberInfo = ref<any>({
     memberName: '',
     memberCode: 0,
     memberAvatar: '',
     memberSignature: '这家伙很懒，什么都没留下',
-    vipPeriod:0,
-    vipDate:'2025-06-19 19:34:46',
-    memberCion:0,
-    balance:0
+    vipPeriod: 0,
+    vipDate: '2025-06-19 19:34:46',
+    memberCion: 0,
+    balance: 0
 })
 const onOpen = (url: string) => window.open(url, '_blank')
-const onGetVipIcon =()=>{
-    let vip =  memberInfo.value.vipPeriod;
-      const vipDateStr = memberInfo.value.vipDate
-   // vipPeriod 为 0，直接返回 V0
+const onGetVipIcon = () => {
+    let vip = memberInfo.value.vipPeriod;
+    const vipDateStr = memberInfo.value.vipDate
+    // vipPeriod 为 0，直接返回 V0
     if (vip === 0) return V0
 
     if (!vipDateStr) return V0 // vipDate 不存在也返回 V0
@@ -196,20 +199,27 @@ const onGetVipIcon =()=>{
     if (vipDate.isAfter(now)) {
         return V6 // 或根据你的业务逻辑返回不同等级
     }
-    if(vip===1){
+    if (vip === 1) {
         return V1
     }
-    if(vip===2){
+    if (vip === 2) {
         return V2
     }
-    if(vip===3){
+    if (vip === 3) {
         return V3
     }
-      if(vip===4){
+    if (vip === 4) {
         return V4
     }
-    if(vip===5){
+    if (vip === 5) {
         return V5
+    }
+}
+const onGn=(index:number)=>{
+    if(index === 0){
+        router.push({
+            path:'/centersetting'
+        })
     }
 }
 onMounted(() => {
@@ -257,6 +267,7 @@ onMounted(() => {
 
     .my-con {
         height: calc(100vh - 100px);
+        overflow: auto;
 
         .info {
             display: flex;
@@ -277,13 +288,15 @@ onMounted(() => {
                         color: var(--primary-color);
                         font-size: 12px;
                     }
-                    .sign{
-                         font-size: 12px;
+
+                    .sign {
+                        font-size: 12px;
                     }
                 }
             }
         }
-        .go-vip{
+
+        .go-vip {
             margin-top: 10px;
             background: linear-gradient(90deg, #FFE2BD -2.32%, #FFAD41 108.33%);
             border-radius: 8px;
@@ -291,23 +304,30 @@ onMounted(() => {
             align-items: center;
             justify-content: space-around;
             padding: 10px;
-            .go-left{
+
+            .go-left {
                 display: flex;
                 align-items: center;
-                .go-left-text{
-                    display: flex;align-items: start;flex-direction: column;
+
+                .go-left-text {
+                    display: flex;
+                    align-items: start;
+                    flex-direction: column;
                     color: #8F5B2B;
                     margin-left: 10px;
-                    .top{
+
+                    .top {
                         font-weight: bold;
                         margin-bottom: 5px;
                     }
-                    .min{
+
+                    .min {
                         font-size: 10px;
                     }
                 }
             }
-            .go-right{
+
+            .go-right {
                 background: linear-gradient(180deg, #FA7908 0%, #F23E1B 100%);
                 color: var(--text-color);
                 font-size: 14px;
@@ -316,44 +336,51 @@ onMounted(() => {
                 font-weight: 500;
             }
         }
-        .go-count{
+
+        .go-count {
             margin-top: 10px;
             width: 100%;
             padding: 10px;
             background: #FFFFFF33;
             color: var(--text-color);
-              border-radius: 8px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            .go-count-left{
+
+            .go-count-left {
                 width: 48%;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 font-size: 12px;
-                 .ac{
+
+                .ac {
                     font-size: 16px;
                     color: var(--primary-color);
                 }
             }
-            .line{
+
+            .line {
                 background: #EEEEEE33;
                 height: 35px;
                 width: 1px;
             }
-            .go-count-right{
+
+            .go-count-right {
                 width: 48%;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 font-size: 12px;
-                .ac{
-                     font-size: 16px;
+
+                .ac {
+                    font-size: 16px;
                     color: var(--primary-color);
                 }
             }
-            .btn{
+
+            .btn {
                 background: linear-gradient(180deg, #FA7908 0%, #F23E1B 100%);
                 color: var(--text-color);
                 font-size: 14px;
@@ -362,11 +389,13 @@ onMounted(() => {
                 font-weight: 500;
             }
         }
-        .gn{
-            .grid{
+
+        .gn {
+            .grid {
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: start;
+
                 .grid-item {
                     display: flex;
                     align-items: center;

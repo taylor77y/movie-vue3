@@ -54,9 +54,6 @@ const closeOverlay=()=>{
 onMounted(async() => {
   // 首页加载时弹出广告
   showGuanggao.value = true
-  console.log(window,"windows");
-  
-  
 })
 </script>
 <style lang="less" scoped>
