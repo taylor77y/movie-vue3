@@ -15,6 +15,7 @@
           @error="onImgError" >
                 </CateInfoItem>
             </div>
+               <van-back-top bottom="10vh" :style="{ backgroundColor: '#FF960C', borderRadius: '50%' }" />
               <div v-if="loading" class="loading">加载中...</div>
       <div v-if="noMore" class="no-more">没有更多了</div>
         </div>

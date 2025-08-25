@@ -1,22 +1,22 @@
 <template>
-    <div class="sre">
-        <div class="header">
-            <div @click="onBack()"><van-icon name="arrow-left" color="white" size="22" /></div>
-            <div class="tit">{{ title }}</div>
-            <div></div>
-        </div>
-        <div class="sreach-c">
-            <van-search v-model="val" placeholder="搜索图片文字视频"  style="margin-right: 10px;background-color: #333333;" /><div class="ons" @click="onSreach()">搜索</div>
-        </div>
-        <div class="srelist"  ref="scrollContainer"
-  @scroll="onScroll">
-           <CartoonItem @goVideo="handleGoVideo" v-for="item in list" :key="item.id" :item="item" 
-          @error="onImgError" />
-                   <div v-if="loading" class="loading">加载中...</div>
-  <div v-if="noMore" class="no-more">没有更多数据</div>
-        </div>
- 
+  <div class="sre">
+    <div class="header">
+      <div @click="onBack()"><van-icon name="arrow-left" color="white" size="22" /></div>
+      <div class="tit">{{ title }}</div>
+      <div></div>
     </div>
+    <div class="sreach-c">
+      <van-search v-model="val" placeholder="搜索图片文字视频" style="margin-right: 10px;background-color: #333333;" />
+      <div class="ons" @click="onSreach()">搜索</div>
+    </div>
+    <div class="srelist" ref="scrollContainer" @scroll="onScroll">
+      <CartoonItem @goVideo="handleGoVideo" v-for="item in list" :key="item.id" :item="item" @error="onImgError" />
+      <van-back-top bottom="10vh" :style="{ backgroundColor: '#FF960C', borderRadius: '50%' }" />
+
+      <div v-if="loading" class="loading">加载中...</div>
+      <div v-if="noMore" class="no-more">没有更多数据</div>
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
@@ -29,14 +29,14 @@ const route = useRoute()
 const title = ref<any>('')
 const val = ref<any>('')
 const list = ref<any>([])
-const currentPage= ref<any>(1)
+const currentPage = ref<any>(1)
 const loading = ref(false)
 const noMore = ref(false)
 const cartoonSonType = ref<any>('')
-const cartoonType=  ref<any>('')
+const cartoonType = ref<any>('')
 const scrollContainer = ref<HTMLElement | null>(null)
 const onBack = () => {
-    router.back()
+  router.back()
 }
 // 滚动事件
 const onScroll = () => {
@@ -47,9 +47,9 @@ const onScroll = () => {
     onGetData()
   }
 }
-const onSreach =async()=>{
+const onSreach = async () => {
   currentPage.value = 1
-  list.value=[]
+  list.value = []
   await onGetData()
 }
 const onGetData = async (reset = false) => {
@@ -86,77 +86,81 @@ const onGetData = async (reset = false) => {
 
   loading.value = false
 }
-const handleGoVideo=()=>{
+const handleGoVideo = () => {
 
 }
-const onImgError=()=>{
-    
+const onImgError = () => {
+
 }
-onMounted(async() => {
-    title.value = route.query.title
-    val.value = route.query.searchStr
-    if(route.query.sonType){
-       cartoonSonType.value= route.query.sonType
-      cartoonType.value= route.query.type
-    }
-    await onGetData()
+onMounted(async () => {
+  title.value = route.query.title
+  val.value = route.query.searchStr
+  if (route.query.sonType) {
+    cartoonSonType.value = route.query.sonType
+    cartoonType.value = route.query.type
+  }
+  await onGetData()
 })
 </script>
 <style lang="less" scoped>
 .sre {
-    height: 100vh;
-    padding: 10px;
+  height: 100vh;
+  padding: 10px;
 
-    .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-bottom: 10px;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
 
-        .tit {
-            font-weight: bold;
-        }
+    .tit {
+      font-weight: bold;
     }
-    .sreach-c{
+  }
+
+  .sreach-c {
+    display: flex;
+    align-items: center;
+
+    .ons {
+      background: linear-gradient(180deg, #FFBE00 0%, #FF960C 100%);
+      color: var(--text-color);
+      width: 15%;
       display: flex;
       align-items: center;
-      .ons{
-        background: linear-gradient(180deg, #FFBE00 0%, #FF960C 100%);
-        color: var(--text-color);
-        width: 15%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 20px;
-        font-size: 14px;
-        padding:2px 8px;
-      }
+      justify-content: center;
+      border-radius: 20px;
+      font-size: 14px;
+      padding: 2px 8px;
     }
-    .srelist{
-        margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        height: calc(100vh - 100px);
-        overflow: auto;
-    }
+  }
+
+  .srelist {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    height: calc(100vh - 100px);
+    overflow: auto;
+  }
 
 }
 
 /deep/ .van-search {
-    width: 100%;
-    padding: 0px;
-    background: #333333;
-    border-radius: 6px;
+  width: 100%;
+  padding: 0px;
+  background: #333333;
+  border-radius: 6px;
 
-    .van-search__content {
-        background: #333333 !important;
-    }
+  .van-search__content {
+    background: #333333 !important;
+  }
 
-    .van-field__control {
-        color: var(--text-color);
-    }
+  .van-field__control {
+    color: var(--text-color);
+  }
 }
+
 .loading,
 .no-more {
   text-align: center;

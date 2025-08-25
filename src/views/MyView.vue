@@ -38,7 +38,7 @@
                         <div class="min">开通VIP全场畅看</div>
                     </div>
                 </div>
-                <div class="go-right">会员充值</div>
+                <div class="go-right" @click="onVip()">会员充值</div>
             </div>
 
             <div class="go-count">
@@ -47,7 +47,7 @@
                         <div>金币数量(个)</div>
                         <div class="ac">{{ memberInfo.memberCion }}</div>
                     </div>
-                    <div class="btn">充值</div>
+                    <div class="btn" @click="onPay()">充值</div>
                 </div>
                 <div class="line"></div>
                 <div class="go-count-right">
@@ -55,7 +55,7 @@
                         <div>余额（元）</div>
                         <div class="ac">${{ memberInfo.balance }}</div>
                     </div>
-                    <div class="btn">提现</div>
+                    <div class="btn" @click="onTx()">提现</div>
                 </div>
             </div>
 
@@ -239,6 +239,19 @@ const onCopyText = async (text: any) => {
         }
     });
 }
+const onPay=()=>{
+    router.push({
+        path:'/pay'
+    })
+}
+const onVip=()=>{
+    router.push({
+        path:'/vip'
+    })
+}
+const onTx =()=>{
+    showSuccessToast('功能加紧开发中');
+}
 const onCreateQT = async()=>{
     const text = window.location.href.replace('/my','')
     qrCodeUrl.value = await QRCode.toDataURL(text, {
@@ -311,7 +324,9 @@ const onGn = (index: number) => {
         })
     }
     if (index === 5) {
-
+            router.push({
+            path: '/agent'
+        })
     }
     if (index === 6) {
         window.open('https://t.me/nineone91porn', '_blank');

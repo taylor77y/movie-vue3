@@ -26,6 +26,7 @@
                       <div class="c-right" @click="onRef(item,index)"><van-icon name="replay" :class="{ spinning: loadingIndex === index }"  /> 换一批</div>
                 </div>
             </div>
+             <van-back-top bottom="10vh" :style="{ backgroundColor: '#FF960C', borderRadius: '50%' }" />
             <div style="height: 50px;"></div>
         </div>
     </div>

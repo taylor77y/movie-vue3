@@ -17,25 +17,36 @@ const routes: Array<RouteRecordRaw> = [
     path: '/videoinfo',
     name: 'VideoInfo',
     component: () => import('@/views/VideoInfo/index.vue'),
-    meta: { showTabbar: false } // 不显示 Tabbar
+    meta: { showTabbar: false } , // 不显示 Tabbar
+      props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
   {
     path: '/history',
     name: 'History',
     component: () => import('@/views/History/index.vue'),
-    meta: { showTabbar: false } // 不显示 Tabbar
+    meta: { showTabbar: false }, // 不显示 Tabbar
+      props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
   {
     path: '/vip',
     name: 'Vip',
     component: () => import('@/views/Vip/index.vue'),
-    meta: { showTabbar: false } // 不显示 Tabbar
+    meta: { showTabbar: false } , // 不显示 Tabbar
+      props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+   {
+    path: '/pay',
+    name: 'Pay',
+    component: () => import('@/views/Pay/index.vue'),
+    meta: { showTabbar: false } , // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
   {
     path: '/cateInfo',
     name: 'CateInfo',
     component: () => import('@/views/CateInfo/index.vue'),
-    meta: { showTabbar: false } // 不显示 Tabbar
+    meta: { showTabbar: false }, // 不显示 Tabbar
+      props: route => ({ key: route.fullPath }) // 强制重新渲染r
   },
     {
     path: '/sreinfo',
@@ -107,6 +118,29 @@ const routes: Array<RouteRecordRaw> = [
     meta: { showTabbar: false }, // 不显示 Tabbar
     props: route => ({ key: route.fullPath }) // 强制重新渲染
   },
+   {
+    path: '/agent',
+    name: 'Agent',
+    component: () => import('@/views/Agent/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+ 
+    {
+    path: '/tx',
+    name: 'Ordertx',
+    component: () => import('@/views/Order/tixian.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+    {
+    path: '/order',
+    name: 'Order',
+    component: () => import('@/views/Order/index.vue'),
+    meta: { showTabbar: false }, // 不显示 Tabbar
+    props: route => ({ key: route.fullPath }) // 强制重新渲染
+  },
+ 
  
  
   

@@ -151,7 +151,7 @@ const test = () => {
       :
       null
   }
-  localStorage.setItem('token', 'a17fe50a509b411c8bc71f801a6c2c23')
+  localStorage.setItem('token', 'cd5ce56828234275938f6293dc2df1c2')
   localStorage.setItem('memberInfo', JSON.stringify(data))
 }
 onMounted(async () => {

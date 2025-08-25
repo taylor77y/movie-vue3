@@ -1,0 +1,491 @@
+<template>
+    <div class="pay">
+        <div class="header">
+            <div @click="onBack()"><van-icon name="arrow-left" color="white" size="22" /></div>
+            <div class="tit">金币充值</div>
+            <div style="width: 22px;"></div>
+        </div>
+        <div class="con">
+            <div class="hbg">
+                <div class="hbg-t">
+                    <img :src="memberInfo?.memberAvatar || defaultAvatar" alt="头像"
+                        style="width: 54px;height: 54px;border-radius: 10px;" />
+
+                    <div class="hbg-info-u">
+                        <div>
+                            <div style="display: flex;align-items: center;">
+                                <div class="name">{{ memberInfo.memberNichen }}</div> <img :src="vipac"
+                                    style="width: 52px;height: 16px;margin-left: 10px;" />
+                            </div>
+                            <div class="hbg-id">升级至尊会员享额外特权</div>
+                        </div>
+                        <div class="hbg-sign">
+                            <div>金币: </div>
+                            <div class="hbg-a active">{{ memberInfo.memberCion }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="title-c">
+                    <div class="vip" v-if="vip">vip</div>
+                    <div class="title" v-html="title"></div>
+                </div>
+            </div>
+            <div class="t">金币充值</div>
+            <div class="grid3">
+                <div v-for="(it, i) in items" :key="it.id" class="cell" :class="{ active: activeIndex === i }"
+                    @click="activeIndex = i">
+                    <div v-if="i < 2"> {{ it.duration }}</div>
+                    <div v-else style="font-size: 12px;text-align: center;">
+                        <div>请填写个数/金额</div>
+                        <div> {{ it.duration }}</div>
+                    </div>
+                    <div v-if="i < 2"
+                        style="display: flex;align-items: center;justify-content: space-between;color: #FF960C;">
+                        <div style="font-size: 22px;">￥{{ it.price }}</div>
+                    </div>
+                    <div v-else
+                        style="display: flex;align-items: center;justify-content: space-between;color: #FF960C;">
+                        <!-- <div style="font-size: 22px;">￥{{ it.price }}</div> -->
+                       <van-field
+                        v-model.number="it.price"
+                        type="number"
+                        placeholder="请输入金额"
+                        input-align="right"
+                        clearable
+                        :border="false"
+                        style="--van-field-input-text-color: #FF960C; font-size: 22px;"
+                        @blur="limitPrice(it)"
+                        />
+
+                    </div>
+                </div>
+            </div>
+            <van-radio-group v-model="checked" direction="horizontal" style="padding: 0 10px;">
+                <van-radio :name="index" v-for="(item, index) in payList" :key="item.ID" checked-color="#FF960C">
+                    <div style="color: white;">{{ item }}</div>
+                </van-radio>
+            </van-radio-group>
+            <div class="btn" @click="onPay()">立即升级</div>
+
+            <div class="t">会员特权</div>
+
+            <div class="privilege">
+			<div class="privilege-item" v-for="(item, index) in privilegeList" :key="index" hover-class="hover">
+				<img class="privilege-item-pic" :src="item.pic" mode=""></img>
+				<div class="privilege-item-text " style="color: var(--text-color)">{{ item.text }}</div>
+			</div>
+		</div>
+        </div>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
+import defaultAvatar from "@/assets/my/user.svg"
+import V0 from "@/assets/proilfe/0.png"
+import V1 from "@/assets/proilfe/1.png"
+import V2 from "@/assets/proilfe/2.png"
+import V3 from "@/assets/proilfe/3.png"
+import V4 from "@/assets/proilfe/4.png"
+import V5 from "@/assets/proilfe/5.png"
+import V6 from "@/assets/proilfe/6.png"
+import coin from '@/assets/pay/vip/coin.png'
+import quan from '@/assets/pay/vip/quan.png'
+import redBag from '@/assets/pay/vip/red-bag.png'
+import goods from '@/assets/pay/vip/goods.png'
+import speed from '@/assets/pay/vip/speed.png'
+import share from '@/assets/pay/vip/share.png'
+import active from '@/assets/pay/vip/active.png'
+import birthday from '@/assets/pay/vip/birthday.png'
+import notic from '@/assets/pay/vip/notic.png'
+import kefu from '@/assets/pay/vip/kefu.png'
+import moment from "moment";
+import { post } from '@/utils/request'
+import AES from '@/utils/aes1.js'
+import { closeToast, showLoadingToast, showSuccessToast, showToast } from "vant";
+const vipac = ref<any>(V0)
+const router = useRouter()
+const memberInfo = ref<any>({})
+const items = ref<any>([])
+const checked = ref(0);
+const activeIndex = ref(0)
+const onBack = () => {
+    router.back()
+}
+const privilegeList = ref<any>([
+  { pic: coin, text: '每日金币' },
+  { pic: quan, text: '大额神券' },
+  { pic: redBag, text: '更多返利' },
+  { pic: goods, text: '精选商品' },
+  { pic: speed, text: '极速到账' },
+  { pic: share, text: '分享领券' },
+  { pic: active, text: '专享活动' },
+  { pic: birthday, text: '生日折扣' },
+  { pic: notic, text: '上架提醒' },
+  { pic: kefu, text: '专属客服' }
+])
+const title = ref<any>('暂未开通vip')
+const payList = ref<any>([])
+
+const vip = ref<any>(false)
+const limitPrice = (item: any) => {
+  if (!item.price) return
+  if (item.price < 30) {
+    showSuccessToast('最小金额为30,已经自动为您修改')
+    item.price = 30
+  } else if (item.price > 5000) {
+     showSuccessToast('最大金额为5000,已经自动为您修改')
+    item.price = 5000
+  }
+}
+const onGetVipInfo = () => {
+    const vip = memberInfo.value.vipPeriod
+    const vipDateStr = memberInfo.value.vipDate
+
+    // 默认值
+    let icon = V0
+    let isVip = false
+    let expireDate = null
+    let daysLeft = 0
+
+    // 如果 vip = 0 或 没有到期时间，直接返回非 VIP
+    if (vip === 0 || !vipDateStr) {
+        return { icon, isVip, expireDate, daysLeft }
+    }
+
+    const vipDate = moment(vipDateStr, 'YYYY-MM-DD HH:mm:ss')
+    const now = moment()
+
+    // 判断是否有效
+    if (vipDate.isAfter(now)) {
+        isVip = true
+        expireDate = vipDate.format('YYYY-MM-DD HH:mm:ss')
+
+        // 计算剩余天数（向上取整，避免 0.x 天显示 0）
+        daysLeft = vipDate.diff(now, 'days')
+        if (vipDate.diff(now, 'hours') % 24 > 0) {
+            daysLeft += 1
+        }
+
+        // 设置对应图标（你可以根据 vipPeriod 定制）
+        if (vip === 1) icon = V1
+        else if (vip === 2) icon = V2
+        else if (vip === 3) icon = V3
+        else if (vip === 4) icon = V4
+        else if (vip === 5) icon = V5
+        else icon = V6 // 默认最高级
+    }
+
+    return { icon, isVip, expireDate, daysLeft }
+}
+const onGetList = async () => {
+    // /app-api/pay/getGoodsLists
+    const res = await post('/app-api/pay/getGoodsLists', {
+        type: 2
+    })
+    if (res.code === 0) {
+        let newitem: any = {
+            commoditySpecification: "",
+            commodityToSort: 9999,
+            duration: "30-5000",
+            id: "3",
+            price: 30,
+            status: 1,
+            time: "",
+            type: 1
+        }
+
+        items.value = [...res.data.optionList, newitem]
+        payList.value = res.data.payList
+    }
+}
+const onYa = async () => {
+    let type = checked.value === 2?checked.value:1
+    const res = await post('/renren-api/api/pay/yianpay', {
+        comSpec: items.value[activeIndex.value].commoditySpecification,
+        index: 0,
+        money: items.value[activeIndex.value].price*1,
+        type: type,
+        typesOf: 1,
+        userId: memberInfo.value.memberCode
+    })
+    console.log(res,"res");
+    if(res.code===0){
+         const goData = JSON.parse(res.data)
+        window.location.href = goData.payurl
+    }
+}
+const onJct = async () => {
+    const res = await post('/renren-api/api/pay/yianpay', {
+        comSpec: items.value[activeIndex.value].commoditySpecification,
+        index: items.value[activeIndex.value].commodityToSort *1 ,
+        money: items.value[activeIndex.value].price*1,
+        payChannel: 2,
+        type: true,
+        typesOf: 1,
+        userId: memberInfo.value.memberCode
+    })
+     if(res.code===0){
+         const goData = JSON.parse(res.data)
+        window.location.href = goData.payurl
+    }
+}
+const onPay = async () => {
+  // 打开全局 loading
+  showLoadingToast({
+    message: '支付中...',
+    forbidClick: true, // 禁止点击背景
+    duration: 0,       // 不自动关闭
+  });
+
+  try {
+    console.log('activeIndex:', activeIndex.value);
+    console.log('checked:', checked.value);
+
+    if (checked.value !== 1) {
+      await onYa(); // 你的支付逻辑
+    } else {
+      await onJct(); // 另一种支付逻辑
+    }
+
+    // 成功提示
+    showToast({
+      message: '去支付',
+      type: 'success',
+    });
+  } catch (err) {
+    console.error(err);
+    showToast({
+      message: '支付失败',
+      type: 'fail',
+    });
+  } finally {
+    // 无论成功或失败都关闭 loading
+    closeToast();
+  }
+};
+onMounted(async () => {
+    await onGetList()
+    const info = localStorage.getItem('memberInfo')
+    if (info) {
+        try {
+            memberInfo.value = JSON.parse(info)
+            console.log('本地用户信息', memberInfo.value)
+            const { icon, isVip, expireDate, daysLeft } = onGetVipInfo()
+            vipac.value = icon;
+            vip.value = isVip
+            if (isVip) {
+                title.value = `VIP，剩余 <span style='color:#FF960C;font-size:18px'>${daysLeft}</span> 天，有效期至 <span style='color:#FF960C;font-size:18px'>${expireDate}</span>`
+            } else {
+                title.value = '暂未开通VIP'
+            }
+        } catch (err) {
+            console.error('解析本地用户信息失败', err)
+        }
+    } else {
+        console.log('本地没有用户信息')
+    }
+})
+</script>
+
+<style lang="less" scoped>
+.pay {
+    height: 100vh;
+    overflow: hidden;
+    color: var(--text-color);
+    padding: 10px;
+
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 10px;
+
+        .tit {
+            font-weight: bold;
+        }
+    }
+
+    .con {
+        height: calc(100vh - 50px);
+        overflow: auto;
+        width: 100%;
+
+        .hbg {
+            width: 100%;
+            height: 150px;
+            background-image: url("@/assets/pay/paybg.svg");
+            background-size: 100% 106%;
+            background-repeat: no-repeat;
+            border-radius: 10px;
+            padding: 10px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            .hbg-t {
+                display: flex;
+                align-items: start;
+
+                .info-u {
+                    color: black;
+                    margin-left: 10px;
+                }
+            }
+
+            .hbg-info-u {
+                margin-left: 10px;
+
+                .name {
+                    color: black;
+                    font-size: 16px;
+                    font-weight: bold;
+                }
+
+                .hbg-id {
+                    color: black;
+                    font-size: 12px;
+                }
+
+                .hbg-sign {
+                    display: flex;
+                    align-items: center;
+                    color: black;
+
+                    .active {
+                        color: #FF960C;
+                        font-size: 24px;
+                        font-weight: bold;
+                        margin-left: 10px;
+                    }
+
+                }
+            }
+
+            .title-c {
+                display: flex;
+                align-items: end;
+                justify-content: end;
+                color: black;
+
+                .vip {
+                    background: linear-gradient(180deg, #FFBE00 0%, #FF960C 100%);
+                    border-top-right-radius: 4px;
+                    border-bottom-left-radius: 4px;
+                    padding: 0 5px;
+                    margin-right: 5px;
+                }
+
+                .title {}
+            }
+        }
+
+        .t {
+            padding: 5px;
+            padding-top: 20px;
+        }
+
+        .grid3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* 一行三个 */
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .cell {
+            width: 23%;
+            padding: 10px 0;
+            margin-left: 7px;
+            width: 100px;
+            height: 115px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: solid 1px #f2f2f3;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: background .15s;
+            justify-content: space-around;
+        }
+
+        .cell.active {
+            position: relative;
+            background: #272727;
+            color: var(--text-color);
+            border-radius: 8px;
+            /* 圆角半径 */
+            /* 渐变边框技巧 */
+            border: 1px solid transparent;
+            background-image:
+                linear-gradient(#272727, #272727),
+                /* 内层背景 */
+                linear-gradient(360deg, #87725E -4.02%, #F4D6AE 111.61%);
+            /* 外层渐变 */
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+             /deep/ .van-cell{
+                background: #272727;
+            }
+        }
+
+    }
+    .btn{
+        margin-top: 30px;
+        background: linear-gradient(180deg, #FFBE00 0%, #FF960C 104.01%);
+        color: black;
+        font-weight: bold;
+        font-size: 18px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 45px;
+    }
+    .privilege {
+	padding: 0 30rpx;
+	margin-bottom: 40rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	flex-wrap: wrap;
+
+	&-item {
+		margin: 0 12px;
+		margin-bottom: 12px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 18%;
+
+		&-pic {
+			width: 40px;
+			height: 40px;
+			margin-bottom: 10px;
+		}
+
+		&-text {
+			font-size: 24rpx;
+			color: #383738;
+		}
+	}
+}
+ /deep/ .van-cell{
+                background: var(--background-color);
+            }
+   
+}
+
+/deep/ .van-field__control{
+    font-size: 16px;
+    text-align: left;
+}
+</style>

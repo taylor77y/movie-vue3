@@ -248,7 +248,6 @@ onActivated(() => {
         <van-loading v-if="store.noMore" size="24px" color="#FF960C">没有更多了</van-loading>
       </div>
       <van-back-top bottom="10vh" :style="{ backgroundColor: '#FF960C', borderRadius: '50%' }" />
-
     </div>
   </div>
 </template>
