@@ -2,7 +2,8 @@
    
     <div  class="cartoon-item"  :class="{ 'full-width': index === 0 }" @click="onGoVideoInfo(item)">
         <div class="img-wrapper" @click="onGoVideoInfo(item)">
-            <img v-lazy="item.cartoonImage"  class="img" @error="onImgError"  @click="onGoVideoInfo(item)"/>
+            <img v-lazy="item.cartoonImage"  class="img zoomIn" :class="{ 'zoom-in': loaded }"
+      @load="onLoad" @error="onImgError"  @click="onGoVideoInfo(item)"/>
             <div class="img-top" v-if="item.cartoonVip" >VIP</div>
             <div class="img-bottom">
                 <div class="flex">
@@ -80,6 +81,8 @@ const onGoVideoInfo=(item)=>{
                 -webkit-user-drag: none; /* 禁止拖拽 */
         user-select: none;
         pointer-events: none;     /* 交给外层 div 接收点击 */
+          transform: scale(0);        /* 初始非常小 */
+  animation: zoomIn 0.5s forwards ease-out;  /* 放大动画 */
         }
 
         .img-top {
@@ -153,6 +156,20 @@ const onGoVideoInfo=(item)=>{
             }
            }
     }
+}
+@keyframes zoomIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(0.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 .adname{
       margin-top: 10px;

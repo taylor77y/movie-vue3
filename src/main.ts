@@ -6,6 +6,9 @@ import router from './router'
 import Vant from 'vant'
 import 'vant/lib/index.css'
 import VConsole from 'vconsole'
+// 引入模块后自动生效
+import '@vant/touch-emulator';
+
 import { createPinia } from 'pinia'
 import { VueClipboard } from '@lxf2513/vue3-clipboard';
 import VueLazyLoad from 'vue3-lazyload'

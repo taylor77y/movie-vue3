@@ -259,7 +259,7 @@ onMounted(async() => {
 });
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 .vip {
   height: 100vh;
   padding: 10px;
@@ -353,6 +353,7 @@ onMounted(async() => {
 	display: flex;
 	flex-wrap: wrap;
 	padding: 10px 0px;
+  width: 100%;
 
 	.icon {
 		width: 25%;

@@ -3,7 +3,7 @@
          <div class="header">
             <div @click="onBack()"><van-icon name="arrow-left"  color="white" size="22"/></div>
             <div class="tit">专题列表</div>
-            <div ></div>
+            <div style="width: 22px;"></div>
         </div>
         <div class="list" ref="scrollContainer" @scroll="onScroll">
             <div style="width: 100%;height: 165px;position: relative;">
@@ -99,7 +99,7 @@ onMounted(async()=>{
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-bottom: 10px;
+        height: 50px;
 
         .tit {
             font-weight: bold;

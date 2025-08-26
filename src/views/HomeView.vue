@@ -172,7 +172,7 @@ onActivated(() => {
       <img src="./../assets/Image/logo.png" style="width: 64px;height: 16px; margin-right: 10px;" />
       <van-search v-model="store.value" placeholder="影视搜索" @focus="onGo('/sreach')"
         style="margin-right: 10px;background-color: #333333;" />
-      <img src="./../assets/home/fuli.png" style="width: 46px;height: 32px; margin-right: 10px;" />
+      <img src="./../assets/home/fuli.png" style="width: 46px;height: 32px; margin-right: 10px;"  @click="onGo('/sign')" />
       <img src="./../assets/home/Clock.png" style="width: 24px;height: 24px; " @click="onGo('/history')" />
     </div>
     <div class="wrapper">
@@ -350,8 +350,8 @@ onActivated(() => {
   .img {
     display: flex;
     align-items: center;
-    justify-content: end;
-    width: 30px;
+    justify-content: center;
+    width: 50px;
   }
 }
 

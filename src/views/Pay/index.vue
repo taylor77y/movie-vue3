@@ -1,4 +1,5 @@
 <template>
+    <!-- 开启顶部安全区适配 -->
     <div class="pay">
         <div class="header">
             <div @click="onBack()"><van-icon name="arrow-left" color="white" size="22" /></div>
@@ -106,6 +107,7 @@ import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
 import { closeToast, showLoadingToast, showSuccessToast, showToast } from "vant";
 const vipac = ref<any>(V0)
+const isios = ref<any>(false)
 const router = useRouter()
 const memberInfo = ref<any>({})
 const items = ref<any>([])
@@ -266,6 +268,7 @@ const onPay = async () => {
     closeToast();
   }
 };
+
 onMounted(async () => {
     await onGetList()
     const info = localStorage.getItem('memberInfo')
@@ -288,21 +291,20 @@ onMounted(async () => {
         console.log('本地没有用户信息')
     }
 })
+
 </script>
 
 <style lang="less" scoped>
 .pay {
     height: 100vh;
-    overflow: hidden;
+    overflow: auto;
     color: var(--text-color);
     padding: 10px;
-
     .header {
+        height: 50px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-bottom: 10px;
-
         .tit {
             font-weight: bold;
         }
@@ -310,15 +312,16 @@ onMounted(async () => {
 
     .con {
         height: calc(100vh - 50px);
-        overflow: auto;
+        overflow: hidden;
         width: 100%;
 
         .hbg {
             width: 100%;
             height: 150px;
             background-image: url("@/assets/pay/paybg.svg");
-            background-size: 100% 106%;
+            background-size: 100% 100%;
             background-repeat: no-repeat;
+            background-size: cover;
             border-radius: 10px;
             padding: 10px 20px;
             display: flex;

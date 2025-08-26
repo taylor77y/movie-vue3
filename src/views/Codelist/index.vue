@@ -92,7 +92,7 @@ onMounted(async () => {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-bottom: 10px;
+         height: 50px;
 
         .tit {
             font-weight: bold;

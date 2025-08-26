@@ -101,11 +101,30 @@ const onLogin = async () => {
         showToast('网络异常，请稍后重试')
     }
 }
+const isIphoneX = () => {
+  const ua = navigator.userAgent
+  const isIOS = /iP(hone|od|ad)/.test(ua)
+  const { width, height } = window.screen
+  // iPhone X/XS: 375 x 812
+  // iPhone XR/XS Max: 414 x 896
+  // iPhone 12/13/14 mini/pro/max 等同 XR/XS 系列尺寸
+  const iphoneXLike =
+    (width === 375 && height === 812) ||
+    (width === 812 && height === 375) ||
+    (width === 414 && height === 896) ||
+    (width === 896 && height === 414)
+  
+  return isIOS && iphoneXLike
+}
 onMounted(() => {
     const video = videoRef.value
     if (video) {
         video.addEventListener('click', e => e.preventDefault())
         video.addEventListener('contextmenu', e => e.preventDefault())
+    }
+     if (isIphoneX()) {
+    const header = document.querySelector('.videoinfo') as HTMLElement
+    if (header) header.style.paddingTop = '90px'
     }
 })
 </script>
@@ -113,7 +132,7 @@ onMounted(() => {
 <style lang="less" scoped>
 .login {
     position: relative;
-    height: 100vh;
+    min-height: 90vh;
     overflow: hidden;
 
 

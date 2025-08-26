@@ -7,5 +7,10 @@
     {
       "path": "./tsconfig.app.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "allowJs": true,          // 允许引入 js 文件
+    "skipLibCheck": true,     // 跳过库的类型检查
+    "noImplicitAny": false    // 允许隐式 any
+  }
 }

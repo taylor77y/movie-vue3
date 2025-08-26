@@ -1,11 +1,12 @@
 <template>
+  
     <div class="sreach">
-        <div class="header">
-            <div @click="onBack()"><van-icon name="arrow-left"  color="white" size="22"/></div>
+         <div class="header">
+            <div @click="onBack()" style="margin-right: 5px;"><van-icon name="arrow-left"  color="white" size="22"/></div>
            <van-search v-model="val" placeholder="搜索图片文字视频"  style="margin-right: 10px;background-color: #333333;"  />
             <div @click="onGoSearch()">搜索</div>
         </div>
-        <div class="hot-section">
+         <div class="hot-section">
             <div class="section-title">
                 <div style="display: flex;align-items: center;"><van-icon name="underway" size="20" /><div style="margin-left:5px;">历史记录</div></div>
                 <div><van-icon name="delete-o" color="white" size="20" @click="onClear()" /></div>
@@ -23,9 +24,9 @@
             </div>
         </div>
     </div>
-    </template>
+</template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref,onBeforeUnmount } from 'vue';
 import { useRouter } from "vue-router";
 const router = useRouter()
 const val = ref<any>('')
@@ -69,35 +70,57 @@ const onSearch = (keyword:any) => {
   if (!keyword) return
   // 去重
   history.value = [keyword, ...history.value.filter((item:any) => item !== keyword)]
-  // 保留最多10条
-  if (history.value.length > 10) history.value = history.value.slice(0, 10)
-  localStorage.setItem('searchHistory', JSON.stringify(history.value))
-   router.push({
+  router.push({
         path:'/sreinfo',
         query:{
             searchStr:keyword,
-            title:'搜索'
+            title:'搜索',
+            sonType:'',
+            type:''
         }
    })
+  // 保留最多10条
+  if (history.value.length > 10) history.value = history.value.slice(0, 10)
+  localStorage.setItem('searchHistory', JSON.stringify(history.value))
+   
+}
+const isIphoneX = () => {
+  const ua = navigator.userAgent
+  const isIOS = /iP(hone|od|ad)/.test(ua)
+  const { width, height } = window.screen
+  // iPhone X/XS: 375 x 812
+  // iPhone XR/XS Max: 414 x 896
+  // iPhone 12/13/14 mini/pro/max 等同 XR/XS 系列尺寸
+  const iphoneXLike =
+    (width === 375 && height === 812) ||
+    (width === 812 && height === 375) ||
+    (width === 414 && height === 896) ||
+    (width === 896 && height === 414)
+  
+  return isIOS && iphoneXLike
 }
 // 加载本地历史
 onMounted(() => {
   const local = localStorage.getItem('searchHistory')
   if (local) history.value = JSON.parse(local)
-  console.log(history.value,"history.value");
-  
+    if (isIphoneX()) {
+    const header = document.querySelector('.sreach') as HTMLElement
+    if (header) header.style.paddingTop = '90px'
+    }
 })
 
+
 </script>
+
 <style lang="less" scoped>
 .sreach{
     height: 100vh;
-    padding: 10px;
+    padding:0 10px;
     .header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-       
+        padding-top: 10px;
     }
     .hot-section{
         .section-title{

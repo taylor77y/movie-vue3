@@ -43,7 +43,7 @@
     <van-popup round v-model:show="showBottom" position="bottom" :style="{ height: '30%' }">
       <div class="pop-bottom">
         <div class="title">付费影视</div>
-        <div class="line linetop">购买本集2金币</div>
+        <div class="line linetop" @click="onBuy()">购买本集2金币</div>
         <div class="line" @click="onVip()">购买VIP</div>
         <div @click="onCancel()">取消</div>
       </div>
@@ -101,7 +101,7 @@
     <van-popup v-model:show="showSelect" closeable position="bottom" :style="{ height: '30%', backgroundColor: '#333' }">
       <div v-for="(item, index) in srcList" :key="index" class="srclit">
         <div class="srtitle">{{ item.channel }}</div>
-        <div class="srbtn" @click="onPlay(item)">{{ item.urlList[0].name }}</div>
+        <div class="srbtn" @click="onPlay(item,index)">{{ item.urlList[0].name }}</div>
       </div>
     </van-popup>
 
@@ -127,6 +127,8 @@ import placeholder from "@/assets/Image/pl.png"
 import moment from 'moment'
 const videoRef = ref<HTMLDivElement | null>(null)
 const url= ref<any>('')
+const moveId =ref<any>(0)
+const islookok = ref<any>(false)
 const memberinfo = ref<any>({})
 const scrollTop = () => {
   if (videoRef.value) {
@@ -252,7 +254,8 @@ const onVip=()=>{
   path:'/vip'
   })
 }
-const onPlay = (item: any) => {
+const onPlay = (item: any,index:any) => {
+  moveId.value = index
   const url = item.urlList[0].url;
   if (!dp.value) return;
   // 清理旧 Hls
@@ -310,19 +313,19 @@ const onGetConfig = async () => {
 
 const onLookOk = async (id: any) => {
   if (!srcList.value.length) return
-  const res = await post('/app-api/cartoon/lookOk', { cartoonCode: id, moviesInfoId: srcList.value[0].urlList[0].id })
+  const res = await post('/app-api/cartoon/lookOk', { cartoonCode: id*1, moviesInfoId: srcList.value[0].urlList[0].id*1 })
   if (res.code === 0) {
-    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-    console.log(data, "onLookOk");
+    if(res.data === true){
+    islookok.value = res.data
+    }
   }
 }
 
-const onGetVideoInfo = async (id: string | number) => {
+const onGetVideoInfo = async (id: any) => {
   const res = await post('/app-api/cartoon/getVideoDetail', { index: 0, vid: id })
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
     videoInfo.value = data.videoInfo
-    
     recommend.value = data.recommend
     srcList.value = data.srcList
     danmuList.value = data.danmuList
@@ -330,6 +333,7 @@ const onGetVideoInfo = async (id: string | number) => {
     await onGetConfig()
     await onLookOk(id)
     await onCreatedVideo()
+    showCenter.value =false
   }
 }
 
@@ -454,18 +458,23 @@ const setupTimeUpdate = (video: HTMLVideoElement) => {
   video.addEventListener("timeupdate", () => {
     const vipdata = getVipStatus()
     if(!vipdata.isVip || vipdata.memberVip <= 0){
-      if (video.currentTime >= config.value.shikan) {
-        video.pause()
-        video.currentTime = config.value.shikan
-        video.controls = false
-        showBottom.value = true
-        video.addEventListener("play", () => {
-          if (video.currentTime >= config.value.shikan) {
-            video.pause()
-            showBottom.value = true
-          }
-        })
+      if(islookok.value){
+          // 本集是否购买过
+      }else{
+        if (video.currentTime >= config.value.shikan) {
+          video.pause()
+          video.currentTime = config.value.shikan
+          video.controls = false
+          showBottom.value = true
+          video.addEventListener("play", () => {
+            if (video.currentTime >= config.value.shikan) {
+              video.pause()
+              showBottom.value = true
+            }
+          })
+        }
       }
+     
     }
   })
 }
@@ -501,7 +510,33 @@ const handleGoVideo=()=>{
   console.log("子组件通知");
   scrollTop();
 }
-
+const onBuy =async()=>{
+  const data = {
+    cartoonCode: 
+    videoInfo.value.cartoonCode*1,
+    moviesInfoId
+    :srcList.value[0].urlList[moveId.value].id*1,
+    type: 0
+  }
+  const res = await post('/app-api/cartoon/buy', {...data})
+  console.log(res,"res");
+  if(res.code === 0){
+    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+    showSuccessToast(data)
+    await onGetConfig()
+    await onLookOk( videoInfo.value.cartoonCode*1)
+    await onCreatedVideo()
+    showBottom.value = false
+  }else{
+    showFailToast(res.msg+'三秒后跳转')
+    setTimeout(()=>{
+      router.push({
+        path:'/pay'
+      })
+    },3000)
+  }
+  
+}
 const onGetUserInfo = async () => {
   // 1. 先尝试从 localStorage 获取
   const cached = localStorage.getItem('memberInfo')
@@ -560,7 +595,21 @@ function getVipStatus() {
     remainingDays
   }
 }
-
+const isIphoneX = () => {
+  const ua = navigator.userAgent
+  const isIOS = /iP(hone|od|ad)/.test(ua)
+  const { width, height } = window.screen
+  // iPhone X/XS: 375 x 812
+  // iPhone XR/XS Max: 414 x 896
+  // iPhone 12/13/14 mini/pro/max 等同 XR/XS 系列尺寸
+  const iphoneXLike =
+    (width === 375 && height === 812) ||
+    (width === 812 && height === 375) ||
+    (width === 414 && height === 896) ||
+    (width === 896 && height === 414)
+  
+  return isIOS && iphoneXLike
+}
 // ----- 生命周期 -----
 onMounted(async () => {
   const id: any = route.query.id
@@ -593,6 +642,10 @@ onMounted(async () => {
     console.error(err)
   }
   // await onGetSavelit()
+    if (isIphoneX()) {
+    const header = document.querySelector('.videoinfo') as HTMLElement
+    if (header) header.style.paddingTop = '90px'
+    }
 })
 
 onUnmounted(() => {
@@ -608,7 +661,7 @@ defineOptions({
 
 <style lang="less" scoped>
 .videoinfo {
-  height: 100dvh;
+  height: 100vh;
   overflow: auto;
 
   .backicon {

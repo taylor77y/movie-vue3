@@ -6,7 +6,7 @@
             <div class="flex">
                 <img src="./../assets/my/Moon.svg" style="margin-right: 10px;" />
                 <img src="./../assets/my/01.svg" style="margin-right: 10px;" />
-                <div class="text">签到</div>
+                <div class="text" @click="onSign()">签到</div>
             </div>
         </div>
         <div class="my-con">
@@ -23,7 +23,7 @@
                             </div>
                             <div class="id">ID:{{ memberInfo.memberCode }}</div>
                         </div>
-                        <div class="sign">签名：{{ memberInfo.memberSignature ? memberInfo.memberSignature : '这家伙很懒，什么都没留下'
+                        <div class="sign" >签名：{{ memberInfo.memberSignature ? memberInfo.memberSignature : '这家伙很懒，什么都没留下'
                         }}
                         </div>
                     </div>
@@ -151,7 +151,7 @@ import { useHomeStore } from '@/store/home'
 import router from '@/router';
 import { copyText } from '@lxf2513/vue3-clipboard';
 import { showToast, showSuccessToast, showFailToast } from 'vant'
-const show = ref<any>(true)
+const show = ref<any>(false)
 const qrCodeUrl= ref<any>('')
 const store = useHomeStore()
 let list = ref<any>([
@@ -301,6 +301,11 @@ const onGetVipIcon = () => {
         return V5
     }
 }
+const onSign=()=>{
+    router.push({
+        path:'/sign'
+    })
+}
 const onGn = (index: number) => {
     if (index === 0) {
         router.push({
@@ -377,7 +382,7 @@ onMounted(() => {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-bottom: 10px;
+           height: 50px;
 
         .tit {
             font-weight: bold;
@@ -399,7 +404,6 @@ onMounted(() => {
     .my-con {
         height: calc(100vh - 100px);
         overflow: auto;
-
         .info {
             display: flex;
             align-items: center;
@@ -522,6 +526,7 @@ onMounted(() => {
         }
 
         .gn {
+            padding-bottom: 80px;
             .grid {
                 display: flex;
                 flex-wrap: wrap;

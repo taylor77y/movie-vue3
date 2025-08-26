@@ -101,8 +101,27 @@ const onGetTag = async () => {
         childList.value = res.data[0]?.child ?? [];
     }
 }
+const isIphoneX = () => {
+  const ua = navigator.userAgent
+  const isIOS = /iP(hone|od|ad)/.test(ua)
+  const { width, height } = window.screen
+  // iPhone X/XS: 375 x 812
+  // iPhone XR/XS Max: 414 x 896
+  // iPhone 12/13/14 mini/pro/max 等同 XR/XS 系列尺寸
+  const iphoneXLike =
+    (width === 375 && height === 812) ||
+    (width === 812 && height === 375) ||
+    (width === 414 && height === 896) ||
+    (width === 896 && height === 414)
+  
+  return isIOS && iphoneXLike
+}
 onMounted(async () => {
     await onGetTag()
+     if (isIphoneX()) {
+    const header = document.querySelector('.tag') as HTMLElement
+    if (header) header.style.paddingTop = '90px'
+    }
 })
 </script>
 <style lang="less" scoped>
@@ -115,7 +134,7 @@ onMounted(async () => {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding-bottom: 10px;
+        height: 50px;
 
         .tit {
             font-weight: bold;

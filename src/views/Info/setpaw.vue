@@ -130,9 +130,7 @@ const onBack = () => {
 .setpaw {
     position: relative;
     height: 100vh;
-    overflow: hidden;
-
-
+    overflow: auto;
     .header {
         position: relative; // 保证在视频上方
         z-index: 1;
@@ -151,7 +149,6 @@ const onBack = () => {
     .page {
         background-color: #000;
         padding: 10px;
-        min-height: 100vh;
 
         .input-c {
             width: 100%;

@@ -16,6 +16,7 @@
   "dependencies": {
     "@cloudgeek/vue3-video-player": "^0.3.10",
     "@lxf2513/vue3-clipboard": "^1.2.0",
+    "@vant/touch-emulator": "^1.4.0",
     "axios": "^1.11.0",
     "crypto-js": "^4.2.0",
     "dplayer": "^1.27.1",

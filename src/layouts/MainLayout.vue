@@ -137,7 +137,7 @@ const test = () => {
       "98999",
     token
       :
-      '965dc1f6c2a54e25886288df2481c02f',
+      '69b156667a1f4b10ac2a87a8757973d1',
     vipDate
       :
       "2025-08-24 19:14:07",
@@ -151,7 +151,7 @@ const test = () => {
       :
       null
   }
-  localStorage.setItem('token', 'cd5ce56828234275938f6293dc2df1c2')
+  localStorage.setItem('token', '69b156667a1f4b10ac2a87a8757973d1')
   localStorage.setItem('memberInfo', JSON.stringify(data))
 }
 onMounted(async () => {
@@ -167,16 +167,17 @@ onMounted(async () => {
     }
   }
 
-
 })
 </script>
 
 <template>
-  <router-view v-slot="{ Component }">
+  <!-- 开启顶部安全区适配 -->
+  <!-- <router-view v-slot="{ Component }" :key="route.fullPath">
     <KeepAlive include="['HomeView','CategoryView']">
       <component :is="Component" />
     </KeepAlive>
-  </router-view>
+  </router-view> -->
+  <router-view ></router-view>
 
   <div class="custom-tabbar" v-if="showTabbar">
     <van-tabbar v-model="active">

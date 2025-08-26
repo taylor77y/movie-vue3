@@ -1,6 +1,7 @@
 <template>
     <div class="share">
-        <div class="back" @click="onBack()"><van-icon name="arrow-left" size="22" color="white" /></div>
+        <div class="flex-dd">
+             <div class="back" @click="onBack()"><van-icon name="arrow-left" size="22" color="white" /></div>
         <div class="yuan"></div>
         <div class="nv"></div>
         <div class="kp"></div>
@@ -30,6 +31,8 @@
                 <div class="coa-text">被邀请人需要绑定邀请人得邀请码才可绑定成功</div>
             </div>
         </div>
+        </div>
+      
     </div>
 </template>
 <script setup lang="ts">
@@ -106,9 +109,15 @@ onMounted(async () => {
     background-repeat: no-repeat;
     height: 100vh;
     position: relative;
-
+    overflow: auto;
+    -webkit-overflow-scrolling: touch; /* 让 iOS 滚动更顺滑 */
+    .flex-dd{
+        height: 110vh;
+        display: flex;
+        flex-direction: column;
+    }
     .back {
-        position: absolute;
+        position: fixed;
         top: 10px;
         left: 10px;
         width: 32px;
