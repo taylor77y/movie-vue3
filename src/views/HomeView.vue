@@ -6,14 +6,16 @@ import CartoonItemO from "./../components/CartoonItemO.vue"
 import placeholder from "@/assets/Image/pl.png"
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
+import { useRoute } from 'vue-router'
 import router from '@/router'
-
+import { showFailToast } from 'vant'
+const route = useRoute()
 const store = useHomeStore()
 const loadingIndex = ref<any>(false)
 const scrollContainer = ref<HTMLElement | null>(null)
 const tagWrapper = ref<HTMLElement | null>(null)
 const tagList = ref<HTMLElement | null>(null)
-
+const imgloadingTime = ref<any>(0)
 // 图片错误占位
 const onImgError = (event: any) => {
   event.target.src = placeholder
@@ -114,18 +116,49 @@ const onRef = async () => {
   }
   loadingIndex.value = false
 }
+const imageStats = ref<{ index: number; time: number }[]>([])
 // 初始化
+const handleImgLoaded = ({
+  title,
+  index,
+  time,
+}: {
+  title: string
+  index: number
+  time: number,
+}) => {
+  imageStats.value.push({ index, time })
+  
+  if (time > 0) { // 排除加载失败（-1）
+    imgloadingTime.value += time
+  }
+  
 
+  // console.log(`${title} 第 ${index} 张图片加载完成，耗时: ${time.toFixed(2)} ms`)
+  console.log(`当前总耗时: ${imgloadingTime.value.toFixed(2)} ms`)
+}
+
+// 
+
+const onBindCode = async(parentId:any)=>{
+   const res = await post('/renren-api/api/member/bindInviteCode', {
+      parentId: parentId
+    })
+    if(res.code =! 0 ){
+      showFailToast(res.msg)
+    }
+}
 onMounted(async () => {
+  if(route.query.id){
+    onBindCode(route.query.id)
+  }
   // 等接口加载完成
   await store.initHome()
-
   // 等 DOM 渲染完成
   await nextTick()
   if (scrollContainer.value) {
     scrollContainer.value.scrollTop = store.scrollTop
   }
-
   // 等图片加载完成
   const images = Array.from(document.images || [])
   let loaded = 0
@@ -207,8 +240,8 @@ onActivated(() => {
         </div>
       </div>
       <div v-if="store.activeTag === 0" class="ranklist">
-        <CartoonItemO @goVideo="handleGoVideo" v-for="(item, index) in store.typelist" :key="item.id" :item="item"
-          :index="index" @error="onImgError" />
+        <CartoonItemO @goVideo="handleGoVideo" v-for="(item, index) in store.typelist" :key="item.id" :item="item" title="精选视频"
+          :index="index" @error="onImgError" @imgLoaded="handleImgLoaded"  />
       </div>
       <div class="change-bt" v-if="store.activeTag === 0">
         <div class="c-left" @click="onGoMore(15, '精选视频')">查看更多</div>
@@ -224,8 +257,8 @@ onActivated(() => {
         </div>
       </div>
       <div v-if="store.activeTag === 0" class="ranklist">
-        <CartoonItemO @goVideo="handleGoVideo" v-for="(item, index) in store.rankList" :key="item.id" :item="item"
-          :index="index" @error="onImgError" />
+        <CartoonItemO @goVideo="handleGoVideo" v-for="(item, index) in store.rankList" :key="item.id" :item="item" title="排行榜"
+          :index="index" @error="onImgError" @imgLoaded="handleImgLoaded"  />
       </div>
 
       <div v-if="store.activeTag === 0" class="title-header">
@@ -238,8 +271,8 @@ onActivated(() => {
         </div>
       </div>
       <div class="ranklist">
-        <CartoonItem @goVideo="handleGoVideo" v-for="item in store.likeList" :key="item.id" :item="item"
-          :cartoon-name="item.cartoonName" @error="onImgError" />
+        <CartoonItem @goVideo="handleGoVideo" v-for="(item,index) in store.likeList" :key="item.id" :item="item" title="最新更新" :index="index"
+          :cartoon-name="item.cartoonName" @error="onImgError" @imgLoaded="handleImgLoaded" />
       </div>
       <div style="display: flex;align-items: center;justify-content: center;">
         <van-loading v-if="store.loading" size="24px" color="#FF960C">加载中...</van-loading>

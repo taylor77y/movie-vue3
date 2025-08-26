@@ -52,7 +52,6 @@ const url =ref('')
 
 const generateQRCodeWithLogo = async (data: any) => {
   const getRandomColor = () => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
-
   const qr = new QrCodeWithLogo({
     content: url.value,
     width: 110,
@@ -97,7 +96,7 @@ onMounted(async () => {
   const memberInfoStr:any = localStorage.getItem('memberInfo')
       const data = JSON.parse(memberInfoStr)
       userinfo.value = data
-      url.value = window.location.href +'?'+`id=${data.memberCode}`
+      url.value = window.location.origin + `?id=${data.memberCode}`
       await generateQRCodeWithLogo(data)
 })
 

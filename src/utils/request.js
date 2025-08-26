@@ -10,10 +10,12 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   (config) => {
+      config.headers['security-flag']= "sec"
     // 这里可以统一加 token
     const token = localStorage.getItem('token')
     if (token) {
       config.headers['Token'] = `${token}`
+    
     }
     return config
   },

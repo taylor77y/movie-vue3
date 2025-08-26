@@ -165,4 +165,11 @@ onMounted(async() => {
   }
 }
 </style>
-
+<style>
+.skeleton { width: 100%; height: 100%; background: #eee; animation: pulse 1.5s infinite; }
+@keyframes pulse {
+  0% { background-color: #eee; }
+  50% { background-color: #ddd; }
+  100% { background-color: #eee; }
+}
+</style>

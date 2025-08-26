@@ -5,7 +5,7 @@
         </div>
     <div v-else class="cartoon-item" @click="onGoVideoInfo(item)">
         <div class="img-wrapper" @click="onGoVideoInfo(item)">
-            <img v-lazy="item.cartoonImage"  class="img zoomIn" @error="onImgError"  @click="onGoVideoInfo(item)"/>
+            <img   @load="onLoad" v-lazy="item.cartoonImage"  class="img zoomIn" @error="onImgError"  @click="onGoVideoInfo(item)"/>
             <div class="img-top" v-if="item.cartoonVip" >VIP</div>
             <div class="img-bottom">
                 <div class="flex">
@@ -27,10 +27,28 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const props = defineProps({
     item: { type: Object, required: true },
+        index: { type: Number, required: true },
+            title: { type: String, required: true },
 })
 
-const emits = defineEmits(['error','goVideo'])
-
+const emits = defineEmits(['error','goVideo','imgLoaded'])
+const start = performance.now() // 组件挂载时记录开始时间
+const onLoad = async() => {
+  const end = performance.now()
+  const time = end - start
+    await getImageSize(item.cartoonImage)
+  emits('imgLoaded', {title:props.title, index: props.index, time })
+}
+const getImageSize = async (url) => {
+  try {
+    const res = await fetch(url, { method: 'HEAD', mode: 'cors' })
+    const size = parseInt(res.headers.get('content-length') || '0', 10)
+    return size
+  } catch (err) {
+    console.warn('获取图片大小失败', err)
+    return 0
+  }
+}
 const onImgError = (e) => {
     emits('error', e)
 }
@@ -51,6 +69,7 @@ const onGoVideoInfo=(item)=>{
 </script>
 
 <style lang="less" scoped>
+
 .ad{
     width: 48%;
     display: flex;

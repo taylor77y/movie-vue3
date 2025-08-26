@@ -1,11 +1,11 @@
 <template>
-    <div v-if="item.adtype" class="ad"  @click="onOpen(item.url)">
+    <div  v-if="item.adtype" class="ad"  @click="onOpen(item.url)">
             <img :src="item.img" class="adimg zoomIn" @click="onOpen(item.url)"/>
              <div class="adname">{{ item.title }}</div>
         </div>
     <div v-else :class="['cartoon-item', { 'full-width': index === 0 }]" @click="onGoVideoInfo(item)">
         <div class="img-wrapper" @click="onGoVideoInfo(item)">
-            <img v-lazy="item.cartoonImage"   class="img zoomIn" @error="onImgError"  @click="onGoVideoInfo(item)"/>
+             <img    @load="onLoad"  v-lazy="item.cartoonImage"  class="img zoomIn" @error="onImgError"  @click="onGoVideoInfo(item)"/>
             <div class="img-top" v-if="item.cartoonVip">VIP</div>
             <div class="img-bottom">
                 <div class="flex">
@@ -27,14 +27,18 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const props = defineProps({
     item: { type: Object, required: true },
-    index: { type: Number, required: true },
+       index: { type: Number, required: true },
+            title: { type: String, required: true },
 })
 
-const emits = defineEmits(['error','goVideo'])
-
-const onImgError = (e) => {
-    emits('error', e)
+const emits = defineEmits(['error','goVideo','imgLoaded'])
+const start = performance.now() // 组件挂载时记录开始时间
+const onLoad = async() => {
+  const end = performance.now()
+  const time = end - start
+  emits('imgLoaded', {title:props.title, index: props.index, time })
 }
+
 const onOpen = (url) => {
   window.open(url, '_blank')
 }

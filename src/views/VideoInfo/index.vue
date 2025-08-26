@@ -610,9 +610,20 @@ const isIphoneX = () => {
   
   return isIOS && iphoneXLike
 }
+const onBindCode = async(parentId:any)=>{
+   const res = await post('/renren-api/api/member/bindInviteCode', {
+      parentId: parentId
+    })
+    if(res.code =! 0 ){
+      showFailToast(res.msg)
+    }
+}
 // ----- 生命周期 -----
 onMounted(async () => {
   const id: any = route.query.id
+  if(id){
+    onBindCode(id)
+  }
   if (!id) {
     let second = 3
     const toast = showLoadingToast({ duration: 0, forbidClick: true, message: `${second} 秒后退出,无携带参数` })

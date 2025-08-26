@@ -2,8 +2,7 @@
    
     <div  class="cartoon-item"  :class="{ 'full-width': index === 0 }" @click="onGoVideoInfo(item)">
         <div class="img-wrapper" @click="onGoVideoInfo(item)">
-            <img v-lazy="item.cartoonImage"  class="img zoomIn" :class="{ 'zoom-in': loaded }"
-      @load="onLoad" @error="onImgError"  @click="onGoVideoInfo(item)"/>
+            <img   v-lazy="item.cartoonImage"  class="img zoomIn" @error="onImgError"  @click="onGoVideoInfo(item)"/>
             <div class="img-top" v-if="item.cartoonVip" >VIP</div>
             <div class="img-bottom">
                 <div class="flex">
@@ -70,8 +69,8 @@ const onGoVideoInfo=(item)=>{
          height: 100px;
         position: relative;
           background-image: url("./../assets/Image/pl.png");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
 
         .img {
             height: 100%;

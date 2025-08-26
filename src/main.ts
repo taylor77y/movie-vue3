@@ -28,6 +28,9 @@ const app = createApp(App)
 document.body.setAttribute('data-theme', 'dark');
 
 app.use(VueLazyLoad, {
+  // @ts-ignore
+  preLoad: 3,
+  attempt: 1,
   loading: pl,   // 占位图
   error: pl      // 加载失败的图
 })
