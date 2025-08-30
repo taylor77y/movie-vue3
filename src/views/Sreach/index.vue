@@ -3,7 +3,7 @@
     <div class="sreach">
          <div class="header">
             <div @click="onBack()" style="margin-right: 5px;"><van-icon name="arrow-left"  color="white" size="22"/></div>
-           <van-search v-model="val" placeholder="搜索图片文字视频"  style="margin-right: 10px;background-color: #333333;"  />
+           <van-search v-model="val" placeholder="搜索图片文字视频"  style="margin-right: 10px;background-color: #333333;"  @blur="onBlur()" @focus="onFocus()"  />
             <div @click="onGoSearch()">搜索</div>
         </div>
          <div class="hot-section">
@@ -28,6 +28,7 @@
 <script setup lang="ts">
 import { onMounted, ref,onBeforeUnmount } from 'vue';
 import { useRouter } from "vue-router";
+console.log('Sreach 页面已加载！')
 const router = useRouter()
 const val = ref<any>('')
 const history = ref<any>([])
@@ -44,6 +45,18 @@ const onGoSearch= ()=>{
 }
 const onAddSearch=(item:any)=>{
     onSearch(item)
+}
+const onFocus =()=>{
+  if (isIphoneX()) {
+    const header = document.querySelector('.sreach') as HTMLElement
+    if (header) header.style.paddingTop = '0px'
+    }
+}
+const  onBlur =()=>{
+  if (isIphoneX()) {
+    const header = document.querySelector('.sreach') as HTMLElement
+    if (header) header.style.paddingTop = '90px'
+    }
 }
 const onClear = () => {
   showConfirmDialog({

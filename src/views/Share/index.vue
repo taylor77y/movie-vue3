@@ -28,7 +28,7 @@
         </div>
         <div class="bottom">
             <div class="coa">
-                <div class="coa-text">被邀请人需要绑定邀请人得邀请码才可绑定成功</div>
+                <div class="coa-text">分享链接或二维码给好友，好友点击后，您将立即获得1天VIP</div>
             </div>
         </div>
         </div>
@@ -39,7 +39,7 @@
 import { useRouter } from "vue-router";
 import {ref,onMounted} from "vue"
 import QrCodeWithLogo from 'qrcode-with-logos'
-import avatar from "@/assets/my/avatar.png"
+import avatar from "/my/avatar.png"
 import {showSuccessToast,showFailToast} from "vant"
 import { copyText } from "@lxf2513/vue3-clipboard";
 const router = useRouter()
@@ -103,7 +103,7 @@ onMounted(async () => {
 </script>
 <style lang="less" scoped>
 .share {
-    background-image: url("./../../assets/share/hy.png");
+    background-image: url("/share/hy.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
     height: 100vh;
@@ -135,7 +135,7 @@ onMounted(async () => {
         width: 300px; // 自己设定大小
         height: 300px;
         transform: translate(-50%, -50%);
-        background-image: url("./../../assets/share/yuan.png");
+        background-image: url("/share/yuan.png");
         background-size: 100% 100%;
         background-repeat: no-repeat;
     }
@@ -147,7 +147,7 @@ onMounted(async () => {
         width: 200px; // 自己设定大小
         height: 350px;
         transform: translate(-50%, -50%);
-        background-image: url("./../../assets/share/nv.png");
+        background-image: url("/share/nv.png");
         background-size: 100% 100%;
         background-repeat: no-repeat;
     }
@@ -159,7 +159,7 @@ onMounted(async () => {
         width: 307px; // 自己设定大小
         height: 130px;
         transform: translate(-50%, -50%);
-        background-image: url("./../../assets/share/kp.png");
+        background-image: url("/share/kp.png");
         background-size: 100% 100%;
         background-repeat: no-repeat;
     }

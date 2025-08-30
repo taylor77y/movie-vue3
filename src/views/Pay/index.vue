@@ -9,7 +9,7 @@
         <div class="con">
             <div class="hbg">
                 <div class="hbg-t">
-                    <img :src="memberInfo?.memberAvatar || defaultAvatar" alt="头像"
+                    <img :src="memberInfo?.memberAvatar || '/my/user.svg'" alt="头像"
                         style="width: 54px;height: 54px;border-radius: 10px;" />
 
                     <div class="hbg-info-u">
@@ -69,14 +69,14 @@
             </van-radio-group>
             <div class="btn" @click="onPay()">立即升级</div>
 
-            <div class="t">会员特权</div>
+            <!-- <div class="t">会员特权</div>
 
             <div class="privilege">
 			<div class="privilege-item" v-for="(item, index) in privilegeList" :key="index" hover-class="hover">
 				<img class="privilege-item-pic" :src="item.pic" mode=""></img>
 				<div class="privilege-item-text " style="color: var(--text-color)">{{ item.text }}</div>
 			</div>
-		</div>
+		</div> -->
         </div>
     </div>
 </template>
@@ -84,29 +84,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import defaultAvatar from "@/assets/my/user.svg"
-import V0 from "@/assets/proilfe/0.png"
-import V1 from "@/assets/proilfe/1.png"
-import V2 from "@/assets/proilfe/2.png"
-import V3 from "@/assets/proilfe/3.png"
-import V4 from "@/assets/proilfe/4.png"
-import V5 from "@/assets/proilfe/5.png"
-import V6 from "@/assets/proilfe/6.png"
-import coin from '@/assets/pay/vip/coin.png'
-import quan from '@/assets/pay/vip/quan.png'
-import redBag from '@/assets/pay/vip/red-bag.png'
-import goods from '@/assets/pay/vip/goods.png'
-import speed from '@/assets/pay/vip/speed.png'
-import share from '@/assets/pay/vip/share.png'
-import active from '@/assets/pay/vip/active.png'
-import birthday from '@/assets/pay/vip/birthday.png'
-import notic from '@/assets/pay/vip/notic.png'
-import kefu from '@/assets/pay/vip/kefu.png'
+
 import moment from "moment";
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
 import { closeToast, showLoadingToast, showSuccessToast, showToast } from "vant";
-const vipac = ref<any>(V0)
+const vipac = ref<any>('/proilfe/0.png')
 const isios = ref<any>(false)
 const router = useRouter()
 const memberInfo = ref<any>({})
@@ -117,17 +100,18 @@ const onBack = () => {
     router.back()
 }
 const privilegeList = ref<any>([
-  { pic: coin, text: '每日金币' },
-  { pic: quan, text: '大额神券' },
-  { pic: redBag, text: '更多返利' },
-  { pic: goods, text: '精选商品' },
-  { pic: speed, text: '极速到账' },
-  { pic: share, text: '分享领券' },
-  { pic: active, text: '专享活动' },
-  { pic: birthday, text: '生日折扣' },
-  { pic: notic, text: '上架提醒' },
-  { pic: kefu, text: '专属客服' }
+  { pic: '/pay/vip/coin.png', text: '每日金币' },
+  { pic: '/pay/vip/quan.png', text: '大额神券' },
+  { pic: '/pay/vip/red-bag.png', text: '更多返利' },
+  { pic: '/pay/vip/goods.png', text: '精选商品' },
+  { pic: '/pay/vip/speed.png', text: '极速到账' },
+  { pic: '/pay/vip/share.png', text: '分享领券' },
+  { pic: '/pay/vip/active.png', text: '专享活动' },
+  { pic: '/pay/vip/birthday.png', text: '生日折扣' },
+  { pic: '/pay/vip/notic.png', text: '上架提醒' },
+  { pic: '/pay/vip/kefu.png', text: '专属客服' }
 ])
+
 const title = ref<any>('暂未开通vip')
 const payList = ref<any>([])
 
@@ -142,46 +126,52 @@ const limitPrice = (item: any) => {
     item.price = 5000
   }
 }
+const vipIcons = [
+  "/proilfe/0.png",
+  "/proilfe/1.png",
+  "/proilfe/2.png",
+  "/proilfe/3.png",
+  "/proilfe/4.png",
+  "/proilfe/5.png",
+  "/proilfe/6.png"
+];
+
 const onGetVipInfo = () => {
-    const vip = memberInfo.value.vipPeriod
-    const vipDateStr = memberInfo.value.vipDate
+    const vip = memberInfo.value.vipPeriod;
+    const vipDateStr = memberInfo.value.vipDate;
 
     // 默认值
-    let icon = V0
-    let isVip = false
-    let expireDate = null
-    let daysLeft = 0
+    let icon = vipIcons[0];
+    let isVip = false;
+    let expireDate: string | null = null;
+    let daysLeft = 0;
 
     // 如果 vip = 0 或 没有到期时间，直接返回非 VIP
     if (vip === 0 || !vipDateStr) {
-        return { icon, isVip, expireDate, daysLeft }
+        return { icon, isVip, expireDate, daysLeft };
     }
 
-    const vipDate = moment(vipDateStr, 'YYYY-MM-DD HH:mm:ss')
-    const now = moment()
+    const vipDate = moment(vipDateStr, 'YYYY-MM-DD HH:mm:ss');
+    const now = moment();
 
     // 判断是否有效
     if (vipDate.isAfter(now)) {
-        isVip = true
-        expireDate = vipDate.format('YYYY-MM-DD HH:mm:ss')
+        isVip = true;
+        expireDate = vipDate.format('YYYY-MM-DD HH:mm:ss');
 
-        // 计算剩余天数（向上取整，避免 0.x 天显示 0）
-        daysLeft = vipDate.diff(now, 'days')
+        // 计算剩余天数（向上取整）
+        daysLeft = vipDate.diff(now, 'days');
         if (vipDate.diff(now, 'hours') % 24 > 0) {
-            daysLeft += 1
+            daysLeft += 1;
         }
 
-        // 设置对应图标（你可以根据 vipPeriod 定制）
-        if (vip === 1) icon = V1
-        else if (vip === 2) icon = V2
-        else if (vip === 3) icon = V3
-        else if (vip === 4) icon = V4
-        else if (vip === 5) icon = V5
-        else icon = V6 // 默认最高级
+        // 设置对应图标
+        icon = vipIcons[vip] || vipIcons[6]; // vip 超过最大值就显示最后一个
     }
 
-    return { icon, isVip, expireDate, daysLeft }
-}
+    return { icon, isVip, expireDate, daysLeft };
+};
+
 const onGetList = async () => {
     // /app-api/pay/getGoodsLists
     const res = await post('/app-api/pay/getGoodsLists', {
@@ -216,7 +206,7 @@ const onYa = async () => {
     console.log(res,"res");
     if(res.code===0){
          const goData = JSON.parse(res.data)
-        window.location.href = goData.payurl
+        window.open(goData.payurl, '_blank')
     }
 }
 const onJct = async () => {
@@ -231,7 +221,7 @@ const onJct = async () => {
     })
      if(res.code===0){
          const goData = JSON.parse(res.data)
-        window.location.href = goData.payurl
+         window.open(goData.payurl, '_blank')
     }
 }
 const onPay = async () => {
@@ -318,7 +308,7 @@ onMounted(async () => {
         .hbg {
             width: 100%;
             height: 150px;
-            background-image: url("@/assets/pay/paybg.svg");
+            background-image: url("public/pay/paybg.svg");
             background-size: 100% 100%;
             background-repeat: no-repeat;
             background-size: cover;

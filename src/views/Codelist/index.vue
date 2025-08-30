@@ -30,7 +30,7 @@ import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
 import { showSuccessToast } from "vant";
 import { onMounted, ref } from "vue";
-import avatar from "@/assets/my/avatar.png"
+import avatar from "/my/avatar.png"
 const router = useRouter()
 const list = ref<any>([])
 const currentPage = ref<any>(1)

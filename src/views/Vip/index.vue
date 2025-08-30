@@ -63,36 +63,24 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import O1 from "@/assets/vipgo/1.png";
-import O2 from "@/assets/vipgo/2.png";
-import O3 from "@/assets/vipgo/3.png";
-import O4 from "@/assets/vipgo/4.png";
-import Icon01 from '@/assets/vipgo/01.png'
-import Icon02 from '@/assets/vipgo/02.png'
-import Icon03 from '@/assets/vipgo/03.png'
-import Icon04 from '@/assets/vipgo/04.png'
-import Icon05 from '@/assets/vipgo/05.png'
-import Icon06 from '@/assets/vipgo/06.png'
-import Icon07 from '@/assets/vipgo/07.png'
-import Icon08 from '@/assets/vipgo/08.png'
-import { post } from '@/utils/request'
-import { closeToast, showLoadingToast, showToast } from 'vant';
 const cards = [
-  { pic: O1, text: '图1' },
-  { pic: O2, text: '图2' },
-  { pic: O3, text: '图3' },
-  { pic: O4, text: '图4' },
+  { pic: '/vipgo/1.png', text: '图1' },
+  { pic: '/vipgo/2.png', text: '图2' },
+  { pic: '/vipgo/3.png', text: '图3' },
+  { pic: '/vipgo/4.png', text: '图4' },
 ];
+
 const iconList = [
-  { name: '金币视频免费看', icon: Icon01 },
-  { name: 'VIP视频免费看', icon: Icon02 },
-  { name: '暗网免费看', icon: Icon03 },
-  { name: '头像昵称修改权限', icon: Icon04 },
-  { name: '高清视频', icon: Icon05 },
-  { name: '专属路线', icon: Icon06 },
-  { name: '免广告播放', icon: Icon07 },
-  { name: '专属客服', icon: Icon08 }
-]
+  { name: '金币视频免费看', icon: '/vipgo/01.png' },
+  { name: 'VIP视频免费看', icon: '/vipgo/02.png' },
+  { name: '暗网免费看', icon: '/vipgo/03.png' },
+  { name: '头像昵称修改权限', icon: '/vipgo/04.png' },
+  { name: '高清视频', icon: '/vipgo/05.png' },
+  { name: '专属路线', icon: '/vipgo/06.png' },
+  { name: '免广告播放', icon: '/vipgo/07.png' },
+  { name: '专属客服', icon: '/vipgo/08.png' }
+];
+
 const list= [{
 				comSpec:30,
 				money:50,
@@ -146,7 +134,7 @@ const onYa = async () => {
     })
     if(res.code===0){
          const goData = JSON.parse(res.data)
-        window.location.href = goData.payurl
+         window.open(goData.payurl, '_blank')
     }
 }
 const onJct = async () => {
@@ -163,7 +151,7 @@ const onJct = async () => {
     })
      if(res.code===0){
          const goData = JSON.parse(res.data)
-        window.location.href = goData.payurl
+         window.open(goData.payurl, '_blank')
     }
 }
 const onPay = async () => {

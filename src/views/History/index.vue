@@ -7,14 +7,24 @@
         </div>
         <Empty v-if="videoHistory.length === 0" description="暂无收藏" />
         <div v-else class="list">
-            <CartoonItem @goVideo="handleGoVideo" v-for="item in videoHistory" :key="item.id" :item="item"
-                @error="onImgError" />
+               <div v-for="(item, index) in videoHistory" :class="['cartoon-item']">
+             <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item']">
+             <div class="skeleton-img">
+              <van-loading type="spinner" />
+            </div>
+            <div class="skeleton-text"></div>
+          </div>
+        <CartoonItem v-show="loadedMap[item.cartoonCode]"  @goVideo="handleGoVideo"  :key="item.id" :item="item"
+          title="最新更新" :index="index" :cartoon-name="item.cartoonName" @error="onImgError"
+          @imgLoaded="handleImgLoaded" />
+          </div>
         </div>
+        
     </div>
 </template>
 <script lang="ts" setup>
 import CartoonItem from "./../../components/CartoonItem.vue"
-import { onMounted, ref } from 'vue';
+import { onMounted, ref,reactive } from 'vue';
 import { useRouter } from "vue-router";
 import { Empty ,showConfirmDialog,showToast} from 'vant';
 const router = useRouter()
@@ -37,9 +47,30 @@ const onGetHisList = () => {
 const onBack =()=>{
     router.back()
 }
-const handleGoVideo = () => {
-
+const handleGoVideo = (item:any) => {
+  console.log('即将跳转', item.cartoonCode)
+  router.push({
+    path: '/videoinfo',
+    query: { id: item.cartoonCode }
+  }).catch(err => console.warn(err))
 }
+const loadedMap = reactive<any>({
+})
+// 初始化
+const handleImgLoaded = ({
+  title,
+  index,
+  time,
+  id
+}: {
+  title: string
+  index: number
+  time: number,
+  id:any
+}) => {
+  loadedMap[id] = true
+}
+
 const onImgError = () => {
 
 }
@@ -110,5 +141,19 @@ onMounted(() => {
 .isdialog .van-button--default{
   background-color: var(--br-color) !important;
    color: var(--text-color);
+}
+.cartoon-item {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+.full-width {
+  width: 100% !important;
+  .img-wrapper{
+    height: 200px;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
 }
 </style>

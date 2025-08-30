@@ -1,17 +1,22 @@
 <template>
-  <div class="videoinfo" ref="videoRef">
-    <div class="backicon" @click="onBack()"><van-icon name="arrow-left" color="#FFFFFF" size="22"/></div>
+  <div class="videoinfo" ref="videoRef" v-if="videoInfo.cartoonName">
+    <div
+      style="height: 50px;display: flex;align-items: center;justify-content: space-between;position: relative;z-index: 9999;width: 100%;">
+      <div class="backicon" @click="onBack()"><van-icon name="arrow-left" color="#FFFFFF" size="22" /></div>
+      <div class="ellipsis">{{ videoInfo.cartoonName }}</div>
+      <div style="width: 22px;"></div>
+    </div>
     <div ref="PlayVideo" class="video-container"></div>
     <div class="introduce">
       {{ videoInfo.cartoonIntroduce }}
     </div>
     <div class="list">
       <div class="item" @click="onSelect()">
-        <img src="./../../assets/videoinfo/x.svg" class="item-img" />
+        <img src="/videoinfo/x.svg" class="item-img" />
         <div class="tit">选集</div>
       </div>
       <div class="item" @click="onShare()">
-        <img src="./../../assets/videoinfo/shar.svg" class="item-img" />
+        <img src="/videoinfo/shar.svg" class="item-img" />
         <div class="tit">分享</div>
       </div>
       <div class="item" @click="onLike()">
@@ -22,6 +27,10 @@
         <img :src="isSaved ? star1 : star" class="item-img" />
         <div class="tit" :class="{ 'active': isSaved }">加入收藏</div>
       </div>
+    </div>
+
+    <div v-if="store.showAd" style="width: 100%;padding: 0 10px;margin-top: 10px;">
+      <AD :list="[...store.squaread]"></AD>
     </div>
     <div style="padding: 0 10px;display: flex;
     flex-direction: column; ">
@@ -35,7 +44,17 @@
         </div>
       </div>
       <div class="ranklist">
-        <CartoonItem @goVideo="handleGoVideo" v-for="item in recommend" :key="item.id" :item="item" @error="onImgError" />
+        <div v-for="(item, index) in recommend" class="cartoon-item">
+          <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
+            <div class="skeleton-img">
+              <van-loading type="spinner" />
+            </div>
+            <div class="skeleton-text"></div>
+          </div>
+          <CartoonItem v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="item.id" :item="item"
+            title="最新更新" :index="index" :cartoon-name="item.cartoonName" @error="onImgError"
+            @imgLoaded="handleImgLoaded" />
+        </div>
       </div>
 
     </div>
@@ -50,58 +69,60 @@
     </van-popup>
     <van-popup v-model:show="showCenter" round
       :style="{ backgroundColor: '#272727', width: '85%', padding: '10px 10px 30px 10px', }">
-      <div style="position: relative;">
-        <div style="display: flex;align-items: end;justify-content: end;"><van-icon name="cross" @click="showCenter =false"  size="22"/></div>
+      <div style="position: relative;z-index: 9999;">
+        <div style="display: flex;align-items: end;justify-content: end;"><van-icon name="cross"
+            @click="showCenter = false" size="22" /></div>
         <div class="share-card">
-        <div class="header">
-          <div class="logo">91PORN</div>
-          <div style="margin-left: 10px;display: flex;flex-direction: column;">
-            <div class="platform-name">91PORN</div>
-            <div class="platform-name">最大成人视频平台</div>
+          <div class="header">
+            <div class="logo">91PORN</div>
+            <div style="margin-left: 10px;display: flex;flex-direction: column;">
+              <div class="platform-name">91PORN</div>
+              <div class="platform-name">最大成人视频平台</div>
+            </div>
           </div>
-        </div>
-        <div class="video-preview">
-          <div style="position: relative;">
-            <img :src="videoInfo.cartoonImage" class="preview-img" />
-            <div class="overlay">
-              <div class="views" style="display: flex;align-items: center;">
-                <img src="./../../assets/videoinfo/view.png" style="width: 14px;height: 17px;" />{{
-                  videoInfo.cartoonHot }}万
+          <div class="video-preview">
+            <div style="position: relative;">
+              <img :src="videoInfo.cartoonImage" class="preview-img" />
+              <div class="overlay">
+                <div class="views" style="display: flex;align-items: center;">
+                  <img src="/videoinfo/view.png" style="width: 14px;height: 17px;" />{{
+                    videoInfo.cartoonHot }}万
+                </div>
+                <div class="duration">{{ videoInfo.vodDuration }}</div>
               </div>
-              <div class="duration">{{ videoInfo.vodDuration }}</div>
             </div>
+            <div class="video-title">{{ videoInfo.cartoonName }}</div>
           </div>
-          <div class="video-title">{{ videoInfo.cartoonName }}</div>
-        </div>
 
-        <div class="invite-section">
-          <div style="width: 50%;">
-            <div class="qr-container">
-              <img :src="qrCodeUrl" alt="二维码" v-if="qrCodeUrl" class="qr-image" />
+          <div class="invite-section">
+            <div style="width: 50%;">
+              <div class="qr-container">
+                <img :src="qrCodeUrl" alt="二维码" v-if="qrCodeUrl" class="qr-image" />
+              </div>
+            </div>
+            <div style="margin-left: 10px;width: 50%;">
+              <div class="invite-code-label">邀请码 {{ memberinfo.memberCode }}</div>
+              <div class="invite-desc">每邀请1人送1天会员</div>
+              <div class="addres">{{ url }}
+              </div>
             </div>
           </div>
-          <div style="margin-left: 10px;width: 50%;">
-            <div class="invite-code-label">邀请码 {{ memberinfo.memberCode }}</div>
-            <div class="invite-desc">每邀请1人送1天会员</div>
-            <div class="addres">{{ url }}
-            </div>
-          </div>
-        </div>
 
-        <div class="qr-section">
-          <div class="actions">
-            <button class="copy-btn" @click="copyQRCodeLink()">复制链接</button>
-            <button class="save-btn" @click="downloadQRCode()">保存图片</button>
+          <div class="qr-section">
+            <div class="actions">
+              <button class="copy-btn" @click="copyQRCodeLink()">复制链接</button>
+              <button class="save-btn" @click="downloadQRCode()">保存图片</button>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     </van-popup>
     <!-- 底部弹出 -->
-    <van-popup v-model:show="showSelect" closeable position="bottom" :style="{ height: '30%', backgroundColor: '#333' }">
+    <van-popup v-model:show="showSelect" closeable position="bottom"
+      :style="{ height: '30%', backgroundColor: '#333' }">
       <div v-for="(item, index) in srcList" :key="index" class="srclit">
         <div class="srtitle">{{ item.channel }}</div>
-        <div class="srbtn" @click="onPlay(item,index)">{{ item.urlList[0].name }}</div>
+        <div class="srbtn" @click="onPlay(item, index)">{{ item.urlList[0].name }}</div>
       </div>
     </van-popup>
 
@@ -109,25 +130,30 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, onUnmounted, onActivated, computed ,watch} from 'vue'
+import { onMounted, ref, onUnmounted, computed, watchEffect, nextTick, onBeforeMount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showLoadingToast, closeToast, showFailToast, showSuccessToast } from 'vant'
 import { post } from '@/utils/request'
-import CartoonItem from "./../../components/CartoonItem.vue"
+import { useHomeStore } from '@/store/home'
+import CartoonItem from "@/components/CartoonItem.vue"
 import AES from "@/utils/aes1.js"
 import DPlayer from 'dplayer'
 import Hls from 'hls.js'
-import likedIcon1 from '@/assets/videoinfo/dianz1.svg'
-import likedIcon from '@/assets/videoinfo/dianz.svg'
-import star1 from '@/assets/videoinfo/star1.svg'
-import star from '@/assets/videoinfo/star.svg'
+const likedIcon1 = '/videoinfo/dianz1.svg';
+const likedIcon = '/videoinfo/dianz.svg';
+const star1 = '/videoinfo/star1.svg';
+const star = '/videoinfo/star.svg';
+const placeholder = '/Image/pl.png';
+
+
 import QRCode from 'qrcode'
 import { copyText } from '@lxf2513/vue3-clipboard';
-import placeholder from "@/assets/Image/pl.png"
 import moment from 'moment'
+import AD from "@/components/Ad.vue"
 const videoRef = ref<HTMLDivElement | null>(null)
-const url= ref<any>('')
-const moveId =ref<any>(0)
+const url = ref<any>('')
+const store = useHomeStore()
+const moveId = ref<any>(0)
 const islookok = ref<any>(false)
 const memberinfo = ref<any>({})
 const scrollTop = () => {
@@ -143,7 +169,7 @@ const showCenter = ref(false)
 const showSelect = ref(false)
 // refs
 const dp = ref<DPlayer | null>(null)
-const PlayVideo = ref<HTMLDivElement | null>(null)
+const PlayVideo = ref<any>(null)
 const hls = ref<any>(null)
 
 // 数据
@@ -152,6 +178,7 @@ const srcList = ref<any>([])
 const recommend = ref<any>([])
 const danmuList = ref<any>([])
 const config = ref<any>({})
+let currentVideoId: string | null = null;
 // 假设 localStorage 里保存了已点赞的视频 id
 // 喜欢的视频列表
 const likedVideos = ref<number[]>(JSON.parse(localStorage.getItem('likedVideos') || '[]'))
@@ -166,7 +193,7 @@ const isLiked = computed(() => {
 // 当前视频是否已收藏
 const isSaved = computed(() => {
   if (!videoInfo.value) return false
-  return savedVideos.value.some((v:any) => v.cartoonCode === videoInfo.value.cartoonCode)
+  return savedVideos.value.some((v: any) => v.cartoonCode === videoInfo.value.cartoonCode)
 })
 
 // 喜欢/取消喜欢
@@ -204,7 +231,7 @@ const onLike = async () => {
 const onSave = async () => {
   if (!videoInfo.value) return
 
-  const index = savedVideos.value.findIndex((v:any) => v.cartoonCode === videoInfo.value.cartoonCode)
+  const index = savedVideos.value.findIndex((v: any) => v.cartoonCode === videoInfo.value.cartoonCode)
 
   if (index === -1) {
     // 添加整个对象
@@ -246,15 +273,15 @@ const onGetSavelit = async () => {
     console.log('收藏list', data);
   }
 }
-const onCancel=()=>{
+const onCancel = () => {
   router.back()
 }
-const onVip=()=>{
+const onVip = () => {
   router.push({
-  path:'/vip'
+    path: '/vip'
   })
 }
-const onPlay = (item: any,index:any) => {
+const onPlay = (item: any, index: any) => {
   moveId.value = index
   const url = item.urlList[0].url;
   if (!dp.value) return;
@@ -302,6 +329,23 @@ const onShare = () => {
 const onSelect = () => {
   showSelect.value = !showSelect.value
 }
+const loadedMap = reactive<any>({
+})
+// 初始化
+const handleImgLoaded = ({
+  title,
+  index,
+  time,
+  id
+}: {
+  title: string
+  index: number
+  time: number,
+  id: any
+}) => {
+  loadedMap[id] = true
+}
+
 // ----- API -----
 const onGetConfig = async () => {
   const res = await post('/app-api/ajax/getConfig', {})
@@ -313,10 +357,10 @@ const onGetConfig = async () => {
 
 const onLookOk = async (id: any) => {
   if (!srcList.value.length) return
-  const res = await post('/app-api/cartoon/lookOk', { cartoonCode: id*1, moviesInfoId: srcList.value[0].urlList[0].id*1 })
+  const res = await post('/app-api/cartoon/lookOk', { cartoonCode: id * 1, moviesInfoId: srcList.value[0].urlList[0].id * 1 })
   if (res.code === 0) {
-    if(res.data === true){
-    islookok.value = res.data
+    if (res.data === true) {
+      islookok.value = res.data
     }
   }
 }
@@ -332,8 +376,18 @@ const onGetVideoInfo = async (id: any) => {
     addToHistory(videoInfo.value)
     await onGetConfig()
     await onLookOk(id)
-    await onCreatedVideo()
-    showCenter.value =false
+    const origin = new URL(srcList.value[0].urlList[0].url).origin
+    if (!document.querySelector(`link[rel="preconnect"][href="${origin}"]`)) {
+      const link = document.createElement('link')
+      link.rel = 'preconnect'
+      link.href = origin
+      link.crossOrigin = 'anonymous'
+      document.head.appendChild(link)
+    }
+    nextTick(async () => {
+      await onCreatedVideo()
+      showCenter.value = false
+    })
   }
 }
 
@@ -358,27 +412,37 @@ const addToHistory = (video: any) => {
   }
 }
 // ----- 创建播放器 -----
+// ----- 创建播放器 -----
 const onCreatedVideo = () => {
   if (!PlayVideo.value || !srcList.value.length) return;
 
-  // 销毁旧的 DPlayer
-  if (dp.value) {
-    dp.value.destroy();
-    dp.value = null;
-  }
-
-  // 安全销毁旧的 HLS（注意：不再调用 stopLoad）
+  // 销毁旧播放器和 HLS
+  dp.value?.destroy();
+  dp.value = null;
   if (hls.value) {
     try {
-      hls.value.off?.(); // 移除所有监听
-      hls.value.destroy?.();
+      hls.value.off(Hls.Events.ERROR);
+      hls.value.detachMedia();
+      hls.value.destroy();
     } catch (e) {
-      console.warn("HLS destroy error", e);
+      console.warn("HLS destroy error:", e);
     }
     hls.value = null;
   }
- console.log("执行到这里了","player");
-  // 创建新的 DPlayer
+
+  const videoUrl = srcList.value[0].urlList[0].url;
+
+  // MP4 提前预加载元数据
+  if (!Hls.isSupported() && videoUrl.endsWith(".mp4")) {
+    const tempVideo = document.createElement("video");
+    tempVideo.preload = "metadata";
+    tempVideo.src = videoUrl;
+    tempVideo.muted = true;
+    tempVideo.playsInline = true;
+    tempVideo.play().catch(() => { });
+  }
+
+  // 创建 DPlayer
   dp.value = new DPlayer({
     container: PlayVideo.value,
     autoplay: true,
@@ -386,24 +450,48 @@ const onCreatedVideo = () => {
     loop: true,
     lang: "zh-cn",
     video: {
-      url: srcList.value[0].urlList[0].url,
+      url: videoUrl,
       pic: videoInfo.value.cartoonImage,
       type: "customHls",
+      playsinline: true,
+      muted: true,
+      controls: false,
       customType: {
         customHls: (video: HTMLVideoElement, player: any) => {
-          console.log(player.options.video.url,"player");
-          const url = player.options.video.url;
-
-          if (Hls.isSupported()) {
-           hls.value = new Hls(
-          );
-
-            // 加载流
-            hls.value.loadSource(url);
-            hls.value.attachMedia(video);
+          // ✅ Safari / iOS 原生 HLS
+          if (video.canPlayType("application/vnd.apple.mpegurl") && videoUrl.endsWith(".m3u8")) {
+            video.src = videoUrl;
+            video.playsInline = true;
             video.muted = true;
+            video.preload = "auto";
+            video.addEventListener("loadedmetadata", () => {
+              video.play().catch(() => {
+                video.addEventListener("click", () => video.play(), { once: true });
+              });
+              setupTimeUpdate(video);
+            });
+            return;
+          }
 
-            // 解析完成后自动播放
+          // ✅ 其他浏览器走 hls.js
+          if (Hls.isSupported() && videoUrl.endsWith(".m3u8")) {
+            hls.value = new Hls({
+              autoStartLoad: true,
+              startPosition: 0,
+              lowLatencyMode: true,
+              maxBufferLength: 1,       // 尽快首帧
+              maxMaxBufferLength: 2,
+              liveSyncDuration: 1,
+              liveMaxLatencyDuration: 3,
+              enableWorker: true,
+            });
+
+            hls.value.loadSource(videoUrl);
+            hls.value.attachMedia(video);
+
+            // ✅ 立即强制开始拉流，避免延迟
+            hls.value.startLoad(0);
+
             hls.value.on(Hls.Events.MANIFEST_PARSED, () => {
               video.play().catch(() => {
                 video.addEventListener("click", () => video.play(), { once: true });
@@ -411,73 +499,72 @@ const onCreatedVideo = () => {
               setupTimeUpdate(video);
             });
 
-            // 错误监听，避免黑屏/死循环 loading
+            let retryCount = 0;
             hls.value.on(Hls.Events.ERROR, (event, data) => {
-              console.warn("HLS Error:", event, data);
               if (data.fatal) {
                 switch (data.type) {
                   case Hls.ErrorTypes.NETWORK_ERROR:
-                    console.warn("尝试恢复网络错误");
-                    hls.value?.startLoad();
+                    if (retryCount < 3) {
+                      retryCount++;
+                      console.warn("尝试恢复网络错误，次数：", retryCount);
+                      hls.value?.startLoad(0);
+                    } else hls.value?.destroy();
                     break;
                   case Hls.ErrorTypes.MEDIA_ERROR:
-                    console.warn("尝试恢复媒体错误");
                     hls.value?.recoverMediaError();
                     break;
                   default:
-                    console.error("无法恢复，销毁 HLS");
                     hls.value?.destroy();
-                    hls.value = null;
                     break;
                 }
               }
             });
 
             player.hlsInstance = hls.value;
-          } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-            // Safari 原生支持 HLS
-            video.src = url;
+          } else {
+            // ✅ MP4 或不支持 HLS 的情况
+            video.src = videoUrl;
+            video.playsInline = true;
+            video.muted = true;
+            video.preload = "auto";
             video.addEventListener("loadedmetadata", () => {
               video.play().catch(() => {
                 video.addEventListener("click", () => video.play(), { once: true });
               });
               setupTimeUpdate(video);
             });
-          } else {
-            alert("当前浏览器不支持 HLS");
           }
-        },
-      },
-    },
+        }
+      }
+    }
   });
 };
 
-
-
+// ----- 试看限制 -----
 const setupTimeUpdate = (video: HTMLVideoElement) => {
   video.addEventListener("timeupdate", () => {
-    const vipdata = getVipStatus()
-    if(!vipdata.isVip || vipdata.memberVip <= 0){
-      if(islookok.value){
-          // 本集是否购买过
-      }else{
+    const vipdata = getVipStatus();
+    if (!vipdata.isVip || vipdata.memberVip <= 0) {
+      if (islookok.value) {
+        // 已购买过不限制
+      } else {
         if (video.currentTime >= config.value.shikan) {
-          video.pause()
-          video.currentTime = config.value.shikan
-          video.controls = false
-          showBottom.value = true
+          video.pause();
+          video.currentTime = config.value.shikan;
+          video.controls = false;
+          showBottom.value = true;
           video.addEventListener("play", () => {
             if (video.currentTime >= config.value.shikan) {
-              video.pause()
-              showBottom.value = true
+              video.pause();
+              showBottom.value = true;
             }
-          })
+          });
         }
       }
-     
     }
-  })
-}
+  });
+};
+
 const copyQRCodeLink = async () => {
   let text = url.value
   copyText(text, undefined, (success, event) => {
@@ -495,47 +582,57 @@ const downloadQRCode = () => {
   a.download = '视频分享好友.png'
   a.click()
 }
-watch(
-  () => route.query.id,
-  (newId, oldId) => {
-    if (newId !== oldId) {
-     onGetVideoInfo(route.query.id)
-    }
+// 监听 route.query.id 变化，只在真正变化时加载视频
+watchEffect(() => {
+  const newId = route.query.id as string;
+  if (newId && newId !== currentVideoId) {
+    currentVideoId = newId;
+    onGetVideoInfo(currentVideoId);
   }
-)
-const onBack= ()=>{
+});
+const onBack = () => {
   router.back()
 }
-const handleGoVideo=()=>{
-  console.log("子组件通知");
+
+
+const handleGoVideo = (item: any) => {
+  console.log('即将跳转', item.cartoonCode)
+  router.push({
+    path: '/videoinfo',
+    query: { id: item.cartoonCode }
+  }).catch(err => console.warn(err))
   scrollTop();
 }
-const onBuy =async()=>{
+
+const onBuy = async () => {
   const data = {
-    cartoonCode: 
-    videoInfo.value.cartoonCode*1,
+    cartoonCode:
+      videoInfo.value.cartoonCode * 1,
     moviesInfoId
-    :srcList.value[0].urlList[moveId.value].id*1,
+      : srcList.value[0].urlList[moveId.value].id * 1,
     type: 0
   }
-  const res = await post('/app-api/cartoon/buy', {...data})
-  console.log(res,"res");
-  if(res.code === 0){
+  const res = await post('/app-api/cartoon/buy', { ...data })
+  console.log(res, "res");
+  if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
     showSuccessToast(data)
     await onGetConfig()
-    await onLookOk( videoInfo.value.cartoonCode*1)
-    await onCreatedVideo()
-    showBottom.value = false
-  }else{
-    showFailToast(res.msg+'三秒后跳转')
-    setTimeout(()=>{
+    await onLookOk(videoInfo.value.cartoonCode * 1)
+    nextTick(async () => {
+
+      await onCreatedVideo()
+      showBottom.value = false
+    })
+  } else {
+    showFailToast(res.msg + '三秒后跳转')
+    setTimeout(() => {
       router.push({
-        path:'/pay'
+        path: '/pay'
       })
-    },3000)
+    }, 3000)
   }
-  
+
 }
 const onGetUserInfo = async () => {
   // 1. 先尝试从 localStorage 获取
@@ -544,14 +641,13 @@ const onGetUserInfo = async () => {
     try {
       const data = JSON.parse(cached)
       console.log('本地缓存用户信息', data)
-      memberinfo.value =data
+      memberinfo.value = data
       return data
     } catch (e) {
       console.error('解析本地缓存出错', e)
       // 如果解析出错，继续请求接口
     }
   }
-
   // 2. 如果没有缓存，或者缓存解析失败，则请求接口
   try {
     const res = await post('/app-api/member/getEntityByCode', {})
@@ -559,7 +655,7 @@ const onGetUserInfo = async () => {
       // 假设 res.data 是加密后的字符串
       const data = AES.decrypt(res.data, 'asdasdsadasdasds', { iv: '5245847584125485' }).toString(AES.enc.Utf8)
       console.log('用户详情', data)
-      memberinfo.value =data
+      memberinfo.value = data
       // 3. 存入 localStorage，下次直接使用
       localStorage.setItem('memberInfo', JSON.stringify(data))
       return data
@@ -595,35 +691,18 @@ function getVipStatus() {
     remainingDays
   }
 }
-const isIphoneX = () => {
-  const ua = navigator.userAgent
-  const isIOS = /iP(hone|od|ad)/.test(ua)
-  const { width, height } = window.screen
-  // iPhone X/XS: 375 x 812
-  // iPhone XR/XS Max: 414 x 896
-  // iPhone 12/13/14 mini/pro/max 等同 XR/XS 系列尺寸
-  const iphoneXLike =
-    (width === 375 && height === 812) ||
-    (width === 812 && height === 375) ||
-    (width === 414 && height === 896) ||
-    (width === 896 && height === 414)
-  
-  return isIOS && iphoneXLike
-}
-const onBindCode = async(parentId:any)=>{
-   const res = await post('/renren-api/api/member/bindInviteCode', {
-      parentId: parentId
-    })
-    if(res.code =! 0 ){
-      showFailToast(res.msg)
-    }
-}
-// ----- 生命周期 -----
-onMounted(async () => {
-  const id: any = route.query.id
-  if(id){
-    onBindCode(id)
+
+const onBindCode = async (parentId: any) => {
+  const res = await post('/renren-api/api/member/bindInviteCode', {
+    parentId: parentId
+  })
+  if (res.code = !0) {
+    // showFailToast(res.msg)
   }
+}
+
+onBeforeMount(async () => {
+  const id: any = route.query.id
   if (!id) {
     let second = 3
     const toast = showLoadingToast({ duration: 0, forbidClick: true, message: `${second} 秒后退出,无携带参数` })
@@ -633,35 +712,46 @@ onMounted(async () => {
       else { clearInterval(timer); closeToast(); router.back() }
     }, 1000)
   } else {
-    await onGetVideoInfo(id)
     await onGetUserInfo()
+    await onGetVideoInfo(id)
   }
-   try {
-    const text = window.location.href+'&'+`share=${memberinfo.value.memberCode}`
-    url.value = text
-    qrCodeUrl.value = await QRCode.toDataURL(text, {
-      width: 108,   // 二维码宽度
-      margin: 1,
-      padding: 2,
-      color: {
-        dark: '#000000',  // 二维码颜色
-        light: '#ffffff'  // 背景颜色
-      }
-    })
-    console.log(qrCodeUrl.value, "qrCodeUrl.value")
-  } catch (err) {
-    console.error(err)
-  }
-  // await onGetSavelit()
-    if (isIphoneX()) {
-    const header = document.querySelector('.videoinfo') as HTMLElement
-    if (header) header.style.paddingTop = '90px'
+
+}),
+  // ----- 生命周期 -----
+  onMounted(async () => {
+    const share: any = route.query.share
+    if (share) {
+      await onBindCode(share)
     }
-})
+    try {
+      const text = window.location.href + '&' + `share=${memberinfo.value.memberCode}`
+      url.value = text
+      qrCodeUrl.value = await QRCode.toDataURL(text, {
+        width: 108,   // 二维码宽度
+        margin: 1,
+        padding: 2,
+        color: {
+          dark: '#000000',  // 二维码颜色
+          light: '#ffffff'  // 背景颜色
+        }
+      })
+      console.log(qrCodeUrl.value, "qrCodeUrl.value")
+    } catch (err) {
+      console.error(err)
+    }
+    // await onGetSavelit()
+    await nextTick(); // 等待 DOM 渲染
+    // 强制滚动到顶部
+
+  })
 
 onUnmounted(() => {
   if (dp.value) { dp.value.destroy(); dp.value = null }
-  if (hls.value) { hls.value.destroy(); hls.value = null }
+  if (hls.value) {
+    hls.value.detachMedia();
+    hls.value.destroy();
+    hls.value = null;
+  }
 })
 
 defineOptions({
@@ -674,13 +764,9 @@ defineOptions({
 .videoinfo {
   height: 100vh;
   overflow: auto;
+  box-sizing: border-box;
 
   .backicon {
-    position: fixed;
-    z-index: 9999;
-    ;
-    left: 10px;
-    top: 10px;
     background-color: rgba(0, 0, 0, .5);
     width: 30px;
     height: 30px;
@@ -694,6 +780,12 @@ defineOptions({
     width: 100%;
     height: 200px;
     background-color: black;
+    position: relative;
+    /* 必须有定位 */
+    z-index: 1;
+    /* 保证低于弹窗 */
+    transform: translateZ(0);
+    /* 强制 GPU 图层 */
   }
 
   .introduce {
@@ -941,5 +1033,23 @@ defineOptions({
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+}
+
+.ellipsis {
+  width: 150px;
+  /* 固定宽度 */
+  white-space: nowrap;
+  /* 不换行 */
+  overflow: hidden;
+  /* 超出隐藏 */
+  text-overflow: ellipsis;
+  /* 显示省略号 */
+}
+
+.cartoon-item {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
 }
 </style>

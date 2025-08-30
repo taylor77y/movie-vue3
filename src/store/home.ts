@@ -18,6 +18,13 @@ export const useHomeStore = defineStore('home', () => {
   const fenlei= ref<any>({
     img:''
   })
+  const showAd = ref<any>(false)
+  const darksidead  = ref<any[]>([])
+  const squaread = ref<any[]>([])
+  const play= ref<any[]>([])
+  const indexPopupAd = ref<any>({
+  })
+  const randomadEnableStatus= ref<any>(0)
   const user =ref<any[]>([])
   const banner = ref<any[]>([])
   const nottitle = ref('')
@@ -44,28 +51,37 @@ export const useHomeStore = defineStore('home', () => {
     const res = await post('/app-api/ajax/getConfig', {})
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+      console.log(data,"data");
+      
       nottitle.value = data.popupContent
+      showAd.value = data.showAd
     }
   }
 
   const getGuangGao = async () => {
     const res = await post('/app-api/ajax/guanggao', {})
     if (res.code === 0) {
-
       
-      const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+      const data = res.data
+      randomadEnableStatus.value = data.randomadEnableStatus
+      console.log("广告",data);
       
       randomad.value = data.randomad.map((item: any) => ({ ...item, adtype: 'ad' }))
+      indexPopupAd.value = data.indexPopupAd
+      play.value= data.play
       banner.value = data.banner
       fenlei.value = data.fenlei
       user.value = data.user
+      squaread.value= data.squaread
+      darksidead.value= data.darksidead
     }
   }
 
   const getTagList = async () => {
     const res = await post('/app-api/cartoon/listLeftType', {})
     if (res.code === 0) {
-      tags.value = res.data
+         const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+      tags.value =data
       tags.value.unshift({ dictCode: 0, dictName: '首页' })
     }
   }
@@ -127,8 +143,6 @@ export const useHomeStore = defineStore('home', () => {
 
   // ----- 初始化方法 -----
   const initHome = async () => {
-    console.log(123);
-    
     if (!initialized) {
       await getConfig()
       await getGuangGao()
@@ -152,10 +166,16 @@ export const useHomeStore = defineStore('home', () => {
     scrollTop,
     randomad,
     banner,
+    indexPopupAd,
     nottitle,
     activeTag,
     initialized,
     user,
+    squaread,
+    play,
+    darksidead,
+    showAd,
+    randomadEnableStatus,
 
     // 方法
     insertAds,

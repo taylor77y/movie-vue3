@@ -3,12 +3,12 @@
         <div class="header">
             <div @click="onBack()"><van-icon name="arrow-left" color="#ff960c" size="22" /></div>
             <div class="tit">任务中心</div>
-            <div class="">
+            <div style="width: 22px;">
             </div>
         </div>
         <div class="sign-li">
             <div class="sign-li-h">
-                <img src="@/assets/check/star-coin.png" style="width: 30px;height: 30px;" />
+                <img src="/check/star-coin.png" style="width: 30px;height: 30px;" />
                 <div class="text">{{ memberInfo.memberCion }}</div>
             </div>
 
@@ -23,7 +23,7 @@
                 ]" v-for="(item, index) in 7">
                     <div v-if="index < 6">
                         <div>第{{ item  }}天 </div>
-                        <img src="@/assets/check/star-coin.png" style="width: 30px;height: 30px;margin: 5px 0;" />
+                        <img src="/check/star-coin.png" style="width: 30px;height: 30px;margin: 5px 0;" />
                         <div class="fl">{{ list[index] }}</div>
                     </div>
                     <div v-else class="d7">
@@ -60,16 +60,16 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { useRouter } from "vue-router";
-import o1 from "@/assets/check/1.png"
-import o2 from "@/assets/check/2.png"
-import o3 from "@/assets/check/3.png"
-import o4 from "@/assets/check/4.png"
+import o1 from "/check/1.png"
+import o2 from "/check/2.png"
+import o3 from "/check/3.png"
+import o4 from "/check/4.png"
 import { post, get } from '@/utils/request'
 import { showFailToast, showLoadingToast, showSuccessToast } from "vant";
 const router = useRouter()
 const list = ['+1金币', '+1金币', '+1天VIP', '+2金币','+2金币', '+3金币', '+3天VIP']
 const days = ref<any>(0)
-const daysqm = ref<any>('-1')
+const daysqm = ref<any>(0)
 const memberInfo = ref<any>({})
 const iconlist = [{
     name: '每日登录',
@@ -120,9 +120,9 @@ const onGo = (index: number) => {
 }
 const onPostSign = async () => {
       showLoadingToast({
-    message: '签到中...',
-    forbidClick: true,
-    });
+        message: '签到中...',
+        forbidClick: true,
+        });
     const today = new Date()
 
     // 获取年、月、日
@@ -133,9 +133,10 @@ const onPostSign = async () => {
     // 拼接成 YYYY-MM-DD
     // lwlist
     const currentDate = `${year}-${month}-${day}`
+    let index =daysqm.value === '-1'?0:daysqm.value
     const data = {
-        amount:lwlist[daysqm.value],
-        commodityType:(lwlist[daysqm.value] === 2||lwlist[daysqm.value] === 6) ?2:1,
+        amount:lwlist[index],
+        commodityType:(index === 2||index === 6) ?2:1,
         date:currentDate
     }
     const res = await post('/renren-api/api/sign', {
@@ -146,9 +147,9 @@ const onPostSign = async () => {
         await onGetSignDay()
         await onGetSignDay()
         await onRfUserInfo()
-        showSuccessToast(res.msg);
+        showSuccessToast("签到成功");
     }else{
-        showFailToast(res.msg);
+        showFailToast("今日已经打过卡了,明天再来吧...");
     }
 }
 const onGetSign = async () => {
@@ -166,8 +167,8 @@ const onGetSignDay = async () => {
     })
     if (res.code === 0) {
         days.value = res.data * 1
-        if(res.data === 0){
-             daysqm.value =  days.value %7
+        if(res.data != 0){
+             daysqm.value =  (days.value %7)-1
         }else{
              daysqm.value =  '-1'
         }
@@ -197,7 +198,6 @@ const onRfUserInfo = async () => {
   if (res.code === 0) {
     memberInfo.value = res.data
     localStorage.setItem('memberInfo', JSON.stringify(res.data))
-    localStorage.setItem('token', res.data.token)
   }
 }
 onMounted(async () => {
@@ -235,7 +235,7 @@ onMounted(async () => {
     .sign-li {
         height: calc(100vh - 50px);
         overflow: auto;
-        background-image: url('@/assets/check/bg.png');
+        background-image: url('/check/bg.png');
         /* 换成你的背景图路径 */
         background-repeat: no-repeat;
         background-position: right top;
@@ -306,7 +306,7 @@ onMounted(async () => {
                     display: flex;
                     align-items: start;
                     flex-direction: column;
-                    background-image: url('@/assets/check/mbl.png');
+                    background-image: url('/check/mbl.png');
                     background-repeat: no-repeat;       /* 不重复 */
                     background-position: center;        /* 居中 */
                     background-size: contain;           /* 保持比例，缩放到容器内完整显示 */

@@ -2,33 +2,18 @@
 import { RouterLink, RouterView } from 'vue-router'
 import { post } from './../utils/request'
 import { v4 as uuidv4 } from 'uuid'
-import O1 from "./../assets/tabbar/01.svg"
-import O2 from "./../assets/tabbar/02.svg"
-import O3 from "./../assets/tabbar/03.svg"
-import O4 from "./../assets/tabbar/04.svg"
-import O5 from "./../assets/tabbar/darknet_activew.svg"
-import OO1 from "./../assets/tabbar/001.svg"
-import OO2 from "./../assets/tabbar/002.svg"
-import OO3 from "./../assets/tabbar/003.svg"
-import OO4 from "./../assets/tabbar/004.svg"
-import OO5 from "./../assets/tabbar/darknet_active.svg"
+
 import { ref, onMounted, computed, KeepAlive, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useHomeStore } from '@/store/home'
-const store = useHomeStore()
 const timer = ref<any>(null)
 const router = useRouter()
 const active = ref("/")
 const route = useRoute()
 const memberInfo = ref<any>({})
 // 计算属性判断是否显示 Tabbar
-// 根据路由 meta 判断是否显示 Tabbar
-const showTabbar = computed(() => route.meta.showTabbar !== false)
 const show = ref<any>(false)
-
-const goPublish = () => {
-  console.log('点击发布')
-}
+const store = useHomeStore()
 const onCreateUUid = () => {
   const uuid = uuidv4()
   return uuid
@@ -53,7 +38,6 @@ const onRfUserInfo = async () => {
   if (res.code === 0) {
     memberInfo.value = res.data
     localStorage.setItem('memberInfo', JSON.stringify(res.data))
-    localStorage.setItem('token', res.data.token)
   }
 }
 const onGo = (path: any) => {
@@ -154,6 +138,7 @@ const test = () => {
   localStorage.setItem('token', '69b156667a1f4b10ac2a87a8757973d1')
   localStorage.setItem('memberInfo', JSON.stringify(data))
 }
+
 onMounted(async () => {
   active.value = route.path
   // 只在开发环境执行 test
@@ -163,34 +148,78 @@ onMounted(async () => {
     if (localStorage.getItem('memberInfo') === null) {
       await onGetUserInfo()
     } else {
+      const userData: any = localStorage.getItem('memberInfo')
+      memberInfo.value = JSON.parse(userData)
+      // 
       timer.value = setInterval(onRfUserInfo, 10000)
     }
   }
 
+  // 动态创建 Aplus 脚本
+  (function (w, d, s, q, i) {
+    w[q] = w[q] || [];
+    const f = d.getElementsByTagName(s)[0];
+    const j = d.createElement(s);
+    j.async = true;
+    j.id = "beacon-aplus";
+    j.src = "https://d.alicdn.com/alilog/mlog/aplus/" + i + ".js";
+    f.parentNode!.insertBefore(j, f);
+  })(window, document, "script", "aplus_queue", "203467608");
+
+  // 设置 appKey
+  window.aplus_queue.push({
+    action: "aplus.setMetaInfo",
+    arguments: ["appKey", "68a1c9fbe563686f427f6968"],
+  });
+
+  // 单页应用手动 PV
+  window.aplus_queue.push({
+    action: "aplus.setMetaInfo",
+    arguments: ["aplus-waiting", "MAN"],
+  });
+
+  // 开启调试
+  window.aplus_queue.push({
+    action: "aplus.setMetaInfo",
+    arguments: ["DEBUG", true],
+  });
+
+  // 设置 uuid
+  window.aplus_queue.push({
+    action: "aplus.setMetaInfo",
+    arguments: ["aplus-idtype", memberInfo.value.h5Uuid],
+  });
+  window.aplus_queue.push({
+    action: "aplus.sendPV",
+    arguments: [
+      {
+        is_auto: false,       // 表示手动上报 PV，不是自动上报
+      },
+      {
+        page_path: "进入首页", // 页面路径或名称
+        user_id: memberInfo.value.h5Uuid      // 用户 ID，可用于埋点区分用户
+      },
+    ],
+  });
 })
 </script>
 
 <template>
   <!-- 开启顶部安全区适配 -->
-  <!-- <router-view v-slot="{ Component }" :key="route.fullPath">
-    <KeepAlive include="['HomeView','CategoryView']">
-      <component :is="Component" />
-    </KeepAlive>
-  </router-view> -->
-  <router-view ></router-view>
-
-  <div class="custom-tabbar" v-if="showTabbar">
+  <RouterView :key="route.fullPath">
+  </RouterView>
+  <div class="custom-tabbar"  v-if="route.meta.showTabbar !== false">
     <van-tabbar v-model="active">
       <van-tabbar-item name="/" @click="onPush('/')">
         <template #icon="{ active: isActive }">
-          <img :src="!isActive ? O1 : OO1" :class="{ 'icon-active': isActive }" />
+          <img :src="!isActive ? '/tabbar/01.svg' : '/tabbar/001.svg'" :class="{ 'icon-active': isActive }" />
         </template>
         <span :class="{ 'text-active': active === 'home' }">首页</span>
       </van-tabbar-item>
 
       <van-tabbar-item name="/category" @click="onPush('/category')">
         <template #icon="{ active: isActive }">
-          <img :src="!isActive ? O2 : OO2" :class="{ 'icon-active': isActive }" />
+          <img :src="!isActive ? '/tabbar/02.svg' : '/tabbar/002.svg'"  :class="{ 'icon-active': isActive }" />
         </template>
         <span :class="{ 'text-active': active === 'category' }">专题</span>
       </van-tabbar-item>
@@ -199,7 +228,9 @@ onMounted(async () => {
       <van-tabbar-item name="/publish" @click="onPush('/publish')">
         <template #icon="{ active: isActive }">
           <div class="center-btn">
-            <img :src="!isActive ? O5 : OO5" class="" style="width: 32px;height: 32px;" />
+            <img :src="!isActive ? '/tabbar/05.svg' : '/tabbar/005.svg'" class="" style="width: 32px;height: 32px;   -webkit-user-drag: none; 
+        user-select: none;
+        pointer-events: none; " />
             <span class="center-text" :class="{ 'text-active': active === 'publish' }">暗网</span>
           </div>
         </template>
@@ -207,27 +238,25 @@ onMounted(async () => {
 
       <van-tabbar-item name="/collengt" @click="onPush('/collengt')">
         <template #icon="{ active: isActive }">
-          <img :src="!isActive ? O3 : OO3" :class="{ 'icon-active': isActive }" />
+          <img :src="!isActive ? '/tabbar/03.svg' : '/tabbar/003.svg'" :class="{ 'icon-active': isActive }" />
         </template>
         <span :class="{ 'text-active': active === 'collengt' }">收藏</span>
       </van-tabbar-item>
 
       <van-tabbar-item name="/my" @click="onPush('/my')">
         <template #icon="{ active: isActive }">
-          <img :src="!isActive ? O4 : OO4" :class="{ 'icon-active': isActive }" />
+          <img :src="!isActive ? '/tabbar/04.svg' : '/tabbar/004.svg'" :class="{ 'icon-active': isActive }" />
         </template>
         <span :class="{ 'text-active': active === 'my' }">我的</span>
       </van-tabbar-item>
     </van-tabbar>
-
-
   </div>
 
   <van-overlay :show="show">
     <div class="g-wrapper aw">
       <div class="block">
         <div class="conta">
-          <img src="./../assets/pub/1.svg" style="width: 160px;height: 160px;" />
+          <img src="/pub/1.svg" style="width: 160px;height: 160px;" />
           <div class="pd5">此板块都是暗网禁片真实解密的内容，</div>
           <div class="pd5">只对少量需求用户开放，</div>
           <div class="pd5">无承受能力者勿入！！</div>
@@ -304,6 +333,7 @@ nav a:first-of-type {
     margin-top: 1rem;
   }
 }
+
 </style>
 <style lang="less" scoped>
 .custom-tabbar {

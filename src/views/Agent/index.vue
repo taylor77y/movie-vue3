@@ -22,9 +22,9 @@
 </template>
 <script setup lang="ts">
 import { ref ,onMounted} from "vue"
-import O1 from "./../../assets/setting/01.svg"
-import O2 from "./../../assets/setting/02.svg"
-import O3 from "./../../assets/setting/03.svg"
+const O1 = '/setting/01.svg';
+const O2 = '/setting/02.svg';
+const O3 = '/setting/03.svg';
 import { useRouter } from "vue-router";
 import { showToast } from "vant";
 const router = useRouter()
@@ -34,10 +34,10 @@ const list = ref<any>([
         title: '账单查看',
         icon: O1
     },
-    // {
-    //     title: '申请提现',
-    //     icon: O2
-    // },
+    {
+        title: '申请提现',
+        icon: O2
+    },
 ])
 const onBack = () => {
     router.back()

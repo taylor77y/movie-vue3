@@ -11,13 +11,13 @@
         <!-- 背景视频 -->
         <video ref="videoRef" class="bg-video" style="width: 100%;height: calc(100vh - 50px);" autoplay muted loop
             playsinline>
-            <source :src="bgVideo" type="video/webm" />
-            <source :src="bgVideo" type="video/mp4" />
+            <source src="/background.mp4" type="video/webm" />
+            <source src="/background.mp4" type="video/mp4" />
         </video>
         <div class="bg-video-item ">
             <div style="display: flex;align-items: center;">
                 <div class="welcome-text">欢迎来到</div>
-                <img class="welcome-logo" src="@/assets/login/91PORN.png" style="width: 150px;height: 30px;" />
+                <img class="welcome-logo" src="/91PORN.png" style="width: 150px;height: 30px;" />
             </div>
             <div class="logintext">账号登录</div>
             <div class="login-container">
@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import bgVideo from '@/assets/login/background.mp4'
+
 import { onMounted, ref } from "vue"
 import { post } from '@/utils/request'
 import { showToast } from "vant"
@@ -61,7 +61,7 @@ const onBack = () => {
     router.back()
 }
 const onKefu = () => {
-    window.location.href = 'http://t.me/porn91kefu'
+    window.open('http://t.me/porn91kefu', '_blank')
 }
 const onLogin = async () => {
     // 判空

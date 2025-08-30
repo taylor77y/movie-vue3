@@ -3,12 +3,18 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-
+import { visualizer } from 'rollup-plugin-visualizer'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+       visualizer({
+      filename: './dist/stats.html', // 打包报告输出路径
+      open: true,                     // 打包完成自动打开
+      gzipSize: true,                 // 显示 gzip 压缩体积
+      brotliSize: true,               // 显示 brotli 压缩体积
+    })
   ],
   base: './',
   server: {
@@ -34,4 +40,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  build: {
+    sourcemap: true, // 开启 sourcemap 更容易分析
+  }
+
 })

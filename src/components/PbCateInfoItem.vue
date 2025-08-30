@@ -1,12 +1,11 @@
 <template>
-   
-    <div  class="cartoon-item"  :class="{ 'full-width': index === 0 }" @click="onGoVideoInfo(item)">
+    <div  class="ad-cartoon-item"   @click="onGoVideoInfo(item)">
         <div class="img-wrapper" @click="onGoVideoInfo(item)">
-            <img   v-lazy="item.cartoonImage"  class="img zoomIn" @error="onImgError"  @click="onGoVideoInfo(item)"/>
+            <van-image @load="onLoad" :src="item.cartoonImage"  class="img zoomIn" @error="onImgError"  @click="onGoVideoInfo(item)" >  </van-image>
             <div class="img-top" v-if="item.cartoonVip" >VIP</div>
             <div class="img-bottom">
                 <div class="flex">
-                    <img src="./../assets/show.svg" style="width: 15px;height: 15px;margin-right: 3px;" />
+                    <img src="/show.svg" style="width: 15px;height: 15px;margin-right: 3px;"  />
                     <div> {{ item.cartoonHot }}</div>
                 </div>
                 <div class="flex">
@@ -26,6 +25,8 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
+import { nextTick } from 'vue'
+import { showLoadingToast } from 'vant';
 const router = useRouter()
 const props = defineProps({
     item: { type: Object, required: true },
@@ -33,31 +34,27 @@ const props = defineProps({
     index: { type: Number, required: true },
 })
 
-const emits = defineEmits(['error','goVideo'])
-
+const emits = defineEmits(['error','goVideo',"imgLoaded"])
+const start = performance.now() // 组件挂载时记录开始时间
 const onImgError = (e) => {
     emits('error', e)
 }
-const onOpen = (url) => {
-  window.open(url, '_blank')
+const onLoad = async() => {
+  const end = performance.now()
+  const time = end - start
+  emits('imgLoaded', {title:props.title, index: props.index, time,id:props.item.cartoonCode  })
 }
-const onGoVideoInfo=(item)=>{
-    router.push({
-        path:'/videoinfo',
-        query:{
-            id:item.cartoonCode
-        }
-    })
-     emits('goVideo', item)
-}
+const onGoVideoInfo = async (item) => {
+   emits('goVideo', item);
+};
 
 
 </script>
 
 <style lang="less" scoped>
 
-.cartoon-item {
-    width: 48%;
+.ad-cartoon-item {
+    width: 100%;
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
@@ -68,9 +65,10 @@ const onGoVideoInfo=(item)=>{
     .img-wrapper {
          height: 100px;
         position: relative;
-          background-image: url("./../assets/Image/pl.png");
+          background-image: url("/Image/pl.png");
         background-size: 100% 100%;
         background-repeat: no-repeat;
+              border-radius: 5px;
 
         .img {
             height: 100%;
@@ -189,10 +187,14 @@ const onGoVideoInfo=(item)=>{
   width: 100% !important;
   .img-wrapper{
     height: 200px;
-    background-image: url("./../assets/Image/pl.png");
+    background-image: url("/Image/pl.png");
     background-size: 100% 100%;
     background-repeat: no-repeat;
   }
   
+}
+/deep/ .van-image__img {
+    border-top-left-radius: 5px;
+     border-top-right-radius: 5px;
 }
 </style>

@@ -10,15 +10,26 @@
       <div class="ons" @click="onSreach()">搜索</div>
     </div>
     <div class="srelist" ref="scrollContainer" @scroll="onScroll">
-      <CartoonItem @goVideo="handleGoVideo" v-for="item in list" :key="item.id" :item="item" @error="onImgError" />
+      <div v-for="(item, index) in list" :class="['cartoon-item', { 'full-width': index === 0 }]">
+        <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
+          <div class="skeleton-img">
+            <van-loading type="spinner" />
+          </div>
+          <div class="skeleton-text"></div>
+        </div>
+        <CartoonItem v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item" title=""
+          :index="index" :cartoon-name="item.cartoonName" @error="onImgError" @imgLoaded="handleImgLoaded" />
+      </div>
       <van-back-top bottom="10vh" :style="{ backgroundColor: '#FF960C', borderRadius: '50%' }" />
+
+
       <div v-if="loading" class="loading">加载中...</div>
       <div v-if="noMore" class="no-more">没有更多数据</div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref,reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
@@ -50,6 +61,22 @@ const onSreach = async () => {
   currentPage.value = 1
   list.value = []
   await onGetData()
+}
+const loadedMap = reactive<any>({
+})
+// 初始化
+const handleImgLoaded = ({
+  title,
+  index,
+  time,
+  id
+}: {
+  title: string
+  index: number
+  time: number,
+  id: any
+}) => {
+  loadedMap[id] = true
 }
 const onGetData = async (reset = false) => {
   if (loading.value) return
@@ -85,9 +112,14 @@ const onGetData = async (reset = false) => {
 
   loading.value = false
 }
-const handleGoVideo = () => {
-
+const handleGoVideo = (item: any) => {
+  console.log('即将跳转', item.cartoonCode)
+  router.push({
+    path: '/videoinfo',
+    query: { id: item.cartoonCode }
+  }).catch(err => console.warn(err))
 }
+
 const onImgError = () => {
 
 }
@@ -103,7 +135,7 @@ const isIphoneX = () => {
     (width === 812 && height === 375) ||
     (width === 414 && height === 896) ||
     (width === 896 && height === 414)
-  
+
   return isIOS && iphoneXLike
 }
 onMounted(async () => {
@@ -114,10 +146,10 @@ onMounted(async () => {
     cartoonType.value = route.query.type
   }
   await onGetData()
-    if (isIphoneX()) {
+  if (isIphoneX()) {
     const header = document.querySelector('.sre') as HTMLElement
     if (header) header.style.paddingTop = '90px'
-    }
+  }
 })
 </script>
 <style lang="less" scoped>
@@ -158,7 +190,8 @@ onMounted(async () => {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    height: calc(100vh - 100px);
+    max-height: calc(100vh - 100px);
+    min-height: 200px;
     overflow: auto;
   }
 
@@ -186,4 +219,35 @@ onMounted(async () => {
   color: var(--primary-color);
   width: 100%;
 }
+
+.cartoon-item {
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
+}
+
+.full-width {
+  width: 100% !important;
+
+  .img-wrapper {
+    height: 200px;
+    background-image: url("/Image/pl.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+}
+.cartoon-item {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    .img-wrapper {
+    height: 100px;
+    background-image: url("/Image/pl.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+}
+ 
 </style>

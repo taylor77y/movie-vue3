@@ -6,10 +6,10 @@
             <div class="tit"> 留言反馈 </div>
             <div style="width: 22px;"></div>
         </div>
-        <div style="padding: 5px 0px;">
+        <div style="padding: 5px 0px;margin-bottom: 20px;">
             感谢您的宝贵意见和建议
         </div>
-        <div>
+        <div style="border-bottom: 1px solid #cccccc;padding-bottom: 20px;">
             <van-cell-group inset style="margin: 0px;">
                 <van-field class="ly" v-model="message" rows="1" autosize  type="textarea"
                     placeholder="请输入留言" />
@@ -99,9 +99,9 @@ const onSubmit=async()=>{
     color: var(--text-color) !important;
 }
 
-/deep/ .van-cell-group--inset {
+:deep .van-cell-group--inset {
     padding: 0px;
-    border-radius: 0px;
+   border-radius: 0px;
     color: var(--text-color);
 }
 .van-field__control{

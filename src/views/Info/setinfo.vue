@@ -14,7 +14,7 @@
                     class="avatar-uploader">
                     <template #default>
                         <div v-if="!fileList.length" class="upload-placeholder">
-                            <img src="@/assets/my/avatar.png" alt="头像" />
+                            <img src="/my/avatar.png" alt="头像" />
                         </div>
                     </template>
                 </van-uploader>
@@ -40,7 +40,6 @@
                         style="padding-right: 30px;" />
                 </div>
             </div>
-
             <!-- 保存按钮 -->
             <div style="width: 100%; display: flex; align-items: center; justify-content: center;">
                 <div type="primary" block @click="onUpdate()" class="save-btn">
@@ -57,7 +56,7 @@ import { useRouter } from "vue-router";
 import { Uploader, showToast } from 'vant'
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
-import avatar from "@/assets/my/avatar.png"
+import avatar from "/my/avatar.png"
 const loading = ref<any>(0)
 const fileList = ref<any>([
 ])
@@ -106,7 +105,6 @@ const onRfUserInfo = async () => {
     if (res.code === 0) {
         userinfo.data = res.data
         localStorage.setItem('memberInfo', JSON.stringify(res.data))
-        localStorage.setItem('token', res.data.token)
     }
 }
 const onBack = () => {

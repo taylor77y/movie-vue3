@@ -36,6 +36,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { post } from '@/utils/request'
+import AES from '@/utils/aes1.js'
 import { onMounted, ref } from "vue";
 
 // 数据
@@ -96,9 +97,9 @@ const onGetTag = async () => {
         dictCode: "", dictLevel: 1
     })
     if (res.code === 0) {
-        console.log(res.data, "data");
-        typeList.value = res.data;
-        childList.value = res.data[0]?.child ?? [];
+          const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+        typeList.value = data;
+        childList.value = data[0]?.child ?? [];
     }
 }
 const isIphoneX = () => {

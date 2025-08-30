@@ -11,9 +11,18 @@
                 <div  class="rtitle">{{ title }}</div>
             </div>
             <div class="list-con">
-                <CateInfoItem @goVideo="handleGoVideo" v-for="item in list" :key="item.id" :item="item"  title="专题"
-          @error="onImgError" >
+              <div v-for="(item,index) in list" class="cartoon-item">
+                         <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
+                      <div class="skeleton-img">
+                      <van-loading type="spinner" />
+                      </div>
+                      <div class="skeleton-text"></div>
+                  </div>
+                <CateInfoItem v-show="loadedMap[item.cartoonCode]"  @goVideo="handleGoVideo"  :key="iindex" :item="item"  title="专题"
+                 @error="onImgError"  @imgLoaded="handleImgLoaded" >
                 </CateInfoItem>
+              </div>
+               
             </div>
                <van-back-top bottom="10vh" :style="{ backgroundColor: '#FF960C', borderRadius: '50%' }" />
               <div v-if="loading" class="loading">加载中...</div>
@@ -24,7 +33,7 @@
 </template>
 <script setup lang="ts">
 import { useRouter,useRoute } from "vue-router";
-import { onMounted,ref } from "vue"
+import { onMounted,ref,reactive } from "vue"
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
 import CateInfoItem from "@/components/CateInfoItem.vue"
@@ -42,8 +51,28 @@ const currentPage = ref<any>(1)
 const path = ref<any>('')
 const loading= ref<any>(false)
 const noMore = ref<any>(false)
-const handleGoVideo= ()=>{
-
+const handleGoVideo = (item:any) => {
+  console.log('即将跳转', item.cartoonCode)
+  router.push({
+    path: '/videoinfo',
+    query: { id: item.cartoonCode }
+  }).catch(err => console.warn(err))
+}
+const loadedMap = reactive<any>({
+})
+// 初始化
+const handleImgLoaded = ({
+  title,
+  index,
+  time,
+  id
+}: {
+  title: string
+  index: number
+  time: number,
+  id:any
+}) => {
+  loadedMap[id] = true
 }
 const onImgError= ()=>{
     
@@ -70,6 +99,7 @@ const onGetData = async () => {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
       if (data.length != 10) noMore.value = true
       list.value = [...list.value, ...data]
+      console.log(list.value,"list.value");
       currentPage.value++
     }
   } catch (err) {
@@ -131,5 +161,21 @@ onMounted(async()=>{
   text-align: center;
   padding: 10px 0;
   color: var(--primary-color);
+}
+
+.cartoon-item {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+.full-width {
+  width: 100% !important;
+  .img-wrapper{
+    height: 200px;
+    background-image: url("/Image/pl.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
 }
 </style>
