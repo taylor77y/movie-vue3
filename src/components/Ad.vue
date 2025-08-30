@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-d">
+  <div class="flex-d" >
     <div class="flex">
         <div v-for="(item) in list" :key="item.id" class="flex-ad" @click="onOpen(item)">
             <img  :src="item.img" class="adimg" />
@@ -10,14 +10,20 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue'
-
+import { post } from '@/utils/request'
+import AES from '@/utils/aes1.js'
 // 定义 props
 const props = defineProps<{
   list: any
 }>()
-const onOpen=(item:any)=>{
-    window.open(item.url,'_blank')
+const onOpen = async(item: any) => {
+  const res = await post('/app-api/member/swiperAdClickCount', {
+    id:item.id
+  })
+  if (res.code === 0) {
+    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+  }
+  window.open(item.url, '_blank')
 }
 // 模板中直接用 props.list
 const list = props.list

@@ -52,16 +52,14 @@ export const useHomeStore = defineStore('home', () => {
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
       console.log(data,"data");
-      
-      nottitle.value = data.popupContent
       showAd.value = data.showAd
+      nottitle.value = data.popupContent
     }
   }
 
   const getGuangGao = async () => {
     const res = await post('/app-api/ajax/guanggao', {})
     if (res.code === 0) {
-      
       const data = res.data
       randomadEnableStatus.value = data.randomadEnableStatus
       console.log("广告",data);
@@ -86,6 +84,7 @@ export const useHomeStore = defineStore('home', () => {
       tags.value.unshift({ dictCode: 0, dictName: '首页' })
     }
   }
+ 
 
   const getData = async () => {
     const res = await post('/app-api/cartoon/listIndex', {})
@@ -145,7 +144,6 @@ export const useHomeStore = defineStore('home', () => {
   // ----- 初始化方法 -----
   const initHome = async () => {
     if (!initialized) {
-      await getConfig()
       await getGuangGao()
       await getTagList()
       await getData()

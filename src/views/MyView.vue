@@ -62,7 +62,7 @@
 
             <div style="margin-top: 10px;">
                 <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
-                    <van-swipe-item v-for="(item, index) in store.user" :key="index" @click="onOpen(item.url)">
+                    <van-swipe-item v-for="(item, index) in store.user" :key="index" @click="onOpen(item)">
                         <img :src="item.img" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
                     </van-swipe-item>
                 </van-swipe>
@@ -127,7 +127,8 @@ import { onMounted, ref } from 'vue';
 
 import moment from 'moment'
 import QRCode from 'qrcode'
-
+import { post } from '@/utils/request'
+import AES from '@/utils/aes1.js'
 import { useHomeStore } from '@/store/home'
 import router from '@/router';
 import { copyText } from '@lxf2513/vue3-clipboard';
@@ -232,7 +233,15 @@ const onGo = (path: any) => {
         path: path,
     })
 }
-const onOpen = (url: string) => window.open(url, '_blank')
+const onOpen = async(item: any) => {
+  const res = await post('/app-api/member/swiperAdClickCount', {
+    id:item.id
+  })
+  if (res.code === 0) {
+    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+  }
+  window.open(item.url, '_blank')
+}
 const onGetVipIcon = () => {
   const vip = memberInfo.value.vipPeriod;
   const vipDateStr = memberInfo.value.vipDate;

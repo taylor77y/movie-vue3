@@ -243,11 +243,11 @@ if(memberInfo.value.h5Uuid){
         <span :class="{ 'text-active': active === 'collengt' }">收藏</span>
       </van-tabbar-item>
 
-      <van-tabbar-item name="/my" @click="onPush('/my')">
+      <van-tabbar-item name="/mine" @click="onPush('/mine')">
         <template #icon="{ active: isActive }">
           <img :src="!isActive ? '/tabbar/04.svg' : '/tabbar/004.svg'" :class="{ 'icon-active': isActive }" />
         </template>
-        <span :class="{ 'text-active': active === 'my' }">我的</span>
+        <span :class="{ 'text-active': active === 'mine' }">我的</span>
       </van-tabbar-item>
     </van-tabbar>
   </div>

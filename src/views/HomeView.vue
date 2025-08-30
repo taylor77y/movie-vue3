@@ -10,7 +10,8 @@ import { useRoute, useRouter } from 'vue-router'
 const pl = '/Image/pl.png';
 const route = useRoute()
 const router = useRouter()
-const store = useHomeStore()
+   const store =useHomeStore()
+
 const loadingIndex = ref<any>(false)
 const scrollContainer = ref<HTMLElement | null>(null)
 const tagWrapper = ref<HTMLElement | null>(null)
@@ -101,7 +102,15 @@ const handleScroll = (e: Event) => {
 
 
 // 页面打开
-const onOpen = (url: string) => window.open(url, '_blank')
+const onOpen = async(item: any) => {
+  const res = await post('/app-api/member/swiperAdClickCount', {
+    id:item.id
+  })
+  if (res.code === 0) {
+    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+  }
+  window.open(item.h5Url, '_blank')
+}
 let startTime = 0
 // 页面开始渲染前记录时间
 onBeforeMount(() => {
@@ -167,7 +176,7 @@ onMounted(async () => {
   }
   // 等接口加载完成
   // 等 DOM 渲染完成
-  await nextTick()
+  
   if (scrollContainer.value) {
     scrollContainer.value.scrollTop = store.scrollTop
   }
@@ -181,6 +190,7 @@ onMounted(async () => {
     const loadTime = endTime - startTime
     console.log(`首页完全加载时间: ${loadTime.toFixed(2)}ms`)
   }
+
 
   if (total === 0) {
     finish()
@@ -201,6 +211,7 @@ onMounted(async () => {
       }
     })
   }
+  await store.getConfig()
 })
 onActivated(() => {
   nextTick(() => {
@@ -241,7 +252,7 @@ onActivated(() => {
     <div ref="scrollContainer" class="scroll-container" @scroll="handleScroll">
    
       <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
-        <van-swipe-item v-for="(item, index) in store.banner" :key="index" @click="onOpen(item.h5Url)">
+        <van-swipe-item v-for="(item, index) in store.banner" :key="index" @click="onOpen(item)">
           <img :src="item.image" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
         </van-swipe-item>
       </van-swipe>

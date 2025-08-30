@@ -23,7 +23,7 @@ const routes: Array<RouteRecordRaw> = [
       { path: 'category', name: 'CategoryView', component: CategoryView },
       { path: 'publish', name: 'PublishView', component: PublishView },
       { path: 'collengt', name: 'CollengtView', component: CollengtView },
-      { path: 'my', name: 'MyView', component: MyView }
+      { path: 'mine', name: 'MyView', component: MyView }
     ]
   },
   { path: '/videoinfo', name: 'VideoInfo', component: VideoInfo, meta: { showTabbar: false } },

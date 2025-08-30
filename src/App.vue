@@ -50,7 +50,7 @@
   <van-number-keyboard safe-area-inset-bottom />
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref, onMounted ,onBeforeMount} from "vue"
 import { useRoute } from 'vue-router'
 import { useHomeStore } from '@/store/home'
 
@@ -74,7 +74,7 @@ const closeOverlay = () => {
 const onOpen= ()=>{
   window.open(homeStore.indexPopupAd[0].url, '_blank')
 }
-onMounted(async () => {
+onBeforeMount(async () => {
   // 首页加载时弹出广告
   // 首页加载时，如果 sessionStorage 里没有记录过广告显示，则弹出广告
   if (!sessionStorage.getItem('showGuanggao')) {
