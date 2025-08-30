@@ -16,7 +16,7 @@
                       <div class="skeleton-img">
                       <van-loading type="spinner" />
                       </div>
-                      <div class="skeleton-text"></div>
+                        <div class="skeleton-text">{{ item.cartoonName }}</div>
                   </div>
                 <CateInfoItem v-show="loadedMap[item.cartoonCode]"  @goVideo="handleGoVideo"  :key="iindex" :item="item"  title="专题"
                  @error="onImgError"  @imgLoaded="handleImgLoaded" >

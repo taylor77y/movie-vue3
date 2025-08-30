@@ -26,7 +26,7 @@
                             <div class="skeleton-img">
                                 <van-loading type="spinner" />
                             </div>
-                            <div class="skeleton-text"></div>
+                               <div class="skeleton-text">{{ item.cartoonName }}</div>
                         </div>
                         <PbCateInfoItem v-show="loadedMap[i.cartoonCode]" @goVideo="handleGoVideo" :key="item.id"
                             :item="i" :index="index" @error="onImgError" title="暗网" @imgLoaded="handleImgLoaded">

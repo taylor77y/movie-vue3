@@ -12,7 +12,7 @@
              <div class="skeleton-img">
               <van-loading type="spinner" />
             </div>
-            <div class="skeleton-text"></div>
+               <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
         <CartoonItem v-show="loadedMap[item.cartoonCode]"  @goVideo="handleGoVideo"  :key="item.id" :item="item"
           title="最新更新" :index="index" :cartoon-name="item.cartoonName" @error="onImgError"

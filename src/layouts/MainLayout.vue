@@ -13,7 +13,6 @@ const route = useRoute()
 const memberInfo = ref<any>({})
 // 计算属性判断是否显示 Tabbar
 const show = ref<any>(false)
-const store = useHomeStore()
 const onCreateUUid = () => {
   const uuid = uuidv4()
   return uuid
@@ -154,7 +153,7 @@ onMounted(async () => {
       timer.value = setInterval(onRfUserInfo, 10000)
     }
   }
-
+if(memberInfo.value.h5Uuid){
   // 动态创建 Aplus 脚本
   (function (w, d, s, q, i) {
     w[q] = w[q] || [];
@@ -201,6 +200,7 @@ onMounted(async () => {
       },
     ],
   });
+}
 })
 </script>
 

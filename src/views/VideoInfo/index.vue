@@ -49,7 +49,7 @@
             <div class="skeleton-img">
               <van-loading type="spinner" />
             </div>
-            <div class="skeleton-text"></div>
+              <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
           <CartoonItem v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="item.id" :item="item"
             title="最新更新" :index="index" :cartoon-name="item.cartoonName" @error="onImgError"
@@ -137,8 +137,7 @@ import { post } from '@/utils/request'
 import { useHomeStore } from '@/store/home'
 import CartoonItem from "@/components/CartoonItem.vue"
 import AES from "@/utils/aes1.js"
-import DPlayer from 'dplayer'
-import Hls from 'hls.js'
+
 const likedIcon1 = '/videoinfo/dianz1.svg';
 const likedIcon = '/videoinfo/dianz.svg';
 const star1 = '/videoinfo/star1.svg';
@@ -155,7 +154,9 @@ const url = ref<any>('')
 const store = useHomeStore()
 const moveId = ref<any>(0)
 const islookok = ref<any>(false)
-const memberinfo = ref<any>({})
+const memberinfo = ref<any>({
+  memberCode:0
+})
 const scrollTop = () => {
   if (videoRef.value) {
     videoRef.value.scrollTop = 0  // 滚动到顶部
@@ -168,7 +169,7 @@ const showBottom = ref(false)
 const showCenter = ref(false)
 const showSelect = ref(false)
 // refs
-const dp = ref<DPlayer | null>(null)
+const dp = ref<any>(null)
 const PlayVideo = ref<any>(null)
 const hls = ref<any>(null)
 
@@ -413,9 +414,10 @@ const addToHistory = (video: any) => {
 }
 // ----- 创建播放器 -----
 // ----- 创建播放器 -----
-const onCreatedVideo = () => {
+const onCreatedVideo =async  () => {
   if (!PlayVideo.value || !srcList.value.length) return;
-
+    const DPlayer = (await import('dplayer')).default;
+  const Hls = (await import('hls.js')).default;
   // 销毁旧播放器和 HLS
   dp.value?.destroy();
   dp.value = null;
