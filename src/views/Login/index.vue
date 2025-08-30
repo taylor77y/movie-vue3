@@ -61,7 +61,7 @@ const onBack = () => {
     router.back()
 }
 const onKefu = () => {
-    window.open('http://t.me/porn91kefu', '_blank')
+    window.open('https://kanbei03.top/chatlink.html', '_blank')
 }
 const onLogin = async () => {
     // 判空
