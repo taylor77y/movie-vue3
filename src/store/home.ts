@@ -70,6 +70,7 @@ export const useHomeStore = defineStore('home', () => {
       indexPopupAd.value = data.indexPopupAd
       play.value= data.play
       banner.value = data.banner
+      
       fenlei.value = data.fenlei
       user.value = data.user
       squaread.value= data.squaread

@@ -242,7 +242,7 @@ onActivated(() => {
    
       <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
         <van-swipe-item v-for="(item, index) in store.banner" :key="index" @click="onOpen(item.h5Url)">
-          <img :src="item.image" style="height: 125px;width: 100%;border-radius: 5px;object-fit: cover;" />
+          <img :src="item.image" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
         </van-swipe-item>
       </van-swipe>
       <AD v-if="store.showAd" :list="[...store.play]"></AD>

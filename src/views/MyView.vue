@@ -13,7 +13,7 @@
             <div class="info" @click="onGo('/setinfo')">
                 <div class="info-left">
                     <div>
-                        <img :src="memberInfo?.memberAvatar || 'public/my/user.svg'" alt="头像"
+                        <img :src="memberInfo?.memberAvatar || '/my/user.svg'" alt="头像"
                             style="width: 82px;height: 82px;border-radius: 10px;" />
                     </div>
                     <div class="info-u">
@@ -63,7 +63,7 @@
             <div style="margin-top: 10px;">
                 <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
                     <van-swipe-item v-for="(item, index) in store.user" :key="index" @click="onOpen(item.url)">
-                        <img :src="item.img" style="height: 125px;width: 100%;border-radius: 5px;object-fit: cover;" />
+                        <img :src="item.img" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
                     </van-swipe-item>
                 </van-swipe>
             </div>

@@ -627,12 +627,9 @@ const onBuy = async () => {
       showBottom.value = false
     })
   } else {
-    showFailToast(res.msg + '三秒后跳转')
-    setTimeout(() => {
-      router.push({
+    router.push({
         path: '/pay'
       })
-    }, 3000)
   }
 
 }
