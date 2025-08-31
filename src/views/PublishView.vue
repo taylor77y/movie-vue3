@@ -5,7 +5,7 @@
             <div class="tit">暗网</div>
             <div></div>
         </div>
-        <AD v-if="store.showAd" :list="[...store.darksidead]"></AD>
+        <AD v-if="store.showDarksideAd" :list="[...store.darksidead]"></AD>
         <div class="mask-list">
             <div v-for="(item, index) in list" :key="item.id" class="mask-item">
                 <div class="mask-title">
@@ -121,6 +121,7 @@ const onRef = async (item: any, index: any) => {
 }
 onMounted(async () => {
     await onGetData()
+    await store.getConfig()
 })
 </script>
 <style lang="less" scoped>

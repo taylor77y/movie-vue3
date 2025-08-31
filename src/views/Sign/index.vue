@@ -97,6 +97,11 @@ const onBack = () => {
     router.back()
 }
 const onGo = (index: number) => {
+    showLoadingToast({
+        message: '敬请期待',
+        forbidClick: true,
+        });
+    return false;
     if (index === 0) {
         router.push({
             path: '/login'

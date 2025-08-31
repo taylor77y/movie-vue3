@@ -16,7 +16,7 @@ export default defineConfig({
       brotliSize: true,               // 显示 brotli 压缩体积
     })
   ],
-  base: './',
+  base: '/',
   server: {
     host: '0.0.0.0', // 允许使用本机 IP 访问
     port: 5173,      // 你可以改成自己想要的端口

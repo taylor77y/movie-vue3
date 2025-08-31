@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, nextTick, onActivated, ref, onBeforeMount,reactive } from 'vue'
+import { onMounted, nextTick, onActivated, ref, onBeforeMount, reactive, onUpdated } from 'vue'
 import { useHomeStore } from '@/store/home'
 import CartoonItem from "@/components/CartoonItem.vue"
 import CartoonItemO from "@/components/CartoonItemO.vue"
@@ -10,8 +10,7 @@ import { useRoute, useRouter } from 'vue-router'
 const pl = '/Image/pl.png';
 const route = useRoute()
 const router = useRouter()
-   const store =useHomeStore()
-
+const store = useHomeStore()
 const loadingIndex = ref<any>(false)
 const scrollContainer = ref<HTMLElement | null>(null)
 const tagWrapper = ref<HTMLElement | null>(null)
@@ -21,10 +20,10 @@ const imgloadingTime = ref<any>(0)
 const onImgError = (event: any) => {
   event.target.src = pl
 }
-
 // 标签点击
 const selectTag = async (id: number, index: number) => {
   store.activeTag = id
+  
   store.currentPage = 1
   store.noMore = false
   store.loading = false
@@ -51,7 +50,7 @@ const selectTag = async (id: number, index: number) => {
     })
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-      store.likeList = data.list
+      store.likeList =  store.insertAdsOther(data.list, store.randomad)
       nextTick(() => {
         if (scrollContainer.value) {
           scrollContainer.value.scrollTop = 0
@@ -63,7 +62,8 @@ const selectTag = async (id: number, index: number) => {
   }
 }
 
-const handleGoVideo = (item:any) => {
+
+const handleGoVideo = (item: any) => {
   console.log('即将跳转', item.cartoonCode)
   router.push({
     path: '/videoinfo',
@@ -102,9 +102,9 @@ const handleScroll = (e: Event) => {
 
 
 // 页面打开
-const onOpen = async(item: any) => {
+const onOpen = async (item: any) => {
   const res = await post('/app-api/member/swiperAdClickCount', {
-    id:item.id
+    id: item.id
   })
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
@@ -141,11 +141,11 @@ const handleImgLoaded = ({
   title: string
   index: number
   time: number,
-  id:any
+  id: any
 }) => {
   imageStats.value.push({ index, time })
   loadedMap[id] = true
-    console.log(loadedMap,"loadedMap");
+  console.log(loadedMap, "loadedMap");
   if (time > 0) { // 排除加载失败（-1）
     imgloadingTime.value += time
   }
@@ -176,7 +176,7 @@ onMounted(async () => {
   }
   // 等接口加载完成
   // 等 DOM 渲染完成
-  
+
   if (scrollContainer.value) {
     scrollContainer.value.scrollTop = store.scrollTop
   }
@@ -211,8 +211,11 @@ onMounted(async () => {
       }
     })
   }
+
   await store.getConfig()
+
 })
+
 onActivated(() => {
   nextTick(() => {
     if (scrollContainer.value) scrollContainer.value.scrollTop = store.scrollTop
@@ -228,8 +231,7 @@ onActivated(() => {
       <img src="/Image/logo.png" style="width: 64px;height: 16px; margin-right: 10px;" />
       <van-search v-model="store.value" placeholder="影视搜索" @focus="onFocus()"
         style="margin-right: 10px;background-color: #333333;" />
-      <img src="/Image/fuli.png" style="width: 46px;height: 32px; margin-right: 10px;"
-        @click="onGo('/sign')" />
+      <img src="/Image/fuli.png" style="width: 46px;height: 32px; margin-right: 10px;" @click="onGo('/sign')" />
       <img src="/Image/Clock.png" style="width: 24px;height: 24px; " @click="onGo('/history')" />
     </div>
     <div class="wrapper">
@@ -248,15 +250,16 @@ onActivated(() => {
     <div>
       <van-notice-bar left-icon="volume-o" background="#333333" color="#FFFFFF" :text="store.nottitle" />
     </div>
-     
+
     <div ref="scrollContainer" class="scroll-container" @scroll="handleScroll">
-   
-      <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
+
+      <van-swipe   v-if="store.showPlayAd" class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
         <van-swipe-item v-for="(item, index) in store.banner" :key="index" @click="onOpen(item)">
           <img :src="item.image" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
         </van-swipe-item>
       </van-swipe>
-      <AD v-if="store.showAd" :list="[...store.play]"></AD>
+      <div></div>
+      <AD v-if="store.showAd" :list="store.play"></AD>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>
@@ -268,17 +271,17 @@ onActivated(() => {
       </div>
       <div v-if="store.activeTag === 0" class="ranklist">
         <div v-for="(item, index) in store.typelist" :class="['cartoon-item', { 'full-width': index === 0 }]">
-           <!-- 骨架屏 -->
+          <!-- 骨架屏 -->
           <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
             <div class="skeleton-img">
               <van-loading type="spinner" />
             </div>
             <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
-          <CartoonItemO v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo"  :key="index" :item="item"  :id="item.id"
-          title="精选视频" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
+          <CartoonItemO v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item"
+            :id="item.id" title="精选视频" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
         </div>
-        
+
       </div>
       <div class="change-bt" v-if="store.activeTag === 0">
         <div class="c-left" @click="onGoMore(15, '精选视频')">查看更多</div>
@@ -295,14 +298,14 @@ onActivated(() => {
       </div>
       <div v-if="store.activeTag === 0" class="ranklist">
         <div v-for="(item, index) in store.rankList" :class="['cartoon-item', { 'full-width': index === 0 }]">
-            <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
-             <div class="skeleton-img">
+          <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
+            <div class="skeleton-img">
               <van-loading type="spinner" />
             </div>
-               <div class="skeleton-text">{{ item.cartoonName }}</div>
+            <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
-        <CartoonItemO  v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item" 
-          title="排行榜" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
+          <CartoonItemO v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item"
+            title="排行榜" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
         </div>
       </div>
 
@@ -316,17 +319,17 @@ onActivated(() => {
         </div>
       </div>
       <div class="ranklist">
-          <div v-for="(item, index) in store.likeList" :class="['cartoon-item', { 'full-width': index === 0 }]">
-             <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
-             <div class="skeleton-img">
+        <div v-for="(item, index) in store.likeList" :class="['cartoon-item', { 'full-width': index === 0 }]">
+          <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
+            <div class="skeleton-img">
               <van-loading type="spinner" />
             </div>
-             <div class="skeleton-text">{{ item.cartoonName }}</div>
+            <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
-        <CartoonItem v-show="loadedMap[item.cartoonCode]"  @goVideo="handleGoVideo"  :key="item.id" :item="item"
-          title="最新更新" :index="index" :cartoon-name="item.cartoonName" @error="onImgError"
-          @imgLoaded="handleImgLoaded" />
-          </div>
+          <CartoonItem v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item"
+            title="最新更新" :index="index" :cartoon-name="item.cartoonName" @error="onImgError"
+            @imgLoaded="handleImgLoaded" />
+        </div>
       </div>
       <div style="display: flex;align-items: center;justify-content: center;">
         <van-loading v-if="store.loading" size="24px" color="#FF960C">加载中...</van-loading>
@@ -490,15 +493,18 @@ onActivated(() => {
     transform: rotate(360deg);
   }
 }
+
 .cartoon-item {
-    width: 48%;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 10px;
+  width: 48%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
 }
+
 .full-width {
   width: 100% !important;
-  .img-wrapper{
+
+  .img-wrapper {
     height: 200px;
     background-size: 100% 100%;
     background-repeat: no-repeat;
@@ -510,5 +516,4 @@ onActivated(() => {
   height: calc(100vh - 200px);
   overflow-y: auto;
 }
-
 </style>

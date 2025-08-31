@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            <div style="margin-top: 10px;">
+            <div style="margin-top: 10px;" v-if="store.showMeAd">
                 <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
                     <van-swipe-item v-for="(item, index) in store.user" :key="index" @click="onOpen(item)">
                         <img :src="item.img" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
@@ -315,7 +315,7 @@ const onGn = (index: number) => {
 const onSave = () => {
     showToast('请手动截图保存')
 }
-onMounted(() => {
+onMounted(async() => {
     const info = localStorage.getItem('memberInfo')
     if (info) {
         try {
@@ -331,6 +331,7 @@ onMounted(() => {
     } else {
         console.log('本地没有用户信息')
     }
+    await store.getConfig()
 })
 </script>
 <style lang="less" scoped>

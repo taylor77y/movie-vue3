@@ -39,13 +39,14 @@ const list = props.list
         justify-content: start;
         flex-wrap: wrap;
         .flex-ad{
-            width: 20%;
+            width: 19%;
             display: flex;
             align-items: center;
             flex-direction: column;
             margin-bottom: 10px;
+            margin-right: 1%;
              .adimg{
-                width: 56px;
+                width: 100%;
                 height: 56px;
                 border-radius: 8px;
                 object-fit: cover;

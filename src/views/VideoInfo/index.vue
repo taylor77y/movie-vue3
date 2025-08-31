@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div v-if="store.showAd" style="width: 100%;padding: 0 10px;margin-top: 10px;">
+    <div v-if="store.showPlayAd" style="width: 100%;padding: 0 10px;margin-top: 10px;">
       <AD :list="[...store.squaread]"></AD>
     </div>
     <div style="padding: 0 10px;display: flex;
@@ -51,7 +51,7 @@
             </div>
               <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
-          <CartoonItem v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="item.id" :item="item"
+          <CartoonItem v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item"
             title="最新更新" :index="index" :cartoon-name="item.cartoonName" @error="onImgError"
             @imgLoaded="handleImgLoaded" />
         </div>
@@ -137,14 +137,11 @@ import { post } from '@/utils/request'
 import { useHomeStore } from '@/store/home'
 import CartoonItem from "@/components/CartoonItem.vue"
 import AES from "@/utils/aes1.js"
-
 const likedIcon1 = '/videoinfo/dianz1.svg';
 const likedIcon = '/videoinfo/dianz.svg';
 const star1 = '/videoinfo/star1.svg';
 const star = '/videoinfo/star.svg';
 const placeholder = '/Image/pl.png';
-
-
 import QRCode from 'qrcode'
 import { copyText } from '@lxf2513/vue3-clipboard';
 import moment from 'moment'
@@ -347,14 +344,7 @@ const handleImgLoaded = ({
   loadedMap[id] = true
 }
 
-// ----- API -----
-const onGetConfig = async () => {
-  const res = await post('/app-api/ajax/getConfig', {})
-  if (res.code === 0) {
-    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-    config.value = data
-  }
-}
+
 
 const onLookOk = async (id: any) => {
   if (!srcList.value.length) return
@@ -375,7 +365,7 @@ const onGetVideoInfo = async (id: any) => {
     srcList.value = data.srcList
     danmuList.value = data.danmuList
     addToHistory(videoInfo.value)
-    await onGetConfig()
+    await store.getConfig()
     await onLookOk(id)
     const origin = new URL(srcList.value[0].urlList[0].url).origin
     if (!document.querySelector(`link[rel="preconnect"][href="${origin}"]`)) {
