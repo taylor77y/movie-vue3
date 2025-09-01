@@ -39,25 +39,18 @@ const onOpen = async(item: any) => {
         justify-content: start;
         flex-wrap: wrap;
         .flex-ad{
-            width: 60px;
+            width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             flex-direction: column;
             margin-bottom: 10px;
-            margin-right: calc((100% - 60px*4)/4);
              .adimg{
                 width: 100%;
                 height: 100%;
                 border-radius: 8px;
                 object-fit: cover;
             }
-        }
-        .flex-ad:nth-child(5n){
-            margin-right: 0;
-        }
-         .flex-ad:nth-child(10n){
-            margin-right: 0;
         }
     }
   

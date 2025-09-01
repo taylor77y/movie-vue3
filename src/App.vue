@@ -50,7 +50,7 @@
   <van-number-keyboard safe-area-inset-bottom />
 </template>
 <script setup lang="ts">
-import { ref, onMounted ,onBeforeMount} from "vue"
+import { ref, onMounted ,onBeforeMount, nextTick} from "vue"
 import { useRoute } from 'vue-router'
 import { useHomeStore } from '@/store/home'
 import { post } from '@/utils/request'
@@ -99,12 +99,21 @@ onBeforeMount(async () => {
     // 记录广告已经显示过，下次刷新就不会再弹
     sessionStorage.setItem('showGuanggao', 'true');
   }
- await homeStore.initHome()
+  await homeStore.initHome()
   await getConfig()
-  if(homeStore.showAd){
-    showIndexGuanggao.value = true
-  }
 })
+onMounted(() => {
+    nextTick(()=>{
+      setTimeout(() => {
+           if(homeStore.indexPopupAd.length > 0){
+        if(homeStore.indexPopupAd[0].status === 1){
+          showIndexGuanggao.value = true
+        }
+      }
+      }, 500);
+    })
+   
+});
 </script>
 <style lang="less" scoped>
 .g-wrapper {
