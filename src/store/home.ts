@@ -89,17 +89,42 @@ const getAdlist = (list: any[]) => {
   return result;
 };
 
-
-const getAdOtlist = (list: any[]) => {
+const getAdTypelist = (list: any[]) => {
   if (!list || !list.length || !randomad.value || !randomad.value.length) return list;
 
   // 先过滤掉已有广告
   const filteredList = list.filter(item => !item._isAd);
 
+  const result: any[] = [...filteredList]; 
+  const interval = 6;
+  let insertIndex = 1;
+
+  const ads = randomad.value;
+  const adCount = ads.length;
+
+  while (insertIndex <= result.length) {
+    let ad;
+    if (adCount === 1) {
+      ad = { ...ads[0], _isAd: true }; // 标识广告
+    } else {
+      const randIdx = Math.floor(Math.random() * adCount);
+      ad = { ...ads[randIdx], _isAd: true }; // 标识广告
+    }
+
+    result.splice(insertIndex, 0, ad);
+    insertIndex += interval + 1;
+  }
+
+  return result;
+};
+
+const getAdOtlist = (list: any[]) => {
+  if (!list || !list.length || !randomad.value || !randomad.value.length) return list;
+  // 先过滤掉已有广告
+  const filteredList = list.filter(item => !item._isAd);
   const result: any[] = [...filteredList]; // 拷贝原数组
   const interval = 9; // 每隔 9 条插入广告
   let insertIndex = 9; // 从索引 9 开始插入
-
   const ads = randomad.value;
   const adCount = ads.length;
 
@@ -150,7 +175,7 @@ const getAdOtlist = (list: any[]) => {
   }
 
   const onGetplay =  () => {
-     const data = {showAd:showAd.value ,squaread:squaread.value}
+     const data = {showAd:showSquareAd.value ,squaread:squaread.value}
      return data;
   }
 
@@ -160,9 +185,9 @@ const getAdOtlist = (list: any[]) => {
     const res = await post('/app-api/cartoon/listIndex', {})
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-       rankList.value =data.rankList
+       rankList.value =getAdlist(data.rankList)
       // rankList.value = insertAds(data.rankList, randomad.value)
-      typelist.value=[...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList].slice(0,-1);
+      typelist.value=getAdTypelist([...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList]);
     }
   }
 
@@ -188,9 +213,6 @@ const getAdOtlist = (list: any[]) => {
           data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'));
           if (data.distinctNameList.length > 0) {
               likeList.value = getAdlist([...likeList.value,...data.distinctNameList])
-            // likeList.value.push(
-            //   ...insertAdsPaginated(data.distinctNameList, randomad.value, likeList.value.length)
-            // );
           } else {
             noMore.value = true;
           }
@@ -205,10 +227,7 @@ const getAdOtlist = (list: any[]) => {
           
           const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'));
           if (data.list.length > 0) {
-            // likeList.value.push(
-            //   ...insertAdsPaginated(data.list, randomad.value, likeList.value.length)
-            // );
-            likeList.value = getAdlist([...likeList.value,...data.list])
+              likeList.value = [...likeList.value,...getAdOtlist(data.list)];
           } else {
             noMore.value = true;
           }
@@ -267,6 +286,7 @@ const getAdOtlist = (list: any[]) => {
     getLikeData,
     loadMore,
     initHome,
-    getAdOtlist
+    getAdOtlist,
+    getAdTypelist,
   }
 })

@@ -25,6 +25,7 @@ const onImgError = (event: any) => {
 }
 // 标签点击
 const selectTag = async (id: number, index: number) => {
+  store.likeList = []
   store.activeTag = id
   
   store.currentPage = 1
@@ -53,9 +54,8 @@ const selectTag = async (id: number, index: number) => {
     })
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-        store.likeList= store.getAdOtlist(data.list)
-        // store.likeList  = store.insertAds(data.list, store.randomad, data.list.length)
-      // store.likeList =  store.insertAds(data.list, store.randomad)
+        console.log(data,"data111111111111111111");
+        store.likeList = store.getAdOtlist(data.list);
       nextTick(() => {
         if (scrollContainer.value) {
           scrollContainer.value.scrollTop = 0
@@ -217,11 +217,12 @@ onMounted(async () => {
     })
   }
   nextTick(async() => {
-    await  store.getGuangGao()
+   await  store.getGuangGao()
    await store.getLikeData()
    await store.getData()
    setTimeout(() => {
     const {showAd,squaread} = store.onGetplay()
+    console.log(showAd,squaread,"首页广告返回");
     showSquareAd.value = showAd
     playlist.value = squaread
     }, 1000);
@@ -291,7 +292,7 @@ onActivated(() => {
             <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
           <CartoonItemO v-show="loadedMap[item.cartoonCode]"  @goVideo="handleGoVideo" :key="index" :item="item"
-            :id="item.cartoonCode.toString()" title="精选视频" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
+            :id="item.cartoonCode" title="精选视频" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
         </div>
 
       </div>

@@ -308,7 +308,7 @@ onMounted(async () => {
         .hbg {
             width: 100%;
             height: 150px;
-            background-image: url("public/pay/paybg.svg");
+            background-image: url("@/assets/paybg.png");
             background-size: 100% 100%;
             background-repeat: no-repeat;
             background-size: cover;
