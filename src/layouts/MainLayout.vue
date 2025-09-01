@@ -140,19 +140,19 @@ const test = () => {
 
 onMounted(async () => {
   active.value = route.path
-  // 只在开发环境执行 test
-  if (import.meta.env.MODE === 'development') {
-    test()
-  } else {
-    if (localStorage.getItem('memberInfo') === null) {
+   if (localStorage.getItem('memberInfo') === null) {
       await onGetUserInfo()
     } else {
       const userData: any = localStorage.getItem('memberInfo')
       memberInfo.value = JSON.parse(userData)
-      // 
       timer.value = setInterval(onRfUserInfo, 10000)
     }
-  }
+  // 只在开发环境执行 test
+  // if (import.meta.env.MODE === 'development') {
+  //   test()
+  // } else {
+   
+  // }
 if(memberInfo.value.h5Uuid){
   // 动态创建 Aplus 脚本
   (function (w, d, s, q, i) {
