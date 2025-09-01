@@ -63,8 +63,11 @@ export const useHomeStore = defineStore('home', () => {
 const getAdlist = (list: any[]) => {
   if (!list || !list.length || !randomad.value || !randomad.value.length) return list;
 
-  const result: any[] = [...list]; // 拷贝原数组
-  const interval = 6; // 每隔 6 条插入广告
+  // 先过滤掉已有广告
+  const filteredList = list.filter(item => !item._isAd);
+
+  const result: any[] = [...filteredList]; 
+  const interval = 6;
   let insertIndex = 0;
 
   const ads = randomad.value;
@@ -73,24 +76,27 @@ const getAdlist = (list: any[]) => {
   while (insertIndex <= result.length) {
     let ad;
     if (adCount === 1) {
-      ad = ads[0]; // 只有一个广告，永远使用它
+      ad = { ...ads[0], _isAd: true }; // 标识广告
     } else {
-      const randIdx = Math.floor(Math.random() * adCount); // 多个广告随机
-      ad = ads[randIdx];
+      const randIdx = Math.floor(Math.random() * adCount);
+      ad = { ...ads[randIdx], _isAd: true }; // 标识广告
     }
 
     result.splice(insertIndex, 0, ad);
-
-    insertIndex += interval + 1; // 下次插入位置
+    insertIndex += interval + 1;
   }
 
   return result;
 };
 
+
 const getAdOtlist = (list: any[]) => {
   if (!list || !list.length || !randomad.value || !randomad.value.length) return list;
 
-  const result: any[] = [...list]; // 拷贝原数组
+  // 先过滤掉已有广告
+  const filteredList = list.filter(item => !item._isAd);
+
+  const result: any[] = [...filteredList]; // 拷贝原数组
   const interval = 9; // 每隔 9 条插入广告
   let insertIndex = 9; // 从索引 9 开始插入
 
@@ -100,10 +106,10 @@ const getAdOtlist = (list: any[]) => {
   while (insertIndex <= result.length) {
     let ad;
     if (adCount === 1) {
-      ad = ads[0]; // 只有一个广告
+      ad = { ...ads[0], _isAd: true }; // 标识广告
     } else {
       const randIdx = Math.floor(Math.random() * adCount); // 多个广告随机
-      ad = ads[randIdx];
+      ad = { ...ads[randIdx], _isAd: true }; // 标识广告
     }
 
     result.splice(insertIndex, 0, ad);
@@ -198,8 +204,6 @@ const getAdOtlist = (list: any[]) => {
         if (res.code === 0) {
           
           const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'));
-            console.log(data, "分类返回2222222222222");
-
           if (data.list.length > 0) {
             // likeList.value.push(
             //   ...insertAdsPaginated(data.list, randomad.value, likeList.value.length)
