@@ -43,7 +43,7 @@ const list = props.list
             align-items: center;
             flex-direction: column;
             margin-bottom: 10px;
-            margin-right: calc((100% - 60px*5)/5);
+            margin-right: calc((100% - 60px*5)/4);;
              .adimg{
                 width: 60px;
                 height: 60px;
@@ -56,6 +56,12 @@ const list = props.list
                 text-align: center;
                 width: 56px;
             }
+        }
+          .flex-ad:nth-child(5n){
+            margin-right: 0;
+        }
+           .flex-ad:nth-child(10n){
+            margin-right: 0;
         }
     }
   
