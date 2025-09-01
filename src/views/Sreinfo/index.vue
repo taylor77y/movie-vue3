@@ -99,6 +99,8 @@ const onGetData = async (reset = false) => {
 
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+          console.log(data, "分类返回3333333333333333");
+
     if (data.length < 10) {
       noMore.value = true
     }

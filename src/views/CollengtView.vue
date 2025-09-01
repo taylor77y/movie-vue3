@@ -7,7 +7,7 @@
         </div>
         <Empty v-if="savedVideos.length === 0" description="暂无收藏" />
         <div v-else class="list">
-             <div v-for="(item, index) in savedVideos" :class="['cartoon-item', { 'full-width': index === 0 }]">
+             <div v-for="(item, index) in savedVideos" :class="['cartoon-item']">
             <CartoonItem @goVideo="handleGoVideo"  :key="item.id" :item="item"
                 :index="index" @error="onImgError" />
                 </div>

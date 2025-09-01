@@ -4,6 +4,7 @@ import { useHomeStore } from '@/store/home'
 import CartoonItem from "@/components/CartoonItem.vue"
 import CartoonItemO from "@/components/CartoonItemO.vue"
 import AD from "@/components/Ad.vue"
+import ADO from "@/components/ADO.vue"
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
 import { useRoute, useRouter } from 'vue-router'
@@ -16,6 +17,8 @@ const scrollContainer = ref<HTMLElement | null>(null)
 const tagWrapper = ref<HTMLElement | null>(null)
 const tagList = ref<HTMLElement | null>(null)
 const imgloadingTime = ref<any>(0)
+const showSquareAd = ref<any>(false)
+const playlist = ref<any>([])
 // 图片错误占位
 const onImgError = (event: any) => {
   event.target.src = pl
@@ -50,7 +53,9 @@ const selectTag = async (id: number, index: number) => {
     })
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-      store.likeList =  store.insertAdsOther(data.list, store.randomad)
+        store.likeList= store.getAdOtlist(data.list)
+        // store.likeList  = store.insertAds(data.list, store.randomad, data.list.length)
+      // store.likeList =  store.insertAds(data.list, store.randomad)
       nextTick(() => {
         if (scrollContainer.value) {
           scrollContainer.value.scrollTop = 0
@@ -98,7 +103,7 @@ const handleScroll = (e: Event) => {
     store.loadMore()
   }
 }
-
+  // ----- API -----
 
 
 // 页面打开
@@ -119,12 +124,13 @@ onBeforeMount(() => {
 
 const onRef = async () => {
   loadingIndex.value = true
+  console.log("这里触发了");
   const res = await post('/app-api/cartoon/listIndex', {
   })
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-    store.rankList = store.insertAds(data.rankList, store.randomad)
-    store.typelist = store.insertAds(data.typeList.flatMap((item: any) => item.cartoonInfoList), store.randomad)
+    // store.rankList = store.insertAds(data.rankList, store.randomad)
+    // store.typelist=[...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList].slice(0,-1);
   }
   loadingIndex.value = false
 }
@@ -145,7 +151,6 @@ const handleImgLoaded = ({
 }) => {
   imageStats.value.push({ index, time })
   loadedMap[id] = true
-  console.log(loadedMap, "loadedMap");
   if (time > 0) { // 排除加载失败（-1）
     imgloadingTime.value += time
   }
@@ -211,9 +216,17 @@ onMounted(async () => {
       }
     })
   }
-
-  await store.getConfig()
-
+  nextTick(async() => {
+    await  store.getGuangGao()
+   await store.getLikeData()
+   await store.getData()
+   setTimeout(() => {
+    const {showAd,squaread} = store.onGetplay()
+    showSquareAd.value = showAd
+    playlist.value = squaread
+    }, 1000);
+  })
+  
 })
 
 onActivated(() => {
@@ -253,13 +266,12 @@ onActivated(() => {
 
     <div ref="scrollContainer" class="scroll-container" @scroll="handleScroll">
 
-      <van-swipe   v-if="store.showPlayAd" class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
+      <van-swipe   class="my-swipe" :autoplay="3000" indicator-color="white" style="margin-bottom: 10px;">
         <van-swipe-item v-for="(item, index) in store.banner" :key="index" @click="onOpen(item)">
           <img :src="item.image" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
         </van-swipe-item>
       </van-swipe>
-      <div></div>
-      <AD v-if="store.showAd" :list="store.play"></AD>
+        <AD  v-if="showSquareAd " :list="playlist"></AD>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>
@@ -278,8 +290,8 @@ onActivated(() => {
             </div>
             <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
-          <CartoonItemO v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item"
-            :id="item.id" title="精选视频" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
+          <CartoonItemO v-show="loadedMap[item.cartoonCode]"  @goVideo="handleGoVideo" :key="index" :item="item"
+            :id="item.cartoonCode.toString()" title="精选视频" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
         </div>
 
       </div>
@@ -287,6 +299,7 @@ onActivated(() => {
         <div class="c-left" @click="onGoMore(15, '精选视频')">查看更多</div>
         <div class="c-right" @click="onRef()"><van-icon name="replay" :class="{ spinning: loadingIndex }" /> 换一批</div>
       </div>
+      <ADO v-if="store.activeTag === 0" :item="store.fenlei"></ADO>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>
@@ -297,18 +310,18 @@ onActivated(() => {
         </div>
       </div>
       <div v-if="store.activeTag === 0" class="ranklist">
-        <div v-for="(item, index) in store.rankList" :class="['cartoon-item', { 'full-width': index === 0 }]">
-          <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
+        <div v-for="(item, index) in store.rankList" :class="['cartoon-item']">
+          <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item']">
             <div class="skeleton-img">
               <van-loading type="spinner" />
             </div>
             <div class="skeleton-text">{{ item.cartoonName }}</div>
           </div>
-          <CartoonItemO v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item"
+          <CartoonItem v-show="loadedMap[item.cartoonCode]" @goVideo="handleGoVideo" :key="index" :item="item"
             title="排行榜" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
         </div>
       </div>
-
+      <ADO v-if="store.activeTag === 0" :item="store.paihang"></ADO>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>
@@ -319,8 +332,8 @@ onActivated(() => {
         </div>
       </div>
       <div class="ranklist">
-        <div v-for="(item, index) in store.likeList" :class="['cartoon-item', { 'full-width': index === 0 }]">
-          <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item', { 'full-width': index === 0 }]">
+        <div v-for="(item, index) in store.likeList" :class="['cartoon-item']">
+          <div v-show="!loadedMap[item.cartoonCode]" :class="['skeleton-item']">
             <div class="skeleton-img">
               <van-loading type="spinner" />
             </div>

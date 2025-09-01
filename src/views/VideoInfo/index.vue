@@ -30,7 +30,7 @@
     </div>
 
     <div v-if="store.showPlayAd" style="width: 100%;padding: 0 10px;margin-top: 10px;">
-      <AD :list="[...store.squaread]"></AD>
+      <AD :list="[...store.play]"></AD>
     </div>
     <div style="padding: 0 10px;display: flex;
     flex-direction: column; ">
@@ -350,8 +350,11 @@ const onLookOk = async (id: any) => {
   if (!srcList.value.length) return
   const res = await post('/app-api/cartoon/lookOk', { cartoonCode: id * 1, moviesInfoId: srcList.value[0].urlList[0].id * 1 })
   if (res.code === 0) {
-    if (res.data === true) {
-      islookok.value = res.data
+    if (res.data.length) {
+        const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+        islookok.value = data
+    }else{
+        islookok.value = res.data
     }
   }
 }
@@ -404,37 +407,19 @@ const addToHistory = (video: any) => {
 }
 // ----- 创建播放器 -----
 // ----- 创建播放器 -----
-const onCreatedVideo =async  () => {
+const onCreatedVideo = async () => {
   if (!PlayVideo.value || !srcList.value.length) return;
-    const DPlayer = (await import('dplayer')).default;
+  const DPlayer = (await import('dplayer')).default;
   const Hls = (await import('hls.js')).default;
-  // 销毁旧播放器和 HLS
+
+  // 清理旧播放器
   dp.value?.destroy();
   dp.value = null;
-  if (hls.value) {
-    try {
-      hls.value.off(Hls.Events.ERROR);
-      hls.value.detachMedia();
-      hls.value.destroy();
-    } catch (e) {
-      console.warn("HLS destroy error:", e);
-    }
-    hls.value = null;
-  }
+  hls.value?.destroy();
+  hls.value = null;
 
   const videoUrl = srcList.value[0].urlList[0].url;
 
-  // MP4 提前预加载元数据
-  if (!Hls.isSupported() && videoUrl.endsWith(".mp4")) {
-    const tempVideo = document.createElement("video");
-    tempVideo.preload = "metadata";
-    tempVideo.src = videoUrl;
-    tempVideo.muted = true;
-    tempVideo.playsInline = true;
-    tempVideo.play().catch(() => { });
-  }
-
-  // 创建 DPlayer
   dp.value = new DPlayer({
     container: PlayVideo.value,
     autoplay: true,
@@ -445,117 +430,56 @@ const onCreatedVideo =async  () => {
       url: videoUrl,
       pic: videoInfo.value.cartoonImage,
       type: "customHls",
-      playsinline: true,
-      muted: true,
-      controls: false,
       customType: {
         customHls: (video: HTMLVideoElement, player: any) => {
-          // ✅ Safari / iOS 原生 HLS
           if (video.canPlayType("application/vnd.apple.mpegurl") && videoUrl.endsWith(".m3u8")) {
             video.src = videoUrl;
-            video.playsInline = true;
-            video.muted = true;
-            video.preload = "auto";
-            video.addEventListener("loadedmetadata", () => {
-              video.play().catch(() => {
-                video.addEventListener("click", () => video.play(), { once: true });
-              });
-              setupTimeUpdate(video);
-            });
-            return;
-          }
-
-          // ✅ 其他浏览器走 hls.js
-          if (Hls.isSupported() && videoUrl.endsWith(".m3u8")) {
-            hls.value = new Hls({
-              autoStartLoad: true,
-              startPosition: 0,
-              lowLatencyMode: true,
-              maxBufferLength: 1,       // 尽快首帧
-              maxMaxBufferLength: 2,
-              liveSyncDuration: 1,
-              liveMaxLatencyDuration: 3,
-              enableWorker: true,
-            });
-
+          } else if (Hls.isSupported() && videoUrl.endsWith(".m3u8")) {
+            hls.value = new Hls();
             hls.value.loadSource(videoUrl);
             hls.value.attachMedia(video);
-
-            // ✅ 立即强制开始拉流，避免延迟
-            hls.value.startLoad(0);
-
-            hls.value.on(Hls.Events.MANIFEST_PARSED, () => {
-              video.play().catch(() => {
-                video.addEventListener("click", () => video.play(), { once: true });
-              });
-              setupTimeUpdate(video);
-            });
-
-            let retryCount = 0;
-            hls.value.on(Hls.Events.ERROR, (event, data) => {
-              if (data.fatal) {
-                switch (data.type) {
-                  case Hls.ErrorTypes.NETWORK_ERROR:
-                    if (retryCount < 3) {
-                      retryCount++;
-                      console.warn("尝试恢复网络错误，次数：", retryCount);
-                      hls.value?.startLoad(0);
-                    } else hls.value?.destroy();
-                    break;
-                  case Hls.ErrorTypes.MEDIA_ERROR:
-                    hls.value?.recoverMediaError();
-                    break;
-                  default:
-                    hls.value?.destroy();
-                    break;
-                }
-              }
-            });
-
-            player.hlsInstance = hls.value;
           } else {
-            // ✅ MP4 或不支持 HLS 的情况
             video.src = videoUrl;
-            video.playsInline = true;
-            video.muted = true;
-            video.preload = "auto";
-            video.addEventListener("loadedmetadata", () => {
-              video.play().catch(() => {
-                video.addEventListener("click", () => video.play(), { once: true });
-              });
-              setupTimeUpdate(video);
-            });
           }
         }
       }
     }
   });
+
+  // ✅ 等 DPlayer 初始化完毕后再绑试看限制
+  const videoEl = dp.value.video; 
+  setupTimeUpdate(videoEl);
+
+  // 调试看看是否真的触发
+  videoEl.addEventListener("timeupdate", () => {
+    console.log("timeupdate 触发:", videoEl.currentTime);
+  });
 };
 
+
+// ----- 试看限制 -----
 // ----- 试看限制 -----
 const setupTimeUpdate = (video: HTMLVideoElement) => {
   video.addEventListener("timeupdate", () => {
-    const vipdata = getVipStatus();
-    if (!vipdata.isVip || vipdata.memberVip <= 0) {
-      if (islookok.value) {
-        // 已购买过不限制
-      } else {
-        if (video.currentTime >= config.value.shikan) {
-          video.pause();
-          video.currentTime = config.value.shikan;
-          video.controls = false;
-          showBottom.value = true;
-          video.addEventListener("play", () => {
-            if (video.currentTime >= config.value.shikan) {
-              video.pause();
-              showBottom.value = true;
-            }
-          });
-        }
+    const vipdata = getVipStatus()
+    console.log("当前时间:", video.currentTime, "试看时间:", config.value.shikan, "是否VIP:", vipdata.isVip, "会员等级:", vipdata.memberVip,"配置",config.value);
+    
+    if(!vipdata.isVip || vipdata.memberVip <= 0){
+      if (video.currentTime >= config.value.shikan) {
+        video.pause()
+        video.currentTime = config.value.shikan
+        video.controls = false
+        showBottom.value = true
+        video.addEventListener("play", () => {
+          if (video.currentTime >= config.value.shikan) {
+            video.pause()
+            showBottom.value = true
+          }
+        })
       }
     }
-  });
-};
+  })
+}
 
 const copyQRCodeLink = async () => {
   let text = url.value
@@ -575,13 +499,13 @@ const downloadQRCode = () => {
   a.click()
 }
 // 监听 route.query.id 变化，只在真正变化时加载视频
-watchEffect(() => {
-  const newId = route.query.id as string;
-  if (newId && newId !== currentVideoId) {
-    currentVideoId = newId;
-    onGetVideoInfo(currentVideoId);
-  }
-});
+// watchEffect(() => {
+//   const newId = route.query.id as string;
+//   if (newId && newId !== currentVideoId) {
+//     currentVideoId = newId;
+//     onGetVideoInfo(currentVideoId);
+//   }
+// });
 const onBack = () => {
   router.back()
 }
@@ -596,6 +520,12 @@ const handleGoVideo = (item: any) => {
   scrollTop();
 }
 
+const onGetConfig = async () => {
+  const res = await post('/app-api/ajax/getConfig', {})
+  if (res.code === 0) {
+    config.value = res.data
+  }
+}
 const onBuy = async () => {
   const data = {
     cartoonCode:
@@ -609,10 +539,8 @@ const onBuy = async () => {
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
     showSuccessToast(data)
-    await onGetConfig()
     await onLookOk(videoInfo.value.cartoonCode * 1)
     nextTick(async () => {
-
       await onCreatedVideo()
       showBottom.value = false
     })
@@ -691,7 +619,7 @@ const onBindCode = async (parentId: any) => {
 }
 
 onBeforeMount(async () => {
-  const id: any = route.query.id
+     const id: any = route.query.id
   if (!id) {
     let second = 3
     const toast = showLoadingToast({ duration: 0, forbidClick: true, message: `${second} 秒后退出,无携带参数` })
@@ -704,14 +632,17 @@ onBeforeMount(async () => {
     await onGetUserInfo()
     await onGetVideoInfo(id)
   }
+  await onGetConfig()
 
 }),
   // ----- 生命周期 -----
   onMounted(async () => {
     const share: any = route.query.share
-    if (share) {
+     if (share) {
       await onBindCode(share)
     }
+ 
+   
     try {
       const text = window.location.href + '&' + `share=${memberinfo.value.memberCode}`
       url.value = text
@@ -728,10 +659,6 @@ onBeforeMount(async () => {
     } catch (err) {
       console.error(err)
     }
-    // await onGetSavelit()
-    await nextTick(); // 等待 DOM 渲染
-    // 强制滚动到顶部
-
   })
 
 onUnmounted(() => {

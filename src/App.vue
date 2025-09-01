@@ -53,7 +53,7 @@
 import { ref, onMounted ,onBeforeMount} from "vue"
 import { useRoute } from 'vue-router'
 import { useHomeStore } from '@/store/home'
-
+import { post } from '@/utils/request'
 const homeStore = useHomeStore()
 const route = useRoute()
 const showIndexGuanggao = ref<any>(false)
@@ -74,6 +74,23 @@ const closeOverlay = () => {
 const onOpen= ()=>{
   window.open(homeStore.indexPopupAd[0].url, '_blank')
 }
+ const getConfig = async () => {
+    const res = await post('/app-api/ajax/getConfig', {})
+    if (res.code === 0) {
+      // const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+      const data = res.data
+      homeStore.showAd= data.showAd
+      homeStore.nottitle = data.popupContent
+      homeStore.showDarksideAd = data.showDarksideAd
+      homeStore.showMeAd = data.showMeAd
+      homeStore.showPaihangAd = data.showPaihangAd
+      homeStore.showPlayAd = data.showPlayAd
+      homeStore.showRandomAd = data.showRandomAd
+      homeStore.showSonType= data.showSonType
+      homeStore.showSquareAd = data.showSquareAd
+      homeStore.showSwiperAd = data.showSwiperAd
+    }
+  }
 onBeforeMount(async () => {
   // 首页加载时弹出广告
   // 首页加载时，如果 sessionStorage 里没有记录过广告显示，则弹出广告
@@ -82,7 +99,8 @@ onBeforeMount(async () => {
     // 记录广告已经显示过，下次刷新就不会再弹
     sessionStorage.setItem('showGuanggao', 'true');
   }
-  await homeStore.initHome()
+ await homeStore.initHome()
+  await getConfig()
   if(homeStore.showAd){
     showIndexGuanggao.value = true
   }

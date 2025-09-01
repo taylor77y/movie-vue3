@@ -45,7 +45,9 @@ const onOpen = (url) => {
 const onGoVideoInfo = async (item) => {
     emits('goVideo', item);
 };
-
+const onImgError = (e) => {
+    emits('error', e)
+}
 
 </script>
 

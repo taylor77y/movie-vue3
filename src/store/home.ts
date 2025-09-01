@@ -18,6 +18,9 @@ export const useHomeStore = defineStore('home', () => {
   const fenlei = ref<any>({
     img: ''
   })
+  const paihang = ref<any>({
+    img: ''
+  })
   const showAd = ref<any>(false)
   const darksidead = ref<any[]>([])
   const squaread = ref<any[]>([])
@@ -37,97 +40,6 @@ export const useHomeStore = defineStore('home', () => {
   const nottitle = ref('')
   const activeTag = ref(0)
 
-  let initialized = false
- const insertAdsOther = <T>(list: T[], ads: T[], interval = 6, startIndex = 0): T[] => {
-    if (!ads || ads.length === 0) return list;
-
-    let result: T[] = [];
-    let usedIndexes: number[] = [];
-
-    const getRandomAd = (): T => {
-      // 随机取广告
-      let idx = Math.floor(Math.random() * ads.length);
-      // 避免连续重复（可选）
-      while (usedIndexes.length && idx === usedIndexes[usedIndexes.length]) {
-        idx = Math.floor(Math.random() * ads.length);
-      }
-      usedIndexes.push(idx);
-      return { ...(ads[idx] as T) };
-    };
-
-    list.forEach((item, i) => {
-      result.push(item);
-
-      // ✅ 从 startIndex 开始，每隔 interval 插广告
-      if (i >= startIndex && (i - startIndex) % interval === 0) {
-        result.push(getRandomAd());
-      }
-    });
-
-    return result;
-  };
-
-  // ----- 工具方法 -----
-  const insertAds = <T>(list: T[], ads: T[], interval = 6, startIndex = 0): T[] => {
-    if (!ads || ads.length === 0) return list;
-
-    let result: T[] = [];
-    let usedIndexes: number[] = [];
-
-    const getRandomAd = (): T => {
-      // 随机取广告
-      let idx = Math.floor(Math.random() * ads.length);
-      // 避免连续重复（可选）
-      while (usedIndexes.length && idx === usedIndexes[usedIndexes.length]) {
-        idx = Math.floor(Math.random() * ads.length);
-      }
-      usedIndexes.push(idx);
-      return { ...(ads[idx] as T) };
-    };
-
-    list.forEach((item, i) => {
-      result.push(item);
-
-      // ✅ 从 startIndex 开始，每隔 interval 插广告
-      if (i >= startIndex && (i - startIndex) % interval === 0) {
-        result.push(getRandomAd());
-      }
-    });
-
-    return result;
-  };
-
-
-
-// 分页式插入广告：广告插入位置基于全局列表长度，而不是当前页
-const insertAdsPaginated = <T>(
-  list: T[],
-  ads: T[],
-  currentTotal: number, // 已有的总长度（分页追加时很关键）
-  interval = 6,
-  startIndex = 1
-): T[] => {
-  if (!ads || ads.length === 0) return list;
-
-  const result: T[] = [];
-  let adIndex = 0;
-
-  list.forEach((item, i) => {
-    const globalIndex = currentTotal + i; // 当前元素在全局中的索引
-    result.push(item);
-
-    // 从 startIndex 开始，每隔 interval 插广告
-    if (globalIndex >= startIndex && (globalIndex - startIndex) % interval === 0) {
-      const adItem = ads[adIndex % ads.length];
-      result.push({ ...(adItem as T) });
-      adIndex++;
-    }
-  });
-
-  return result;
-};
-
-
 
   // ----- API -----
   const getConfig = async () => {
@@ -135,13 +47,10 @@ const insertAdsPaginated = <T>(
     if (res.code === 0) {
       // const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
       const data = res.data
-      console.log(data, "data配置配置配置配置配置");
       showAd.value = data.showAd
       nottitle.value = data.popupContent
       showDarksideAd.value = data.showDarksideAd
       showMeAd.value = data.showMeAd
-      showPaihangAd.value = data.showPaihangAd
-      showPlayAd.value = data.showPlayAd
       showPaihangAd.value = data.showPaihangAd
       showPlayAd.value = data.showPlayAd
       showRandomAd.value = data.showRandomAd
@@ -151,6 +60,62 @@ const insertAdsPaginated = <T>(
     }
   }
 
+const getAdlist = (list: any[]) => {
+  if (!list || !list.length || !randomad.value || !randomad.value.length) return list;
+
+  const result: any[] = [...list]; // 拷贝原数组
+  const interval = 6; // 每隔 6 条插入广告
+  let insertIndex = 0;
+
+  const ads = randomad.value;
+  const adCount = ads.length;
+
+  while (insertIndex <= result.length) {
+    let ad;
+    if (adCount === 1) {
+      ad = ads[0]; // 只有一个广告，永远使用它
+    } else {
+      const randIdx = Math.floor(Math.random() * adCount); // 多个广告随机
+      ad = ads[randIdx];
+    }
+
+    result.splice(insertIndex, 0, ad);
+
+    insertIndex += interval + 1; // 下次插入位置
+  }
+
+  return result;
+};
+
+const getAdOtlist = (list: any[]) => {
+  if (!list || !list.length || !randomad.value || !randomad.value.length) return list;
+
+  const result: any[] = [...list]; // 拷贝原数组
+  const interval = 9; // 每隔 9 条插入广告
+  let insertIndex = 9; // 从索引 9 开始插入
+
+  const ads = randomad.value;
+  const adCount = ads.length;
+
+  while (insertIndex <= result.length) {
+    let ad;
+    if (adCount === 1) {
+      ad = ads[0]; // 只有一个广告
+    } else {
+      const randIdx = Math.floor(Math.random() * adCount); // 多个广告随机
+      ad = ads[randIdx];
+    }
+
+    result.splice(insertIndex, 0, ad);
+
+    insertIndex += interval + 1; // 下次插入位置
+  }
+
+  return result;
+};
+
+
+
   const getGuangGao = async () => {
     const res = await post('/app-api/ajax/guanggao', {})
     if (res.code === 0) {
@@ -158,14 +123,14 @@ const insertAdsPaginated = <T>(
       randomad.value = data.randomad
         .filter((item: any) => item.status === 1)
         .map((item: any) => ({ ...item, adtype: 'ad' }));
-      indexPopupAd.value = data.indexPopupAd?.filter((item: any) => item.status === 1) || [];
+      indexPopupAd.value = data.indexPopupAd?.filter((item: any) => item.type === 1) || [];
       play.value = data.play?.filter((item: any) => item.status === 1) || [];
       banner.value = data.banner?.filter((item: any) => item.status === 1) || [];
       user.value = data.user?.filter((item: any) => item.status === 1) || [];
       squaread.value = data.squaread?.filter((item: any) => item.status === 1) || [];
       darksidead.value = data.darksidead?.filter((item: any) => item.status === 1) || [];
       fenlei.value = data.fenlei
-      console.log(data, "广告广告广告广告广告");
+      paihang.value = data.paihang
     }
   }
 
@@ -178,13 +143,20 @@ const insertAdsPaginated = <T>(
     }
   }
 
+  const onGetplay =  () => {
+     const data = {showAd:showAd.value ,squaread:squaread.value}
+     return data;
+  }
+
 
   const getData = async () => {
+   
     const res = await post('/app-api/cartoon/listIndex', {})
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-      rankList.value = insertAds(data.rankList, randomad.value)
-      typelist.value = insertAds(data.typeList.flatMap((item: any) => item.cartoonInfoList), randomad.value)
+       rankList.value =data.rankList
+      // rankList.value = insertAds(data.rankList, randomad.value)
+      typelist.value=[...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList].slice(0,-1);
     }
   }
 
@@ -192,62 +164,62 @@ const insertAdsPaginated = <T>(
     const res = await post('/app-api/cartoon/listIndexLike', { currentPage: currentPage.value })
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-      likeList.value = insertAds(data.distinctNameList, randomad.value)
+      console.log(randomad.value ,"广告");
+      likeList.value = getAdlist(data.distinctNameList)
     }
   }
-const loadMore = async () => {
-  if (loading.value || noMore.value) return;
+  const loadMore = async () => {
+    if (loading.value || noMore.value) return;
 
-  currentPage.value++;
-  loading.value = true;
+    currentPage.value++;
+    loading.value = true;
 
-  try {
-    let res, data;
-    if (activeTag.value === 0) {
-      res = await post('/app-api/cartoon/listIndexLike', { currentPage: currentPage.value });
-      if (res.code === 0) {
-        data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'));
-        if (data.distinctNameList.length > 0) {
-          likeList.value.push(
-            ...insertAdsPaginated(data.distinctNameList, randomad.value, likeList.value.length)
-          );
-        } else {
-          noMore.value = true;
+    try {
+      let res, data;
+      if (activeTag.value === 0) {
+        res = await post('/app-api/cartoon/listIndexLike', { currentPage: currentPage.value });
+        if (res.code === 0) {
+          data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'));
+          if (data.distinctNameList.length > 0) {
+              likeList.value = getAdlist([...likeList.value,...data.distinctNameList])
+            // likeList.value.push(
+            //   ...insertAdsPaginated(data.distinctNameList, randomad.value, likeList.value.length)
+            // );
+          } else {
+            noMore.value = true;
+          }
+        }
+      } else {
+        res = await post('/app-api/cartoon/listPaging', {
+          currentPage: currentPage.value,
+          type: "全部",
+          typeCode: activeTag.value,
+        });
+        if (res.code === 0) {
+          
+          const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'));
+            console.log(data, "分类返回2222222222222");
+
+          if (data.list.length > 0) {
+            // likeList.value.push(
+            //   ...insertAdsPaginated(data.list, randomad.value, likeList.value.length)
+            // );
+            likeList.value = getAdlist([...likeList.value,...data.list])
+          } else {
+            noMore.value = true;
+          }
         }
       }
-    } else {
-      res = await post('/app-api/cartoon/listPaging', {
-        currentPage: currentPage.value,
-        type: "全部",
-        typeCode: activeTag.value,
-      });
-      if (res.code === 0) {
-        data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'));
-        if (data.list.length > 0) {
-          likeList.value.push(
-            ...insertAdsPaginated(data.list, randomad.value, likeList.value.length)
-          );
-        } else {
-          noMore.value = true;
-        }
-      }
+    } finally {
+      loading.value = false;
     }
-  } finally {
-    loading.value = false;
-  }
-};
+  };
 
 
 
   // ----- 初始化方法 -----
   const initHome = async () => {
-    if (!initialized) {
-      await getGuangGao()
       await getTagList()
-      await getData()
-      await getLikeData()
-      initialized = true
-    }
   }
 
   return {
@@ -266,10 +238,11 @@ const loadMore = async () => {
     indexPopupAd,
     nottitle,
     activeTag,
-    initialized,
     user,
     squaread,
     play,
+    fenlei,
+    paihang,
     darksidead,
     showAd,
     showDarksideAd,
@@ -280,9 +253,9 @@ const loadMore = async () => {
     showSonType,
     showSquareAd,
     showSwiperAd,
+    onGetplay,
 
     // 方法
-    insertAds,
     getConfig,
     getGuangGao,
     getTagList,
@@ -290,6 +263,6 @@ const loadMore = async () => {
     getLikeData,
     loadMore,
     initHome,
-    insertAdsOther
+    getAdOtlist
   }
 })
