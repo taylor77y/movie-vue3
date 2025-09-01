@@ -77,7 +77,7 @@
                 </div>
             </div>
         </div>
-        <van-overlay :show="show" @click="show = false">
+        <van-overlay :show="show" @click="toggleShow()">
             <div class="wrapper">
                 <div class="flex-b" @click.stop>
                     <div class="block">
@@ -88,7 +88,7 @@
                                 <div class="line">
                                 </div>
                                 <div style="display: flex;align-items: center;justify-content: center;height: 40px;">
-                                    <van-icon name="cross" size="22" @click="show = false" />
+                                    <van-icon name="cross" size="22" @click="toggleShow()" />
                                 </div>
 
                             </div>
@@ -149,7 +149,7 @@ let list = ref<any>([
   },
   {
     name: '官方网站:',
-    text: 'https://91porn.hk/#/',
+    text: 'https://91porn.hk',
     src: '/my/me/03.png'
   },
   {
@@ -315,6 +315,10 @@ const onGn = (index: number) => {
 const onSave = () => {
     showToast('请手动截图保存')
 }
+const toggleShow = () => {
+  show.value = !show.value
+  localStorage.setItem("show", String(show.value))
+}
 onMounted(async() => {
     const info = localStorage.getItem('memberInfo')
     if (info) {
@@ -332,6 +336,14 @@ onMounted(async() => {
         console.log('本地没有用户信息')
     }
     await store.getConfig()
+    // 第一次进入，localStorage 没有值，就设为 true
+  if (!localStorage.getItem("show")) {
+    localStorage.setItem("show", "true")
+    show.value = true
+  } else {
+    // 后续刷新或再次进入时，用存储的值
+    show.value = localStorage.getItem("show") === "true"
+  }
 })
 </script>
 <style lang="less" scoped>
@@ -614,7 +626,6 @@ onMounted(async() => {
 .mask-bg {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
     border-radius: 10px;
     background: linear-gradient(147.03deg, #FEFEFE 5.39%, #E9D7AF 52.03%, #E0C397 84.83%, #F2C4AC 107.35%);
     display: flex;
