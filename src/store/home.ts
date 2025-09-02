@@ -242,6 +242,9 @@ const getAdOtlist = (list: any[]) => {
   // ----- 初始化方法 -----
   const initHome = async () => {
       await getTagList()
+      await getGuangGao()
+      await getLikeData()
+      await getData()
   }
 
   return {

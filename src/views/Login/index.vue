@@ -87,7 +87,7 @@ const onLogin = async () => {
             const parsedData = res.data
             console.log(parsedData.token,"parsedData");
             localStorage.setItem('memberInfo', JSON.stringify(parsedData))
-            localStorage.setItem('token', JSON.stringify(parsedData.token))
+            localStorage.setItem('token',parsedData.token)
             router.push("/")
             // 登录成功提示
             showToast('登录成功！')

@@ -128,6 +128,8 @@ const onRef = async () => {
   })
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+    console.log(data,"data22222222222222222");
+    
     store.rankList =store.getAdlist(data.rankList)
     store.typelist=store.getAdTypelist([...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList]);
   }
@@ -173,7 +175,23 @@ const onFocus = () => {
     path: '/sreach'
   })
 }
-
+ const getConfig = async () => {
+    const res = await post('/app-api/ajax/getConfig', {})
+    if (res.code === 0) {
+      // const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+      const data = res.data
+      store.showAd= data.showAd
+      store.nottitle = data.popupContent
+      store.showDarksideAd = data.showDarksideAd
+      store.showMeAd = data.showMeAd
+      store.showPaihangAd = data.showPaihangAd
+      store.showPlayAd = data.showPlayAd
+      store.showRandomAd = data.showRandomAd
+      store.showSonType= data.showSonType
+      store.showSquareAd = data.showSquareAd
+      store.showSwiperAd = data.showSwiperAd
+    }
+  }
 onMounted(async () => {
   if (route.query.id) {
     onBindCode(route.query.id)
@@ -216,15 +234,12 @@ onMounted(async () => {
     })
   }
   nextTick(async() => {
-   await  store.getGuangGao()
-   await store.getLikeData()
-   await store.getData()
-   setTimeout(() => {
-    const {showAd,squaread} = store.onGetplay()
-    console.log(showAd,squaread,"首页广告返回");
-    showSquareAd.value = showAd
+    await  store.getGuangGao()
+    await getConfig()
+      const {showAd,squaread} = store.onGetplay()
+       showSquareAd.value = showAd
     playlist.value = squaread
-    }, 1000);
+ 
   })
   
 })

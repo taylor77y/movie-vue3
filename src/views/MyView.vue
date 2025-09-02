@@ -534,11 +534,11 @@ onMounted(async() => {
         align-items: center;
         justify-content: space-around;
         flex-direction: column;
-        width: 80%;
+        width: 85%;
 
         .block {
             width: 100%;
-            height: 80%;
+            height: 450px;
             background: linear-gradient(1turn, #161616 79.38%, #30303d);
             color: #fff;
             border-radius: 10px;

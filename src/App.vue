@@ -2,7 +2,7 @@
   <!-- 开启顶部安全区适配 -->
   <RouterView :key="route.fullPath">
   </RouterView>
-  <div  v-if="route.path === '/'"  class="anzhuang" @click="onAnZhuang()">安装到桌面</div>
+  <div v-if="route.path === '/'" class="anzhuang" @click="onAnZhuang()">安装到桌面</div>
 
   <van-overlay :show="showGuanggao" :style="{ zIndex: 9998 }">
     <div class="g-wrapper">
@@ -37,12 +37,12 @@
       </div>
     </van-overlay>
   </van-overlay>
-  <van-overlay :show="showIndexGuanggao"  :style="{ zIndex: 9996 }">
-    <div  class="g-wrapper">
-         <div class="indexgg" >
-          <div class="close" @click="showIndexGuanggao = false"><van-icon name="cross" color="black" size="24" /></div>
-          <img class="index" @click="onOpen()" :src="homeStore.indexPopupAd[0].img"/>
-         </div>
+  <van-overlay :show="showIndexGuanggao" :style="{ zIndex: 9996 }">
+    <div class="g-wrapper">
+      <div class="indexgg">
+        <div class="close" @click="showIndexGuanggao = false"><van-icon name="cross" color="black" size="24" /></div>
+        <img class="index" @click="onOpen()" :src="homeStore.indexPopupAd[0].img" />
+      </div>
     </div>
   </van-overlay>
   <!-- homeStore -->
@@ -50,7 +50,7 @@
   <van-number-keyboard safe-area-inset-bottom />
 </template>
 <script setup lang="ts">
-import { ref, onMounted ,onBeforeMount, nextTick} from "vue"
+import { ref, onMounted, onBeforeMount, nextTick } from "vue"
 import { useRoute } from 'vue-router'
 import { useHomeStore } from '@/store/home'
 import { post } from '@/utils/request'
@@ -63,7 +63,7 @@ const onAnZhuang = () => {
   showGuanggao.value = true
 }
 const onDowloand = () => {
-   window.open('https://91porn.hk/download/apk/kanbei14.apk', '_blank')
+  window.open('https://91porn.hk/download/apk/kanbei14.apk', '_blank')
 }
 const onShowAppleTutorial = () => {
   showOverlay.value = !showOverlay.value
@@ -71,26 +71,26 @@ const onShowAppleTutorial = () => {
 const closeOverlay = () => {
   showOverlay.value = !showOverlay.value
 }
-const onOpen= ()=>{
+const onOpen = () => {
   window.open(homeStore.indexPopupAd[0].url, '_blank')
 }
- const getConfig = async () => {
-    const res = await post('/app-api/ajax/getConfig', {})
-    if (res.code === 0) {
-      // const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-      const data = res.data
-      homeStore.showAd= data.showAd
-      homeStore.nottitle = data.popupContent
-      homeStore.showDarksideAd = data.showDarksideAd
-      homeStore.showMeAd = data.showMeAd
-      homeStore.showPaihangAd = data.showPaihangAd
-      homeStore.showPlayAd = data.showPlayAd
-      homeStore.showRandomAd = data.showRandomAd
-      homeStore.showSonType= data.showSonType
-      homeStore.showSquareAd = data.showSquareAd
-      homeStore.showSwiperAd = data.showSwiperAd
-    }
+const getConfig = async () => {
+  const res = await post('/app-api/ajax/getConfig', {})
+  if (res.code === 0) {
+    // const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+    const data = res.data
+    homeStore.showAd = data.showAd
+    homeStore.nottitle = data.popupContent
+    homeStore.showDarksideAd = data.showDarksideAd
+    homeStore.showMeAd = data.showMeAd
+    homeStore.showPaihangAd = data.showPaihangAd
+    homeStore.showPlayAd = data.showPlayAd
+    homeStore.showRandomAd = data.showRandomAd
+    homeStore.showSonType = data.showSonType
+    homeStore.showSquareAd = data.showSquareAd
+    homeStore.showSwiperAd = data.showSwiperAd
   }
+}
 onBeforeMount(async () => {
   // 首页加载时弹出广告
   // 首页加载时，如果 sessionStorage 里没有记录过广告显示，则弹出广告
@@ -100,19 +100,23 @@ onBeforeMount(async () => {
     sessionStorage.setItem('showGuanggao', 'true');
   }
   await homeStore.initHome()
-  await getConfig()
+
 })
-onMounted(() => {
-    nextTick(()=>{
-      setTimeout(() => {
-           if(homeStore.indexPopupAd.length > 0){
-        if(homeStore.indexPopupAd[0].status === 1){
+onMounted(async () => {
+  await getConfig()
+  await homeStore.getGuangGao()
+  console.log(homeStore.indexPopupAd,"homeStore.indexPopupAd");
+  
+  nextTick(() => {
+    setTimeout(() => {
+      if (homeStore.indexPopupAd.length > 0) {
+        if (homeStore.indexPopupAd[0].status === 1) {
           showIndexGuanggao.value = true
         }
       }
-      }, 500);
-    })
-   
+    }, 500);
+  })
+
 });
 </script>
 <style lang="less" scoped>
@@ -255,22 +259,26 @@ onMounted(() => {
     background-color: #eee;
   }
 }
-.indexgg{
+
+.indexgg {
   width: 80%;
   height: auto;
   height: 80%;
   border-radius: 8px;
   position: relative;
-  .index{
+
+  .index {
     width: 100%;
     height: 100%;
   }
-  .close{
+
+  .close {
     position: absolute;
     right: 10px;
     top: 10px;
   }
 }
+
 .anzhuang {
   width: 180px;
   height: 42px;
