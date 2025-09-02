@@ -186,7 +186,6 @@ const getAdOtlist = (list: any[]) => {
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
        rankList.value =getAdlist(data.rankList)
-      // rankList.value = insertAds(data.rankList, randomad.value)
       typelist.value=getAdTypelist([...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList]);
     }
   }
@@ -288,5 +287,6 @@ const getAdOtlist = (list: any[]) => {
     initHome,
     getAdOtlist,
     getAdTypelist,
+    getAdlist
   }
 })

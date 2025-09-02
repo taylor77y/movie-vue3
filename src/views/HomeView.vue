@@ -124,13 +124,12 @@ onBeforeMount(() => {
 
 const onRef = async () => {
   loadingIndex.value = true
-  console.log("这里触发了");
   const res = await post('/app-api/cartoon/listIndex', {
   })
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-    // store.rankList = store.insertAds(data.rankList, store.randomad)
-    // store.typelist=[...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList].slice(0,-1);
+    store.rankList =store.getAdlist(data.rankList)
+    store.typelist=store.getAdTypelist([...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList]);
   }
   loadingIndex.value = false
 }
