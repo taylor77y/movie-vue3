@@ -142,6 +142,7 @@ const likedIcon = '/videoinfo/dianz.svg';
 const star1 = '/videoinfo/star1.svg';
 const star = '/videoinfo/star.svg';
 const placeholder = '/Image/pl.png';
+import { v4 as uuidv4 } from 'uuid'
 import QRCode from 'qrcode'
 import { copyText } from '@lxf2513/vue3-clipboard';
 import moment from 'moment'
@@ -350,12 +351,14 @@ const onLookOk = async (id: any) => {
   if (!srcList.value.length) return
   const res = await post('/app-api/cartoon/lookOk', { cartoonCode: id * 1, moviesInfoId: srcList.value[0].urlList[0].id * 1 })
   if (res.code === 0) {
-    if (res.data.length) {
-        const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-        islookok.value = data
-    }else{
-        islookok.value = res.data
-    }
+    const str = "DuMlXN8M6xFnNpGLaYGl/A==";
+    if (str === res.data) {
+          const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+          islookok.value = false
+      }else{
+          islookok.value = true
+      }
+   
   }
 }
 
@@ -466,16 +469,19 @@ const setupTimeUpdate = (video: HTMLVideoElement) => {
     
     if(!vipdata.isVip || vipdata.memberVip <= 0){
       if (video.currentTime >= config.value.shikan) {
-        video.pause()
-        video.currentTime = config.value.shikan
-        video.controls = false
-        showBottom.value = true
-        video.addEventListener("play", () => {
-          if (video.currentTime >= config.value.shikan) {
-            video.pause()
-            showBottom.value = true
-          }
-        })
+        if(!islookok.value){
+          video.pause()
+          video.currentTime = config.value.shikan
+          video.controls = false
+          showBottom.value = true
+          video.addEventListener("play", () => {
+            if (video.currentTime >= config.value.shikan) {
+              video.pause()
+              showBottom.value = true
+            }
+          })
+        }
+        
       }
     }
   })
@@ -540,10 +546,10 @@ const onBuy = async () => {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
     showSuccessToast(data)
     await onLookOk(videoInfo.value.cartoonCode * 1)
-    nextTick(async () => {
+      nextTick(async () => {
       await onCreatedVideo()
-      showBottom.value = false
-    })
+        showBottom.value = false
+      })
   } else {
     router.push({
         path: '/pay'
@@ -551,7 +557,7 @@ const onBuy = async () => {
   }
 
 }
-const onGetUserInfo = async () => {
+const onGetUserInfo = async (share:any) => {
   // 1. 先尝试从 localStorage 获取
   const cached = localStorage.getItem('memberInfo')
   if (cached) {
@@ -559,29 +565,28 @@ const onGetUserInfo = async () => {
       const data = JSON.parse(cached)
       console.log('本地缓存用户信息', data)
       memberinfo.value = data
+       await onCreateQrCode()
       return data
     } catch (e) {
       console.error('解析本地缓存出错', e)
       // 如果解析出错，继续请求接口
     }
-  }
-  // 2. 如果没有缓存，或者缓存解析失败，则请求接口
-  try {
-    const res = await post('/app-api/member/getEntityByCode', {})
+  }else{
+    const res = await post('/renren-api/api/auto-register', {
+      deviceType: 0,
+      uuid: onCreateUUid()
+    })
     if (res.code === 0) {
-      // 假设 res.data 是加密后的字符串
-      const data = AES.decrypt(res.data, 'asdasdsadasdasds', { iv: '5245847584125485' }).toString(AES.enc.Utf8)
-      console.log('用户详情', data)
-      memberinfo.value = data
-      // 3. 存入 localStorage，下次直接使用
-      localStorage.setItem('memberInfo', JSON.stringify(data))
-      return data
-    } else {
-      console.error('接口返回错误', res)
+      memberinfo.value = res.data
+      localStorage.setItem('memberInfo', JSON.stringify(res.data))
+      localStorage.setItem('token', res.data.token)
+      if(share && share != 0){
+          await onBindCode(share)
+      }
+       await onCreateQrCode()
     }
-  } catch (err) {
-    console.error('获取用户信息失败', err)
   }
+
 }
 
 
@@ -617,49 +622,59 @@ const onBindCode = async (parentId: any) => {
     // showFailToast(res.msg)
   }
 }
-
-onBeforeMount(async () => {
-     const id: any = route.query.id
-  if (!id) {
-    let second = 3
-    const toast = showLoadingToast({ duration: 0, forbidClick: true, message: `${second} 秒后退出,无携带参数` })
-    const timer = setInterval(() => {
-      second--
-      if (second > 0) toast.message = `${second} 秒后退出,无携带参数`
-      else { clearInterval(timer); closeToast(); router.back() }
-    }, 1000)
-  } else {
-    await onGetUserInfo()
-    await onGetVideoInfo(id)
+const onCreateUUid = () => {
+  const uuid = uuidv4()
+  return uuid
+}
+const onCreateQrCode = async () => {
+  if (!memberinfo.value.memberCode) return
+  url.value = `${window.location.origin}/videoinfo?id=${route.query.id}&share=${memberinfo.value.memberCode}`
+  try {
+    qrCodeUrl.value = await QRCode.toDataURL(url.value, { width: 150 })
+  } catch (err) {
+    console.error('生成二维码失败', err)
   }
-  await onGetConfig()
+}
+onBeforeMount(async () => {
+  const share: any = route.query.share
+    if (share) {
+        if (localStorage.getItem('memberInfo') === null) {
+            await onGetUserInfo(share)
+        } 
+    }else{
+        const cached = localStorage.getItem('memberInfo')
+      if (cached) {
+        try {
+          const data = JSON.parse(cached)
+          console.log('本地缓存用户信息', data)
+          memberinfo.value = data
+          await onCreateQrCode()
+          return data
+        } catch (e) {
+          console.error('解析本地缓存出错', e)
+          // 如果解析出错，继续请求接口
+        }
+      }
+    }
+})
+onMounted(async () => {
+     const id: any = route.query.id
+      if (!id) {
+        let second = 3
+        const toast = showLoadingToast({ duration: 0, forbidClick: true, message: `${second} 秒后退出,无携带参数` })
+        const timer = setInterval(() => {
+          second--
+          if (second > 0) toast.message = `${second} 秒后退出,无携带参数`
+          else { clearInterval(timer); closeToast(); router.back() }
+        }, 1000)
+      } else {
+        await onGetVideoInfo(id)
+        await onGetConfig()
+      }
+
 
 }),
-  // ----- 生命周期 -----
-  onMounted(async () => {
-    const share: any = route.query.share
-     if (share) {
-      await onBindCode(share)
-    }
- 
-   
-    try {
-      const text = window.location.href + '&' + `share=${memberinfo.value.memberCode}`
-      url.value = text
-      qrCodeUrl.value = await QRCode.toDataURL(text, {
-        width: 108,   // 二维码宽度
-        margin: 1,
-        padding: 2,
-        color: {
-          dark: '#000000',  // 二维码颜色
-          light: '#ffffff'  // 背景颜色
-        }
-      })
-      console.log(qrCodeUrl.value, "qrCodeUrl.value")
-    } catch (err) {
-      console.error(err)
-    }
-  })
+
 
 onUnmounted(() => {
   if (dp.value) { dp.value.destroy(); dp.value = null }

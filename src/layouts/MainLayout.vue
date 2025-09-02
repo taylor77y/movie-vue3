@@ -66,76 +66,23 @@ watch(
   { immediate: true } // 页面初次加载也执行一次
 )
 const test = () => {
-  const data = {
-    androidUuid
-      :
-      null,
-    balance
-      :
-      0,
-    createTime
-      :
-      "2025-08-24 19:14:07",
-    h5Uuid
-      :
-      "27944f23-c238-4cbb-954b-4ff23936b6f7",
-    hasAccount
-      :
-      null,
-    iosUuid
-      :
-      null,
-    memberAvatar
-      :
-      null,
-    memberCion
-      :
-      0,
-    memberCode
-      :
-      "98210",
-    memberName
-      :
-      "28117039104",
-    memberNichen
-      :
-      "28117039104",
-    memberPwdTemp
-      :
-      "1234567",
-    memberSignature
-      :
-      null,
-    memberVip
-      :
-      0,
-    memberViptime
-      :
-      0,
-    mobile
-      :
-      null,
-    pid
-      :
-      "98999",
-    token
-      :
-      '69b156667a1f4b10ac2a87a8757973d1',
-    vipDate
-      :
-      "2025-08-24 19:14:07",
-    vipPeriod
-      :
-      0,
-    wxOpenid
-      :
-      null,
-    wxUnionid
-      :
-      null
-  }
-  localStorage.setItem('token', '69b156667a1f4b10ac2a87a8757973d1')
-  localStorage.setItem('memberInfo', JSON.stringify(data))
+  const user = {
+  memberCode: "132040",
+  memberAvatar: null,
+  memberNichen: "28912814080",
+  memberCion: 0,
+  balance: 0,
+  createTime: "2025-09-02 19:06:11",
+  h5Uuid: "9886e1b4-6fb3-471e-aad8-880a8e3a3cc2",
+  ip: "188.253.4.232",
+  memberName: "28912814080",
+  memberPwdTemp: "KPnTB8",
+  userAgent: "MacOSX(iPhone)_MobileSafari_16.6",
+  vipDate: "2025-09-02 19:06:11",
+  vipPeriod: 0
+};
+  localStorage.setItem('token', '16272a51b2bb4936b40f14ccc12ccee9')
+  localStorage.setItem('memberInfo', JSON.stringify(user))
 }
 
 onMounted(async () => {
@@ -153,54 +100,54 @@ onMounted(async () => {
   // } else {
    
   // }
-if(memberInfo.value.h5Uuid){
-  // 动态创建 Aplus 脚本
-  (function (w, d, s, q, i) {
-    w[q] = w[q] || [];
-    const f = d.getElementsByTagName(s)[0];
-    const j = d.createElement(s);
-    j.async = true;
-    j.id = "beacon-aplus";
-    j.src = "https://d.alicdn.com/alilog/mlog/aplus/" + i + ".js";
-    f.parentNode!.insertBefore(j, f);
-  })(window, document, "script", "aplus_queue", "203467608");
+  if(memberInfo.value.h5Uuid){
+    // 动态创建 Aplus 脚本
+    (function (w, d, s, q, i) {
+      w[q] = w[q] || [];
+      const f = d.getElementsByTagName(s)[0];
+      const j = d.createElement(s);
+      j.async = true;
+      j.id = "beacon-aplus";
+      j.src = "https://d.alicdn.com/alilog/mlog/aplus/" + i + ".js";
+      f.parentNode!.insertBefore(j, f);
+    })(window, document, "script", "aplus_queue", "203467608");
 
-  // 设置 appKey
-  window.aplus_queue.push({
-    action: "aplus.setMetaInfo",
-    arguments: ["appKey", "68a1c9fbe563686f427f6968"],
-  });
+    // 设置 appKey
+    window.aplus_queue.push({
+      action: "aplus.setMetaInfo",
+      arguments: ["appKey", "68a1c9fbe563686f427f6968"],
+    });
 
-  // 单页应用手动 PV
-  window.aplus_queue.push({
-    action: "aplus.setMetaInfo",
-    arguments: ["aplus-waiting", "MAN"],
-  });
+    // 单页应用手动 PV
+    window.aplus_queue.push({
+      action: "aplus.setMetaInfo",
+      arguments: ["aplus-waiting", "MAN"],
+    });
 
-  // 开启调试
-  window.aplus_queue.push({
-    action: "aplus.setMetaInfo",
-    arguments: ["DEBUG", true],
-  });
+    // 开启调试
+    window.aplus_queue.push({
+      action: "aplus.setMetaInfo",
+      arguments: ["DEBUG", true],
+    });
 
-  // 设置 uuid
-  window.aplus_queue.push({
-    action: "aplus.setMetaInfo",
-    arguments: ["aplus-idtype", memberInfo.value.h5Uuid],
-  });
-  window.aplus_queue.push({
-    action: "aplus.sendPV",
-    arguments: [
-      {
-        is_auto: false,       // 表示手动上报 PV，不是自动上报
-      },
-      {
-        page_path: "进入首页", // 页面路径或名称
-        user_id: memberInfo.value.h5Uuid      // 用户 ID，可用于埋点区分用户
-      },
-    ],
-  });
-}
+    // 设置 uuid
+    window.aplus_queue.push({
+      action: "aplus.setMetaInfo",
+      arguments: ["aplus-idtype", memberInfo.value.h5Uuid],
+    });
+    window.aplus_queue.push({
+      action: "aplus.sendPV",
+      arguments: [
+        {
+          is_auto: false,       // 表示手动上报 PV，不是自动上报
+        },
+        {
+          page_path: "进入首页", // 页面路径或名称
+          user_id: memberInfo.value.h5Uuid      // 用户 ID，可用于埋点区分用户
+        },
+      ],
+    });
+  }
 })
 </script>
 
