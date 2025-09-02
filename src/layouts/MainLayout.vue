@@ -58,7 +58,7 @@ watch(
     if (val === '/publish') {
         const userData: any = localStorage.getItem('memberInfo')
       memberInfo.value = JSON.parse(userData)
-      if (memberInfo.value.memberVip === 3) {
+      if (memberInfo.value.memberVip === 3 || memberInfo.value.vipPeriod > 0) {
         show.value = false
       } else {
         show.value = true
