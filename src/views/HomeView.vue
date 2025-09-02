@@ -128,8 +128,6 @@ const onRef = async () => {
   })
   if (res.code === 0) {
     const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-    console.log(data,"data22222222222222222");
-    
     store.rankList =store.getAdlist(data.rankList)
     store.typelist=store.getAdTypelist([...data.typeList[0].cartoonInfoList,...data.typeList[1].cartoonInfoList,...data.typeList[2].cartoonInfoList,...data.typeList[3].cartoonInfoList]);
   }

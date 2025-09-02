@@ -90,8 +90,7 @@ const getAdlist = (list: any[]) => {
 };
 
 const getAdTypelist = (list: any[]) => {
-  if (!list || !list.length || !randomad.value || !randomad.value.length) return list;
-
+  if (!list || !list.length || !randomad.value || !randomad.value.length) return list.slice(0,-1);
   // 先过滤掉已有广告
   const filteredList = list.filter(item => !item._isAd);
 
@@ -114,8 +113,8 @@ const getAdTypelist = (list: any[]) => {
     result.splice(insertIndex, 0, ad);
     insertIndex += interval + 1;
   }
-
-  return result;
+    return result;
+  
 };
 
 const getAdOtlist = (list: any[]) => {
@@ -194,7 +193,7 @@ const getAdOtlist = (list: any[]) => {
     const res = await post('/app-api/cartoon/listIndexLike', { currentPage: currentPage.value })
     if (res.code === 0) {
       const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-      console.log(randomad.value ,"广告");
+    
       likeList.value = getAdlist(data.distinctNameList)
     }
   }

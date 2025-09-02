@@ -513,8 +513,14 @@ const downloadQRCode = () => {
 //   }
 // });
 const onBack = () => {
-  router.back()
+  if (route.query.share) {
+    // 直接跳首页，并带参数，替换当前历史记录
+    router.replace({ path: '/'})
+  } else {
+    router.back()
+  }
 }
+
 
 
 const handleGoVideo = (item: any) => {
