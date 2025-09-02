@@ -61,7 +61,7 @@ const onBack = () => {
     router.back()
 }
 const onKefu = () => {
-    window.open('https://kanbei03.top/chatlink.html', '_blank')
+    window.open('/chatlink.html', '_blank')
 }
 const onLogin = async () => {
     // 判空
@@ -113,7 +113,7 @@ const isIphoneX = () => {
     (width === 812 && height === 375) ||
     (width === 414 && height === 896) ||
     (width === 896 && height === 414)
-  
+
   return isIOS && iphoneXLike
 }
 onMounted(() => {

@@ -276,7 +276,7 @@ const onGn = (index: number) => {
         show.value = true
     }
     if (index === 2) {
-        window.open('https://kanbei03.top/chatlink.html', '_blank');
+        window.open('/chatlink.html', '_blank');
     }
     if (index === 3) {
         router.push({
