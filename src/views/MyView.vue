@@ -244,22 +244,19 @@ const onOpen = async(item: any) => {
 }
 const onGetVipIcon = () => {
   const vip = memberInfo.value.vipPeriod;
-  const vipDateStr = memberInfo.value.vipDate;
+    const vipDateStr = memberInfo.value.vipDate;
+       const vipDate = moment(vipDateStr, 'YYYY-MM-DD HH:mm:ss');
+        const now = moment();
+    
+   if(vip>0){
+     return vipIcons[vip] || vipIcons[6];
+   }else if (vip === 0 && !vipDate.isAfter(now)){
+     return vipIcons[0]
+   }else{
+     return vipIcons[6]
+   }
+  
 
-  // vip = 0 或 vipDate 不存在，返回默认 V0
-  if (vip === 0 || !vipDateStr) return vipIcons[0];
-
-  const vipDate = moment(vipDateStr, 'YYYY-MM-DD HH:mm:ss');
-  const now = moment();
-
-  // VIP 有效
-  if (vipDate.isAfter(now)) {
-    // 根据业务逻辑返回对应等级
-    return vipIcons[vip] || vipIcons[6]; // 超出范围就返回最高 V6
-  }
-
-  // VIP 已过期
-  return vipIcons[0];
 };
 const onSign = () => {
     router.push({
@@ -322,6 +319,8 @@ const toggleShow = () => {
 onMounted(async() => {
     const info = localStorage.getItem('memberInfo')
     if (info) {
+        console.log(12313312);
+        
         try {
             memberInfo.value = JSON.parse(info)
             console.log('本地用户信息', memberInfo.value)

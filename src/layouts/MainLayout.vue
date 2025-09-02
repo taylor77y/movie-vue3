@@ -56,6 +56,8 @@ watch(
   () => route.path,
   (val) => {
     if (val === '/publish') {
+        const userData: any = localStorage.getItem('memberInfo')
+      memberInfo.value = JSON.parse(userData)
       if (memberInfo.value.memberVip === 3) {
         show.value = false
       } else {
