@@ -118,9 +118,9 @@ const payList = ref<any>([])
 const vip = ref<any>(false)
 const limitPrice = (item: any) => {
   if (!item.price) return
-  if (item.price < 30) {
-    showSuccessToast('最小金额为30,已经自动为您修改')
-    item.price = 30
+  if (item.price < 10) {
+    showSuccessToast('最小金额为10,已经自动为您修改')
+    item.price = 10
   } else if (item.price > 5000) {
      showSuccessToast('最大金额为5000,已经自动为您修改')
     item.price = 5000
@@ -181,9 +181,9 @@ const onGetList = async () => {
         let newitem: any = {
             commoditySpecification: "",
             commodityToSort: 9999,
-            duration: "30-5000",
+            duration: "10-5000",
             id: "3",
-            price: 30,
+            price: 10,
             status: 1,
             time: "",
             type: 1
@@ -270,7 +270,7 @@ onMounted(async () => {
             vipac.value = icon;
             vip.value = isVip
             if (isVip) {
-                title.value = `VIP，剩余 <span style='color:#FF960C;font-size:18px'>${daysLeft}</span> 天，有效期至 <span style='color:#FF960C;font-size:18px'>${expireDate}</span>`
+                title.value = `剩余 <span style='color:#FF960C;font-size:12px'>${daysLeft}</span> 天，有效期至 <span style='color:#FF960C;font-size:12px'>${expireDate}</span>`
             } else {
                 title.value = '暂未开通VIP'
             }
@@ -371,7 +371,9 @@ onMounted(async () => {
                     margin-right: 5px;
                 }
 
-                .title {}
+                .title {
+                font-size: 12px;
+                }
             }
         }
 

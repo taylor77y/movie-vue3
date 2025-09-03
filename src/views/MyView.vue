@@ -255,8 +255,6 @@ const onGetVipIcon = () => {
    }else{
      return vipIcons[6]
    }
-  
-
 };
 const onSign = () => {
     router.push({
@@ -319,8 +317,6 @@ const toggleShow = () => {
 onMounted(async() => {
     const info = localStorage.getItem('memberInfo')
     if (info) {
-        console.log(12313312);
-        
         try {
             memberInfo.value = JSON.parse(info)
             console.log('本地用户信息', memberInfo.value)

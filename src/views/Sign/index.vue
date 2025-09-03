@@ -139,6 +139,9 @@ const onPostSign = async () => {
     // lwlist
     const currentDate = `${year}-${month}-${day}`
     let index =daysqm.value === '-1'?0:daysqm.value
+  
+    
+    
     const data = {
         amount:lwlist[index],
         commodityType:(index === 2||index === 6) ?2:1,
@@ -172,12 +175,11 @@ const onGetSignDay = async () => {
     })
     if (res.code === 0) {
         days.value = res.data * 1
-        if(res.data != 0){
+        if(res.data * 1 != 0){
              daysqm.value =  (days.value %7)-1
         }else{
              daysqm.value =  '-1'
         }
-       
     }
 }
 const isIphoneX = () => {

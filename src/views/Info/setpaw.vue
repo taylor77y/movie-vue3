@@ -12,12 +12,11 @@
             <div>
                 <div>原密码</div>
                 <div class="input-c" style="position: relative;">
-                    <input v-model="form.oldPwd" :type="showPassword ? 'text' : 'password'" class="input-p"
+                    <input v-model="form.oldPwd" type="text" class="input-p input-a" :disabled="true"
                         placeholder="请输入原密码" style="padding-right: 30px;" />
                     <span @click="togglePassword(0)"
                         style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;">
-                        <van-icon name="eye" v-if="!showPassword" />
-                        <van-icon name="eye-o" v-else />
+                        <van-icon name="eye-o"/>
                     </span>
                 </div>
             </div>
@@ -125,6 +124,21 @@ const submit = async () => {
 const onBack = () => {
     router.back()
 }
+onMounted(() => {
+    const info = localStorage.getItem('memberInfo')
+    if (info) {
+        try {
+            const data = JSON.parse(info)
+            console.log('本地用户信息', data);
+            
+            form.oldPwd = data.memberPwdTemp || ''
+        } catch (err) {
+            console.error('解析本地用户信息失败', err)
+        }
+    } else {
+        console.log('本地没有用户信息')
+    }
+})
 </script>
 <style lang="less" scoped>
 .setpaw {
@@ -167,6 +181,9 @@ const onBack = () => {
                 padding-right: 30px;
                 display: flex;
                 align-items: center;
+            }
+            .input-a{
+                color: #cccccc;
             }
         }
     }
