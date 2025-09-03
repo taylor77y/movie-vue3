@@ -4,7 +4,7 @@ import { useHomeStore } from '@/store/home'
 import CartoonItem from "@/components/CartoonItem.vue"
 import CartoonItemO from "@/components/CartoonItemO.vue"
 import SquAD from "@/components/SquAD.vue"
-import ADO from "@/components/ADO.vue"
+import PaihangADO from "@/components/PaihangADO.vue"
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
 import { useRoute, useRouter } from 'vue-router'
@@ -108,7 +108,7 @@ const handleScroll = (e: Event) => {
 
 // 页面打开
 const onOpen = async (item: any) => {
-  const res = await post('/app-api/member/swiperAdClickCount', {
+  const res = await post('/renren-api/api/member/swiperAdClickCount', {
     id: item.id
   })
   if (res.code === 0) {
@@ -312,7 +312,7 @@ onActivated(() => {
         <div class="c-left" @click="onGoMore(15, '精选视频')">查看更多</div>
         <div class="c-right" @click="onRef()"><van-icon name="replay" :class="{ spinning: loadingIndex }" /> 换一批</div>
       </div>
-      <ADO v-if="store.activeTag === 0" :item="store.fenlei"></ADO>
+      <PaihangADO v-if="store.activeTag === 0" :item="store.fenlei"></PaihangADO>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>
@@ -334,7 +334,7 @@ onActivated(() => {
             title="排行榜" :index="index" @error="onImgError" @imgLoaded="handleImgLoaded" />
         </div>
       </div>
-      <ADO v-if="store.activeTag === 0" :item="store.paihang"></ADO>
+      <PaihangADO v-if="store.activeTag === 0" :item="store.paihang"></PaihangADO>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>

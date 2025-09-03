@@ -16,7 +16,7 @@ const props = defineProps<{
   item: any
 }>()
 const onOpen = async(item: any) => {
-  const res = await post('/app-api/member/randomAdClickCount', {
+  const res = await post('/renren-api/api/member/randomAdClickCount', {
     id:item.id
   })
   if (res.code === 0) {

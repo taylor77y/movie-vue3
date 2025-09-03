@@ -43,7 +43,7 @@ const onImgError = (e) => {
     emits('error', e)
 }
 const onOpen = async(item) => {
-    const res = await post('/app-api/member/randomAdClickCount', {
+    const res = await post('/renren-api/api/member/randomAdClickCount', {
     id:item.id
   })
   if (res.code === 0) {

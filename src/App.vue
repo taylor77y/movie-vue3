@@ -71,7 +71,12 @@ const onShowAppleTutorial = () => {
 const closeOverlay = () => {
   showOverlay.value = !showOverlay.value
 }
-const onOpen = () => {
+  const onOpen = async(item: any) => {
+  const res = await post('/renren-api/api/member/indexAdClickCount', {
+    id:homeStore.indexPopupAd[0].id
+  })
+  if (res.code === 0) {
+  }
   window.open(homeStore.indexPopupAd[0].url, '_blank')
 }
 const getConfig = async () => {
