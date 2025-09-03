@@ -12,7 +12,24 @@ import VideoInfo from '@/views/VideoInfo/index.vue'
 import History from '@/views/History/index.vue'
 import Vip from '@/views/Vip/index.vue'
 import Pay from '@/views/Pay/index.vue'
-import CateInfo from '@/views/CateInfo/index.vue'
+
+// 首先需在文件顶部引入所有对应的组件（路径需根据你的实际项目结构调整）
+import CateInfo from '@/views/CateInfo/index.vue' // 假设CateInfo组件实际路径也在views下，与其他组件保持统一
+import Sreinfo from '@/views/Sreinfo/index.vue'
+import Sreach from '@/views/Sreach/index.vue'
+import Centersetting from '@/views/Centersetting/index.vue'
+import Login from '@/views/Login/index.vue'
+import Setpaw from '@/views/Info/setpaw.vue'
+import Setinfo from '@/views/Info/setinfo.vue'
+import Share from '@/views/Share/index.vue'
+import Feed from '@/views/Feedback/index.vue'
+import Codelist from '@/views/Codelist/index.vue'
+import Taglist from '@/views/Taglist/index.vue'
+import Agent from '@/views/Agent/index.vue'
+import Ordertx from '@/views/Order/tixian.vue'
+import Order from '@/views/Order/index.vue'
+import Sign from '@/views/Sign/index.vue'
+
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -33,20 +50,96 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/cateInfo', name: 'CateInfo', component: CateInfo, meta: { showTabbar: false } },
 
   // ✅ 次要页面继续懒加载
-  { path: '/sreinfo', name: 'Sreinfo', component: () => import('@/views/Sreinfo/index.vue'), meta: { showTabbar: false } },
-  { path: '/sreach', name: 'Sreach', component: () => import('@/views/Sreach/index.vue'), meta: { showTabbar: false } },
-  { path: '/centersetting', name: 'Centersetting', component: () => import('@/views/Centersetting/index.vue'), meta: { showTabbar: false } },
-  { path: '/login', name: 'Login', component: () => import('@/views/Login/index.vue'), meta: { showTabbar: false } },
-  { path: '/setpaw', name: 'Setpaw', component: () => import('@/views/Info/setpaw.vue'), meta: { showTabbar: false } },
-  { path: '/setinfo', name: 'Setinfo', component: () => import('@/views/Info/setinfo.vue'), meta: { showTabbar: false } },
-  { path: '/share', name: 'Share', component: () => import('@/views/Share/index.vue'), meta: { showTabbar: false } },
-  { path: '/feed', name: 'Feed', component: () => import('@/views/Feedback/index.vue'), meta: { showTabbar: false } },
-  { path: '/codelist', name: 'Codelist', component: () => import('@/views/Codelist/index.vue'), meta: { showTabbar: false } },
-  { path: '/taglist', name: 'Taglist', component: () => import('@/views/Taglist/index.vue'), meta: { showTabbar: false } },
-  { path: '/agent', name: 'Agent', component: () => import('@/views/Agent/index.vue'), meta: { showTabbar: false } },
-  { path: '/tx', name: 'Ordertx', component: () => import('@/views/Order/tixian.vue'), meta: { showTabbar: false } },
-  { path: '/order', name: 'Order', component: () => import('@/views/Order/index.vue'), meta: { showTabbar: false } },
-  { path: '/sign', name: 'Sign', component: () => import('@/views/Sign/index.vue'), meta: { showTabbar: false } },
+  { 
+    path: '/cateInfo', 
+    name: 'CateInfo', 
+    component: CateInfo, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/sreinfo', 
+    name: 'Sreinfo', 
+    component: Sreinfo, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/sreach', 
+    name: 'Sreach', 
+    component: Sreach, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/centersetting', 
+    name: 'Centersetting', 
+    component: Centersetting, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/login', 
+    name: 'Login', 
+    component: Login, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/setpaw', 
+    name: 'Setpaw', 
+    component: Setpaw, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/setinfo', 
+    name: 'Setinfo', 
+    component: Setinfo, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/share', 
+    name: 'Share', 
+    component: Share, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/feed', 
+    name: 'Feed', 
+    component: Feed, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/codelist', 
+    name: 'Codelist', 
+    component: Codelist, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/taglist', 
+    name: 'Taglist', 
+    component: Taglist, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/agent', 
+    name: 'Agent', 
+    component: Agent, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/tx', 
+    name: 'Ordertx', 
+    component: Ordertx, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/order', 
+    name: 'Order', 
+    component: Order, 
+    meta: { showTabbar: false } 
+  },
+  { 
+    path: '/sign', 
+    name: 'Sign', 
+    component: Sign, 
+    meta: { showTabbar: false } 
+  },
 
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]

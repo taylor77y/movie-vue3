@@ -30,7 +30,7 @@
     </div>
 
     <div v-if="store.showPlayAd" style="width: 100%;padding: 0 10px;margin-top: 10px;">
-      <AD :list="[...store.play]"></AD>
+      <PlayAd :list="[...store.play]"></PlayAd>
     </div>
     <div style="padding: 0 10px;display: flex;
     flex-direction: column; ">
@@ -146,7 +146,7 @@ import { v4 as uuidv4 } from 'uuid'
 import QRCode from 'qrcode'
 import { copyText } from '@lxf2513/vue3-clipboard';
 import moment from 'moment'
-import AD from "@/components/Ad.vue"
+import PlayAd from "@/components/PlayAd.vue"
 const videoRef = ref<HTMLDivElement | null>(null)
 const url = ref<any>('')
 const store = useHomeStore()

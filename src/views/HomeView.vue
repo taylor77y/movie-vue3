@@ -3,7 +3,7 @@ import { onMounted, nextTick, onActivated, ref, onBeforeMount, reactive, onUpdat
 import { useHomeStore } from '@/store/home'
 import CartoonItem from "@/components/CartoonItem.vue"
 import CartoonItemO from "@/components/CartoonItemO.vue"
-import AD from "@/components/Ad.vue"
+import SquAD from "@/components/SquAD.vue"
 import ADO from "@/components/ADO.vue"
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
@@ -284,7 +284,7 @@ onActivated(() => {
           <img :src="item.image" style="height: 125px;width: 100%;border-radius: 5px;object-fit: fill;" />
         </van-swipe-item>
       </van-swipe>
-        <AD  v-if="showSquareAd " :list="playlist"></AD>
+        <SquAD  v-if="showSquareAd " :list="playlist"></SquAD>
       <div v-if="store.activeTag === 0" class="title-header">
         <div class="left">
           <div class="line"></div>

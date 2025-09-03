@@ -5,7 +5,7 @@
             <div class="tit">暗网</div>
             <div></div>
         </div>
-        <AD v-if="store.showDarksideAd" :list="[...store.darksidead]"></AD>
+        <DarkAd v-if="store.showDarksideAd" :list="[...store.darksidead]"></DarkAd>
         <div class="mask-list">
             <div v-for="(item, index) in list" :key="item.id" class="mask-item">
                 <div class="mask-title">
@@ -51,7 +51,7 @@ import AES from '@/utils/aes1.js'
 import PbCateInfoItem from "@/components/PbCateInfoItem.vue"
 import { useRouter } from "vue-router";
 import { useHomeStore } from '@/store/home'
-import AD from "@/components/Ad.vue"
+import DarkAd from "@/components/DarkAd.vue"
 const store = useHomeStore()
 const router = useRouter()
 const list = ref<any>([])

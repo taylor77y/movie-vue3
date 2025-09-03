@@ -1,6 +1,6 @@
 <template>
-    <div v-if="item.adtype" class="ad-ad" @click="onOpen(item.url)">
-                <van-image @load="onLoad" :src="item.img"  class="adimg zoomIn" @click="onOpen(item.url)" >  </van-image>
+    <div v-if="item.adtype" class="ad-ad" @click="onOpen(item)">
+                <van-image @load="onLoad" :src="item.img"  class="adimg zoomIn" >  </van-image>
              <div class="adname">{{ item.title }}</div>
         </div>
     <div v-else class="ad-cartoon-item" @click="onGoVideoInfo(item)">
@@ -29,6 +29,8 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue'
 import { useRouter } from 'vue-router'
+import { post } from '@/utils/request'
+import AES from '@/utils/aes1.js'
 const router = useRouter()
 const props = defineProps({
     item: { type: Object, required: true },
@@ -46,8 +48,15 @@ const onLoad = async() => {
 const onImgError = (e) => {
     emits('error', e)
 }
-const onOpen = (url) => {
-  window.open(url, '_blank')
+const onOpen = async(item) => {
+    console.log(item,'item1');
+    const res = await post('/app-api/member/randomAdClickCount', {
+    id:item.id
+  })
+  if (res.code === 0) {
+    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+  }
+  window.open(item.url, '_blank')
 }
 const onGoVideoInfo = async (item) => {
      emits('goVideo', item);

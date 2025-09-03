@@ -139,12 +139,10 @@ const onPostSign = async () => {
     // lwlist
     const currentDate = `${year}-${month}-${day}`
     let index =daysqm.value === '-1'?0:daysqm.value
-  
-    
     
     const data = {
         amount:lwlist[index],
-        commodityType:(index === 2||index === 6) ?2:1,
+        commodityType:(index === 1||index === 5) ?2:1,
         date:currentDate
     }
     const res = await post('/renren-api/api/sign', {
