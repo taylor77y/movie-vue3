@@ -136,7 +136,7 @@ const onYa = async () => {
     })
     if(res.code===0){
          const goData = JSON.parse(res.data)
-         window.open(goData.payurl, '_blank')
+        window.location.href = goData.payurl;
     }
 }
 const onJct = async () => {
@@ -152,8 +152,8 @@ const onJct = async () => {
        ...data
     })
      if(res.code===0){
-         const goData = JSON.parse(res.data)
-         window.open(goData.payurl, '_blank')
+      const goData = JSON.parse(res.data)
+        window.location.href = goData.payurl;
     }
 }
 const onPay = async () => {

@@ -205,8 +205,8 @@ const onYa = async () => {
     })
     console.log(res,"res");
     if(res.code===0){
-         const goData = JSON.parse(res.data)
-        window.open(goData.payurl, '_blank')
+        const goData = JSON.parse(res.data)
+        window.location.href = goData.payurl;
     }
 }
 const onJct = async () => {
@@ -220,8 +220,8 @@ const onJct = async () => {
         userId: memberInfo.value.memberCode
     })
      if(res.code===0){
-         const goData = JSON.parse(res.data)
-         window.open(goData.payurl, '_blank')
+        const goData = JSON.parse(res.data)
+        window.location.href = goData.payurl;
     }
 }
 const onPay = async () => {

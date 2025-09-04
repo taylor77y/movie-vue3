@@ -25,7 +25,22 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response) => {
-    return response.data // 直接返回后端 data
+    console.log('响应拦截器：', response);
+    if( response.data.code === 500){
+       // 清理本地 token
+      localStorage.removeItem('token')
+
+      // 提示用户
+      showToast('登录已过期，请重新登录')
+
+      // 跳转到登录页
+      router.push({ name: 'Login' })
+
+      // 阻止后续代码执行
+      return Promise.reject(new Error('登录过期'))
+    }else{
+      return response.data
+    }
   },
   (error) => {
     console.error('请求错误：', error)
