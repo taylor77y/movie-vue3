@@ -71,7 +71,7 @@ const list = ['+1金币', '+1金币', '+1天VIP', '+2金币','+2金币', '+3金�
 const days = ref<any>(0)
 const daysqm = ref<any>(0)
 const memberInfo = ref<any>({})
-const iconlist = [{
+const iconlist = ref([{
     name: '每日登录',
     des: '每日登录可领取1金币',
     icon: o1,
@@ -91,21 +91,21 @@ const iconlist = [{
     des: '充值会员可领取5金币',
     icon: o4,
     title: '去完成'
-}]
+}])
 const lwlist=[1, 1, 1, 2, 2, 3, 3]
 const onBack = () => {
     router.back()
 }
+const isLogin = ref(false)
+const isPay = ref(false)
 const onGo = (index: number) => {
-    showLoadingToast({
-        message: '敬请期待',
-        forbidClick: true,
-        });
-    return false;
+  
     if (index === 0) {
-        router.push({
-            path: '/login'
-        })
+       if(isLogin.value){
+          showSuccessToast('今日已领取') 
+       }else{
+        router.replace("/login")
+       }
     }
     if (index === 1) {
         router.push({
@@ -118,9 +118,11 @@ const onGo = (index: number) => {
         })
     }
     if (index === 3) {
-        router.push({
-            path: '/vip'
-        })
+        if(isPay.value){
+          showSuccessToast('您已经领取过了') 
+       }else{
+        router.replace("/login")
+       }
     }
 }
 const onPostSign = async () => {
@@ -180,6 +182,33 @@ const onGetSignDay = async () => {
         }
     }
 }
+const onGetSignToDay = async () => {
+    const res = await get('/renren-api/api/sign/dailyLogin', {
+    })
+    if(res.code === 0){
+       isLogin.value = res.data
+       if(isLogin.value){
+          iconlist.value[0].title = '已领取'  
+       }else{
+          iconlist.value[0].title = '待领取'  
+       }
+    }
+    
+}
+const onGetVipToDay = async () => {
+    const res = await get('/renren-api/api/sign/firstRechargeVip', {
+    })  
+    if(res.code === 0){
+       isPay.value = res.data
+       if(isPay.value){
+          iconlist.value[3].title = '已领取'  
+       }else{
+          iconlist.value[3].title = '去完成'  
+       }
+    }
+
+    
+}
 const isIphoneX = () => {
   const ua = navigator.userAgent
   const isIOS = /iP(hone|od|ad)/.test(ua)
@@ -218,6 +247,8 @@ onMounted(async () => {
     } else {
         console.log('本地没有用户信息')
     }
+    await onGetSignToDay()
+    await onGetVipToDay()
     
 })
 </script>

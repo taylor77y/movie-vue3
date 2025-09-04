@@ -88,7 +88,7 @@ import { useRouter } from "vue-router";
 import moment from "moment";
 import { post } from '@/utils/request'
 import AES from '@/utils/aes1.js'
-import { closeToast, showLoadingToast, showSuccessToast, showToast } from "vant";
+import { closeToast, showLoadingToast, showSuccessToast, showToast,showFailToast } from "vant";
 const vipac = ref<any>('/proilfe/0.png')
 const isios = ref<any>(false)
 const router = useRouter()
@@ -203,10 +203,14 @@ const onYa = async () => {
         typesOf: 1,
         userId: memberInfo.value.memberCode
     })
-    console.log(res,"res");
     if(res.code===0){
         const goData = JSON.parse(res.data)
         window.location.href = goData.payurl;
+    }else{
+         showFailToast({
+        message: res.msg,
+        duration: 3000 // 3 秒
+      });
     }
 }
 const onJct = async () => {
@@ -222,6 +226,11 @@ const onJct = async () => {
      if(res.code===0){
         const goData = JSON.parse(res.data)
         window.location.href = goData.payurl;
+    }else{
+          showFailToast({
+        message: res.msg,
+        duration: 3000 // 3 秒
+      });
     }
 }
 const onPay = async () => {
@@ -241,12 +250,7 @@ const onPay = async () => {
     } else {
       await onJct(); // 另一种支付逻辑
     }
-
     // 成功提示
-    showToast({
-      message: '去支付',
-      type: 'success',
-    });
   } catch (err) {
     console.error(err);
     showToast({
@@ -255,7 +259,7 @@ const onPay = async () => {
     });
   } finally {
     // 无论成功或失败都关闭 loading
-    closeToast();
+      closeToast();
   }
 };
 

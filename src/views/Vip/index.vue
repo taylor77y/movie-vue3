@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { post } from '@/utils/request'
-import { showToast, showLoadingToast, closeToast } from 'vant';
+import { showToast, showLoadingToast, closeToast,showFailToast } from 'vant';
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 const cards = [
@@ -137,6 +137,11 @@ const onYa = async () => {
     if(res.code===0){
          const goData = JSON.parse(res.data)
         window.location.href = goData.payurl;
+    }else{
+       showFailToast({
+        message: res.msg,
+        duration: 3000 // 3 秒
+      });
     }
 }
 const onJct = async () => {
@@ -154,6 +159,11 @@ const onJct = async () => {
      if(res.code===0){
       const goData = JSON.parse(res.data)
         window.location.href = goData.payurl;
+    }else{
+     showFailToast({
+        message: res.msg,
+        duration: 3000 // 3 秒
+      });
     }
 }
 const onPay = async () => {
@@ -165,18 +175,12 @@ const onPay = async () => {
   });
 
   try {
-    console.log('activeIndex:', activeIndex.value);
-    console.log('checked:', checked.value);
     if (checked.value !== 1) {
       await onYa(); // 你的支付逻辑
     } else {
       await onJct(); // 另一种支付逻辑
     }
-    // 成功提示
-    showToast({
-      message: '去支付',
-      type: 'success',
-    });
+    // // 成功提示
   } catch (err) {
     console.error(err);
     showToast({
@@ -184,8 +188,8 @@ const onPay = async () => {
       type: 'fail',
     });
   } finally {
-    // 无论成功或失败都关闭 loading
-    closeToast();
+     // 无论成功或失败都关闭 loading
+      closeToast();
   }
 };
 // 滚动防抖

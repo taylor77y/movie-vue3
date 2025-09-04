@@ -1,6 +1,8 @@
 // src/utils/request.js
 import axios from 'axios'
+import {showToast} from 'vant'
 
+import router  from '../router'
 // 创建 axios 实例
 const service = axios.create({
   baseURL: '/', // 开发环境下用代理，直接写 / 就行
@@ -15,7 +17,6 @@ service.interceptors.request.use(
     const token = localStorage.getItem('token')
     if (token) {
       config.headers['Token'] = `${token}`
-    
     }
     return config
   },
@@ -25,8 +26,7 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response) => {
-    console.log('响应拦截器：', response);
-    if( response.data.code === 500){
+    if(response.data.code === 8000){
        // 清理本地 token
       localStorage.removeItem('token')
 
@@ -34,7 +34,7 @@ service.interceptors.response.use(
       showToast('登录已过期，请重新登录')
 
       // 跳转到登录页
-      router.push({ name: 'Login' })
+      router.replace('/login')
 
       // 阻止后续代码执行
       return Promise.reject(new Error('登录过期'))
