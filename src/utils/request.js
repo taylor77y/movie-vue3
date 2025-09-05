@@ -30,11 +30,16 @@ service.interceptors.response.use(
        // 清理本地 token
       localStorage.removeItem('token')
 
-      // 提示用户
-      showToast('登录已过期，请重新登录')
+        // 提示用户，3秒自动关闭
+      showToast({
+        message: '登录已过期，请重新登录',
+        duration: 3000, // 3 秒
+      });
 
-      // 跳转到登录页
-      router.replace('/login')
+      // 3秒后跳转到登录页
+      setTimeout(() => {
+        router.replace('/login');
+      }, 3000);
 
       // 阻止后续代码执行
       return Promise.reject(new Error('登录过期'))

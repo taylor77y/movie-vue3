@@ -67,6 +67,7 @@
                     <div style="color: white;">{{ item }}</div>
                 </van-radio>
             </van-radio-group>
+       
             <div class="btn" @click="onPay()">立即升级</div>
 
             <!-- <div class="t">会员特权</div>
@@ -114,7 +115,6 @@ const privilegeList = ref<any>([
 
 const title = ref<any>('暂未开通vip')
 const payList = ref<any>([])
-
 const vip = ref<any>(false)
 const limitPrice = (item: any) => {
   if (!item.price) return
@@ -251,7 +251,7 @@ const onPay = async () => {
       await onJct(); // 另一种支付逻辑
     }
     // 成功提示
-  } catch (err) {
+            } catch (err) {
     console.error(err);
     showToast({
       message: '支付失败',

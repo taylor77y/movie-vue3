@@ -24,12 +24,23 @@
         </div>
       </div>
     </div>
-
+      
      <van-radio-group v-model="checked" direction="horizontal" style="padding: 10px 0px;">
                 <van-radio :name="index" v-for="(item, index) in payList" :key="item.ID" checked-color="#FF960C">
                     <div style="color: white;">{{ item }}</div>
                 </van-radio>
             </van-radio-group>
+               <div  class="gradient-text-time">
+               <div class="time-text"><div class="l-text">限时优惠</div> |<div class="text">距优惠结束仅剩</div></div><van-count-down :time="time">
+                <template #default="timeData">
+                    <span class="block">{{ timeData.hours }}</span>
+                    <span class="colon">:</span>
+                    <span class="block">{{ timeData.minutes }}</span>
+                    <span class="colon">:</span>
+                    <span class="block">{{ timeData.seconds }}</span>
+                </template>
+                </van-count-down>
+            </div>
             <div class="btn" @click="onPay()">立即升级</div>
 
             <div class="gr-text">会员权益</div>
@@ -65,6 +76,8 @@ import { post } from '@/utils/request'
 import { showToast, showLoadingToast, closeToast,showFailToast } from 'vant';
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
+ const time = ref(15 * 60  * 1000);
+
 const cards = [
   { pic: '/vipgo/1.png', text: '图1' },
   { pic: '/vipgo/2.png', text: '图2' },
@@ -85,7 +98,7 @@ const iconList = [
 
 const list= [{
 				comSpec:30,
-				money:50,
+				money:30,
 			},{
 				comSpec:90,
 				money:100,
@@ -387,4 +400,41 @@ onMounted(async() => {
 	padding: 0px 20px;
 }
 
+</style>
+
+<style lang="less" scoped>
+.gradient-text-time{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  .time-text{
+    display: flex;
+    align-items: center;
+    .l-text{
+       padding-right:8px;
+    }
+    .text{
+      padding-left:8px;
+      padding-right: 8px;
+      color: #E20100;
+    }
+  }
+}
+  .colon {
+    display: inline-block;
+    margin: 0 4px;
+    color: #1989fa;
+  }
+  .block {
+    margin: 15px 0px;
+    display: inline-block;
+    width: 22px;
+    height: 26px;
+    line-height: 26px;
+    color: #fff;
+    font-size: 20px;
+    text-align: center;
+     background-color: #E20100;
+  }
 </style>
