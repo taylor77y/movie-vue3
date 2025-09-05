@@ -9,74 +9,73 @@
     </div>
 
     <div style="height: calc(100vh - 50px);overflow: auto;">
-         <div class="gradient-text">开通VIP享受会员特权</div>
+      <div class="gradient-text">开通VIP享受会员特权</div>
 
-    <div class="slider-container" ref="sliderRef" @scroll.passive="onScroll">
-      <div class="slider-wrapper" ref="wrapperRef">
-        <div 
-          v-for="(item, index) in cards" 
-          :key="index" 
-          class="card" 
-          :class="{ active: activeIndex === index }"
-          @click="onClickCard(index)"
-        >
-          <img :src="item.pic" :alt="item.text" />
+      <div class="slider-container" ref="sliderRef" @scroll.passive="onScroll">
+        <div class="slider-wrapper" ref="wrapperRef">
+          <div v-for="(item, index) in cards" :key="index" class="card" :class="{ active: activeIndex === index }"
+            @click="onClickCard(index)">
+            <img :src="item.pic" :alt="item.text" />
+          </div>
         </div>
       </div>
-    </div>
-      
-     <van-radio-group v-model="checked" direction="horizontal" style="padding: 10px 0px;">
-                <van-radio :name="index" v-for="(item, index) in payList" :key="item.ID" checked-color="#FF960C">
-                    <div style="color: white;">{{ item }}</div>
-                </van-radio>
-            </van-radio-group>
-               <div  class="gradient-text-time">
-               <div class="time-text"><div class="l-text">限时优惠</div> |<div class="text">距优惠结束仅剩</div></div><van-count-down :time="time">
-                <template #default="timeData">
-                    <span class="block">{{ timeData.hours }}</span>
-                    <span class="colon">:</span>
-                    <span class="block">{{ timeData.minutes }}</span>
-                    <span class="colon">:</span>
-                    <span class="block">{{ timeData.seconds }}</span>
-                </template>
-                </van-count-down>
-            </div>
-            <div class="btn" @click="onPay()">立即升级</div>
 
-            <div class="gr-text">会员权益</div>
-		<div class="iconlist">
-			<div v-for="(item, index) in iconList" :key="index" class="icon">
-				<div class="iconimg">
-					<img :src="item.icon" style="width: 30px;height: 26px;"/>
-				</div>
-				<div class="text">{{ item.name }}</div>
-			</div>
-		</div>
-		<div class="icontext">
-			<div>
-				常见问题
-			</div>
-			<div>
-				1：如多次支付失败，请尝试其它支付方式或稍后重试
-			</div>
-			<div>
-				2：支付成功后2-10分钟到账，超过10分钟未到账请
-			</div>
-			<div>
-				3：部分手机支付时误报病毒，请忽略即可
-			</div>
-		</div>
-        <div style="height: 30px;"></div>
+      <van-radio-group v-model="checked" direction="horizontal" style="padding: 10px 0px;">
+        <van-radio :name="index" v-for="(item, index) in payList" :key="item.ID" checked-color="#FF960C">
+          <div style="color: white;">{{ item }}</div>
+        </van-radio>
+      </van-radio-group>
+      <div class="gradient-text-time">
+        <div class="time-text">
+          <div class="l-text">限时优惠</div> <div class="line"></div><div class="text">距优惠结束仅剩</div>
+        </div><van-count-down :time="time">
+          <template #default="timeData">
+            <span class="block">{{ timeData.hours }}</span>
+            <span class="colon">:</span>
+            <span class="block min">{{ String(timeData.minutes).padStart(2, '0')[0] }}</span>
+            <span class="block">{{ String(timeData.minutes).padStart(2, '0')[1] }}</span>
+            <span class="colon">:</span>
+            <span class="block sec">{{ String(timeData.seconds).padStart(2, '0')[0] }}</span>
+            <span class="block">{{ String(timeData.seconds).padStart(2, '0')[1] }}</span>
+          </template>
+        </van-count-down>
+      </div>
+      <div class="btn" @click="onPay()">立即升级</div>
+
+      <div class="gr-text">会员权益</div>
+      <div class="iconlist">
+        <div v-for="(item, index) in iconList" :key="index" class="icon">
+          <div class="iconimg">
+            <img :src="item.icon" style="width: 30px;height: 26px;" />
+          </div>
+          <div class="text">{{ item.name }}</div>
+        </div>
+      </div>
+      <div class="icontext">
+        <div>
+          常见问题
+        </div>
+        <div>
+          1：如多次支付失败，请尝试其它支付方式或稍后重试
+        </div>
+        <div>
+          2：支付成功后2-10分钟到账，超过10分钟未到账请
+        </div>
+        <div>
+          3：部分手机支付时误报病毒，请忽略即可
+        </div>
+      </div>
+      <div style="height: 30px;"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { post } from '@/utils/request'
-import { showToast, showLoadingToast, closeToast,showFailToast } from 'vant';
+import { showToast, showLoadingToast, closeToast, showFailToast } from 'vant';
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
- const time = ref(15 * 60  * 1000);
+const time = ref(15 * 60 * 1000);
 
 const cards = [
   { pic: '/vipgo/1.png', text: '图1' },
@@ -96,26 +95,26 @@ const iconList = [
   { name: '专属客服', icon: '/vipgo/08.png' }
 ];
 
-const list= [{
-				comSpec:30,
-				money:30,
-			},{
-				comSpec:90,
-				money:100,
-			},{
-				comSpec:365,
-				money:200,
-			},{
-				comSpec:3650,
-				money:500,
-			}]
+const list = [{
+  comSpec: 30,
+  money: 30,
+}, {
+  comSpec: 90,
+  money: 100,
+}, {
+  comSpec: 365,
+  money: 200,
+}, {
+  comSpec: 3650,
+  money: 500,
+}]
 const activeIndex = ref(0);
 const cardWidth = 125;
 const gap = 16;
-const checked= ref<any>(0)
-const payList= ref<any>([])
+const checked = ref<any>(0)
+const payList = ref<any>([])
 const sliderRef = ref<HTMLElement | null>(null);
-const memberInfo= ref<any>({})
+const memberInfo = ref<any>({})
 const router = useRouter();
 const onBack = () => router.back();
 
@@ -126,58 +125,58 @@ const onClickCard = (index: number) => {
 };
 
 const onGetList = async () => {
-    // /app-api/pay/getGoodsLists
-    const res = await post('/app-api/pay/getGoodsLists', {
-        type: 2
-    })
-    if (res.code === 0) {
-        payList.value = res.data.payList
-    }
+  // /app-api/pay/getGoodsLists
+  const res = await post('/app-api/pay/getGoodsLists', {
+    type: 2
+  })
+  if (res.code === 0) {
+    payList.value = res.data.payList
+  }
 }
 const onYa = async () => {
-    let type = checked.value === 0?1:2
-      const data ={
-        comSpec: list[activeIndex.value].comSpec,
-        index: activeIndex.value,
-        money: list[activeIndex.value].money*1,
-        type: type ,
-        typesOf: 2,
-        userId: memberInfo.value.memberCode
-    }
-    const res = await post('/renren-api/api/pay/yianpay', {
-        ...data
-    })
-    if(res.code===0){
-         const goData = JSON.parse(res.data)
-        window.location.href = goData.payurl;
-    }else{
-       showFailToast({
-        message: res.msg,
-        duration: 3000 // 3 秒
-      });
-    }
+  let type = checked.value === 0 ? 1 : 2
+  const data = {
+    comSpec: list[activeIndex.value].comSpec,
+    index: activeIndex.value,
+    money: list[activeIndex.value].money * 1,
+    type: type,
+    typesOf: 2,
+    userId: memberInfo.value.memberCode
+  }
+  const res = await post('/renren-api/api/pay/yianpay', {
+    ...data
+  })
+  if (res.code === 0) {
+    const goData = JSON.parse(res.data)
+    window.location.href = goData.payurl;
+  } else {
+    showFailToast({
+      message: res.msg,
+      duration: 3000 // 3 秒
+    });
+  }
 }
 const onJct = async () => {
-    const data ={
-         comSpec: list[activeIndex.value].comSpec,
-        index: activeIndex.value ,
-        money: list[activeIndex.value].money*1,
-        type: payList.value[checked.value],
-        typesOf:  2,
-        userId: memberInfo.value.memberCode
-    }
-    const res = await post('/renren-api/api/pay/yianpay', {
-       ...data
-    })
-     if(res.code===0){
-      const goData = JSON.parse(res.data)
-        window.location.href = goData.payurl;
-    }else{
-     showFailToast({
-        message: res.msg,
-        duration: 3000 // 3 秒
-      });
-    }
+  const data = {
+    comSpec: list[activeIndex.value].comSpec,
+    index: activeIndex.value,
+    money: list[activeIndex.value].money * 1,
+    type: payList.value[checked.value],
+    typesOf: 2,
+    userId: memberInfo.value.memberCode
+  }
+  const res = await post('/renren-api/api/pay/yianpay', {
+    ...data
+  })
+  if (res.code === 0) {
+    const goData = JSON.parse(res.data)
+    window.location.href = goData.payurl;
+  } else {
+    showFailToast({
+      message: res.msg,
+      duration: 3000 // 3 秒
+    });
+  }
 }
 const onPay = async () => {
   // 打开全局 loading
@@ -201,8 +200,8 @@ const onPay = async () => {
       type: 'fail',
     });
   } finally {
-     // 无论成功或失败都关闭 loading
-      closeToast();
+    // 无论成功或失败都关闭 loading
+    closeToast();
   }
 };
 // 滚动防抖
@@ -230,7 +229,7 @@ const onScroll = () => {
     } else {
       activeIndex.value = 3
     }
-   
+
   }, 50)
 }
 
@@ -249,20 +248,20 @@ const centerCard = (index: number) => {
   sliderRef.value.scrollTo({ left: targetScroll, behavior: 'smooth' });
 };
 
-onMounted(async() => {
+onMounted(async () => {
   nextTick(() => centerCard(activeIndex.value));
- 
-   const info = localStorage.getItem('memberInfo')
-    if (info) {
-        try {
-            memberInfo.value = JSON.parse(info)
-           await onGetList()
-        } catch (err) {
-            console.error('解析本地用户信息失败', err)
-        }
-    } else {
-        console.log('本地没有用户信息')
+
+  const info = localStorage.getItem('memberInfo')
+  if (info) {
+    try {
+      memberInfo.value = JSON.parse(info)
+      await onGetList()
+    } catch (err) {
+      console.error('解析本地用户信息失败', err)
     }
+  } else {
+    console.log('本地没有用户信息')
+  }
 });
 </script>
 
@@ -308,7 +307,8 @@ onMounted(async() => {
 /* 左右填充一半容器宽度保证首尾居中 */
 .slider-wrapper {
   display: flex;
-  padding: 0 20px; /* 50% - 卡片一半宽度 */
+  padding: 0 20px;
+  /* 50% - 卡片一半宽度 */
 }
 
 .card {
@@ -341,100 +341,119 @@ onMounted(async() => {
   font-size: 14px;
   color: #fff;
 }
-.btn{
-        margin-top: 10px;
-        background: linear-gradient(180deg, #FFBE00 0%, #FF960C 104.01%);
-        color: black;
-        font-weight: bold;
-        font-size: 18px;
-        height: 45px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 45px;
-    }
-    .gr-text{
-        margin-top: 10px;
-    }
+
+.btn {
+  margin-top: 10px;
+  background: linear-gradient(180deg, #FFBE00 0%, #FF960C 104.01%);
+  color: black;
+  font-weight: bold;
+  font-size: 18px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 45px;
+}
+
+.gr-text {
+  margin-top: 10px;
+}
+
 .iconlist {
-	display: flex;
-	flex-wrap: wrap;
-	padding: 10px 0px;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px 0px;
   width: 100%;
 
-	.icon {
-		width: 25%;
-		margin-bottom: 10px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		flex-wrap: wrap;
-		justify-content: space-between;
+  .icon {
+    width: 25%;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: space-between;
 
-		.iconimg {
-			background-color: #333333;
-			width: 60px;
-			height: 60px;
-			border-radius: 8px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
+    .iconimg {
+      background-color: #333333;
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-		.text {
-			font-family: PingFang SC;
-			font-size: 11px;
-			line-height: 16px;
-			letter-spacing: 0%;
-			color: white;
-			margin-top: 5px;
-		}
-	}
+    .text {
+      font-family: PingFang SC;
+      font-size: 11px;
+      line-height: 16px;
+      letter-spacing: 0%;
+      color: white;
+      margin-top: 5px;
+    }
+  }
 }
 
 .icontext {
-	color: #999999;
-	font-family: PingFang SC;
-	font-size: 12px;
-	line-height: 16px;
-	padding: 0px 20px;
+  color: #999999;
+  font-family: PingFang SC;
+  font-size: 12px;
+  line-height: 16px;
+  padding: 0px 20px;
 }
-
 </style>
 
 <style lang="less" scoped>
-.gradient-text-time{
+.gradient-text-time {
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  .time-text{
+
+  .time-text {
     display: flex;
     align-items: center;
-    .l-text{
-       padding-right:8px;
+
+    .l-text {
+      padding-right: 4px;
     }
-    .text{
-      padding-left:8px;
+    .line{
+      background-color: #E20100;
+      width: 2px;
+      height: 20px;
+    }
+
+    .text {
+      padding-left: 4px;
       padding-right: 8px;
       color: #E20100;
     }
   }
 }
-  .colon {
-    display: inline-block;
-    margin: 0 4px;
-    color: #1989fa;
-  }
-  .block {
-    margin: 15px 0px;
-    display: inline-block;
-    width: 22px;
-    height: 26px;
-    line-height: 26px;
-    color: #fff;
-    font-size: 20px;
-    text-align: center;
-     background-color: #E20100;
-  }
+
+.colon {
+  display: inline-block;
+  color: #E20100;
+  font-size: 26px;
+}
+
+.block {
+  margin: 15px 0px;
+  display: inline-block;
+  width: 22px;
+  height: 26px;
+  line-height: 26px;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  background-color: #E20100;
+  border-radius: 5px;
+}
+.min{
+  margin-right: 3px;
+}
+.sec{
+  margin-right: 3px;
+}
 </style>
