@@ -242,11 +242,11 @@ const onGetVipIcon = () => {
 
     if (vip > 0) {
         return vipIcons[vip] || vipIcons[6];
+    }else if(vip == 0){
+        return vipIcons[6]
     } else if (vip === 0 && !vipDate.isAfter(now)) {
         return vipIcons[0]
-    } else {
-        return vipIcons[6]
-    }
+    } 
 };
 const onSign = () => {
     router.push({
@@ -308,31 +308,30 @@ const toggleShow = () => {
 }
 
 const checkVipStatus = () => {
+    const vipDate = memberInfo.value.vipDate
+    const expireDate = moment(vipDate, 'YYYY-MM-DD HH:mm:ss').startOf('day') // 到期当天零点
+     if(memberInfo.value.vipPeriod === 0){
+        vipText.value = `您还不是VIP会员`
+        return false
+    }
     if(memberInfo.value.vipPeriod === 1){
-        vipText.value = '您已经开通月卡'
+        vipText.value = `会员到期: ${expireDate.format('YYYY-MM-DD')}`
         return false
     }
     if(memberInfo.value.vipPeriod === 2){
-        vipText.value = '您已经开通季卡'
+        vipText.value = `会员到期: ${expireDate.format('YYYY-MM-DD')}`
            return false
     }
 
     if(memberInfo.value.vipPeriod === 3){
-        vipText.value = '您已经开通年卡'
+        vipText.value = `会员到期: ${expireDate.format('YYYY-MM-DD')}`
            return false
     }
-    const vipDate = memberInfo.value.vipDate
-    if (!vipDate) {
-        vipText.value = '未开通'
-        return
+     if(memberInfo.value.vipPeriod === 6){
+        vipText.value = `试用时间: ${expireDate.format('YYYY-MM-DD')}`
+           return false
     }
-    const today = moment().startOf('day') // 今天零点
-    const expireDate = moment(vipDate, 'YYYY-MM-DD HH:mm:ss').startOf('day') // 到期当天零点
-    if (expireDate.isBefore(today)) {
-        vipText.value = '未开通'
-    } else {
-        vipText.value = `会员到期: ${expireDate.format('YYYY-MM-DD')}`
-    }
+   
 }
 
 const handleStorageChange=async(e:any)=> {
