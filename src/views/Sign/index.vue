@@ -98,14 +98,29 @@ const onBack = () => {
 }
 const isLogin = ref(false)
 const isPay = ref(false)
-const onGo = (index: number) => {
-  
+const onGo = async(index: number) => {
     if (index === 0) {
-       if(isLogin.value){
-          showSuccessToast('今日已领取') 
-       }else{
-        router.replace("/login")
-       }
+        console.log(isLogin.value);
+        
+        // 如果已经登录才调用接口
+        if (!isLogin.value) {
+            const res = await onGetSignToDay()
+            if (res.code === 500) { 
+                 const signedDates = getSignedDates()
+                signedDates.push(today)
+                saveSignedDates(signedDates)
+               showFailToast("今日已经签到过了");
+            }else{
+                const signedDates = getSignedDates()
+                 signedDates.push(today)
+                 saveSignedDates(signedDates)
+                 isLogin.value = true
+                 iconlist.value[0].title = '已领取'
+                showSuccessToast('领取成功')
+            }
+        } else{
+             showFailToast("今日已经签到过了");
+        }
     }
     if (index === 1) {
         router.push({
@@ -121,7 +136,7 @@ const onGo = (index: number) => {
         if(isPay.value){
           showSuccessToast('您已经领取过了') 
        }else{
-        router.replace("/login")
+            router.push({ path: '/vip' })
        }
     }
 }
@@ -137,8 +152,8 @@ const onPostSign = async () => {
         const month = String(today.getMonth() + 1).padStart(2, '0') // 月份从0开始
         const day = String(today.getDate()).padStart(2, '0')
 
-    // 拼接成 YYYY-MM-DD
-    // lwlist
+    // // 拼接成 YYYY-MM-DD
+    // // lwlist
     const currentDate = `${year}-${month}-${day}`
     let index =daysqm.value === '-1'?0:daysqm.value
     
@@ -185,15 +200,7 @@ const onGetSignDay = async () => {
 const onGetSignToDay = async () => {
     const res = await get('/renren-api/api/sign/dailyLogin', {
     })
-    if(res.code === 0){
-       isLogin.value = res.data
-       if(isLogin.value){
-          iconlist.value[0].title = '已领取'  
-       }else{
-          iconlist.value[0].title = '待领取'  
-       }
-    }
-    
+   return res
 }
 const onGetVipToDay = async () => {
     const res = await get('/renren-api/api/sign/firstRechargeVip', {
@@ -234,7 +241,26 @@ const onRfUserInfo = async () => {
     localStorage.setItem('memberInfo', JSON.stringify(res.data))
   }
 }
+const signedKey = 'signedDates'
+const today = new Date().toISOString().split('T')[0] // 2025-09-06
+// 获取打卡记录数组
+const getSignedDates = () => {
+  return JSON.parse(localStorage.getItem(signedKey) || '[]')
+}
+
+// 保存打卡记录
+const saveSignedDates = (dates) => {
+  localStorage.setItem(signedKey, JSON.stringify(dates))
+}
 onMounted(async () => {
+     const signedDates = getSignedDates()
+    if (signedDates.includes(today)) {
+        isLogin.value = true
+        iconlist.value[0].title = '已领取'
+    }else{
+        isLogin.value = false
+        iconlist.value[0].title = '待领取'
+    }
     const info = localStorage.getItem('memberInfo')
     if (info) {
         try {
@@ -247,7 +273,6 @@ onMounted(async () => {
     } else {
         console.log('本地没有用户信息')
     }
-    await onGetSignToDay()
     await onGetVipToDay()
     
 })

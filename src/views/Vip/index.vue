@@ -10,15 +10,23 @@
 
     <div style="height: calc(100vh - 50px);overflow: auto;">
       <div class="gradient-text">开通VIP享受会员特权</div>
+      
 
-      <div class="slider-container" ref="sliderRef" @scroll.passive="onScroll">
-        <div class="slider-wrapper" ref="wrapperRef">
-          <div v-for="(item, index) in cards" :key="index" class="card" :class="{ active: activeIndex === index }"
-            @click="onClickCard(index)">
-            <img :src="item.pic" :alt="item.text" />
-          </div>
-        </div>
-      </div>
+       <div
+    class="slider"
+    ref="slider"
+    @scroll.passive="onScroll"
+    :style="{ paddingLeft: sidePad + 'px', paddingRight: sidePad + 'px' }"
+  >
+    <div
+      v-for="(item, index) in cards"
+      :key="index"
+      class="slide"
+      :class="{ active: index === activeIndex }"
+    >
+     <img class="img" :src="item.pic"/>
+    </div>
+  </div>
 
       <van-radio-group v-model="checked" direction="horizontal" style="padding: 10px 0px;">
         <van-radio :name="index" v-for="(item, index) in payList" :key="item.ID" checked-color="#FF960C">
@@ -76,7 +84,6 @@ import { showToast, showLoadingToast, closeToast, showFailToast } from 'vant';
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 const time = ref(15 * 60 * 1000);
-
 const cards = [
   { pic: '/vipgo/1.png', text: '图1' },
   { pic: '/vipgo/2.png', text: '图2' },
@@ -88,7 +95,7 @@ const iconList = [
   { name: '金币视频免费看', icon: '/vipgo/01.png' },
   { name: 'VIP视频免费看', icon: '/vipgo/02.png' },
   { name: '暗网免费看', icon: '/vipgo/03.png' },
-  { name: '头像昵称修改权限', icon: '/vipgo/04.png' },
+  { name: '头像昵称修改', icon: '/vipgo/04.png' },
   { name: '高清视频', icon: '/vipgo/05.png' },
   { name: '专属路线', icon: '/vipgo/06.png' },
   { name: '免广告播放', icon: '/vipgo/07.png' },
@@ -111,18 +118,13 @@ const list = [{
 const activeIndex = ref(0);
 const cardWidth = 125;
 const gap = 16;
+
 const checked = ref<any>(0)
 const payList = ref<any>([])
-const sliderRef = ref<HTMLElement | null>(null);
+const slider = ref<HTMLElement | null>(null);
 const memberInfo = ref<any>({})
 const router = useRouter();
 const onBack = () => router.back();
-
-// 点击选中
-const onClickCard = (index: number) => {
-  activeIndex.value = index;
-  nextTick(() => centerCard(index));
-};
 
 const onGetList = async () => {
   // /app-api/pay/getGoodsLists
@@ -152,7 +154,7 @@ const onYa = async () => {
   } else {
     showFailToast({
       message: res.msg,
-      duration: 3000 // 3 秒
+      duration: 6000 // 3 秒
     });
   }
 }
@@ -174,7 +176,7 @@ const onJct = async () => {
   } else {
     showFailToast({
       message: res.msg,
-      duration: 3000 // 3 秒
+      duration: 6000 // 3 秒
     });
   }
 }
@@ -205,51 +207,49 @@ const onPay = async () => {
   }
 };
 // 滚动防抖
-let scrollTimeout: number | null = null
-const onScroll = () => {
-  if (!sliderRef.value) return
-  if (scrollTimeout) clearTimeout(scrollTimeout)
+const items = ref([1, 2, 3, 4])   // 4 个元素
+const sidePad = ref(0)            // 动态左右留白
+const GAP = 10                    // 卡片间距（与 CSS gap 对齐）
 
-  scrollTimeout = window.setTimeout(() => {
-    const container = sliderRef.value!
-    const scrollLeft = container.scrollLeft
-    const containerWidth = container.offsetWidth
-    const scrollWidth = container.scrollWidth
-    const scrollableDistance = scrollWidth - containerWidth
-    const percent = scrollableDistance > 0 ? scrollLeft / scrollableDistance : 0
-    // 根据百分比分四个区间
-    if (percent < 0.125) {
-      activeIndex.value = 0
-    } else if (percent < 0.375) {
-      activeIndex.value = 1
-    } else if (percent < 0.625) {
-      activeIndex.value = 2
-    } else if (percent < 0.875) {
-      activeIndex.value = 3
-    } else {
-      activeIndex.value = 3
-    }
-
-  }, 50)
+const computePad = () => {
+  const el = slider.value
+  if (!el) return
+  const first = el.querySelector<HTMLElement>('.slide')
+  if (!first) return
+  const containerW = el.clientWidth
+  const cardW = first.offsetWidth
+  sidePad.value = Math.max(0, (containerW - cardW) / 2) // 一半容器 - 一半卡片
 }
 
+const onScroll = () => {
+  const el = slider.value
+  if (!el) return
+  const centerX = el.scrollLeft + el.clientWidth / 2
 
+  let closest = 0
+  let minDist = Number.POSITIVE_INFINITY
+  el.querySelectorAll<HTMLElement>('.slide').forEach((child, i) => {
+    const childCenter = child.offsetLeft + child.offsetWidth / 2
+    const d = Math.abs(childCenter - centerX)
+    if (d < minDist) {
+      minDist = d
+      closest = i
+    }
+  })
+  activeIndex.value = closest
+}
 
-// 居中卡片
-const centerCard = (index: number) => {
-  if (!sliderRef.value) return;
-  const containerWidth = sliderRef.value.offsetWidth;
-  const totalWidth = cards.length * (cardWidth + gap) - gap;
-  let targetScroll = index * (cardWidth + gap) + cardWidth / 2 - containerWidth / 2;
-
-  if (targetScroll < 0) targetScroll = 0;
-  if (targetScroll > totalWidth - containerWidth) targetScroll = totalWidth - containerWidth;
-
-  sliderRef.value.scrollTo({ left: targetScroll, behavior: 'smooth' });
-};
-
-onMounted(async () => {
-  nextTick(() => centerCard(activeIndex.value));
+const onResize = () => {
+  computePad()
+  nextTick(onScroll)
+}
+onMounted(async() => {
+   computePad()
+    window.addEventListener('resize', onResize)
+    nextTick(() => {
+      // 有了左右留白后，首张也能居中；初始化计算一次
+      onScroll()
+    })
 
   const info = localStorage.getItem('memberInfo')
   if (info) {
@@ -294,51 +294,35 @@ onMounted(async () => {
 }
 
 /* 滑动容器 */
-.slider-container {
+.slider {
+  display: flex;
   overflow-x: auto;
-  white-space: nowrap;
+  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-  height: 240px;
-  display: flex;
-  align-items: center;
+  padding: 20px;
+  gap: 10px;
 }
 
-/* 左右填充一半容器宽度保证首尾居中 */
-.slider-wrapper {
-  display: flex;
-  padding: 0 20px;
-  /* 50% - 卡片一半宽度 */
-}
-
-.card {
+.slide {
   flex: 0 0 auto;
-  width: 125px;
-  height: 180px;
-  margin-right: 16px;
-  border-radius: 12px;
+  width: 110px;
+  height: 140px;
+  border-radius: 10px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transform: scale(1);
-  transition: transform 0.3s ease;
+  align-items: center;
+  font-size: 20px;
+  transition: transform 0.3s;
+  scroll-snap-align: center;
+  .img{
+    width: 100%;
+    height: 100%;
+    margin:  0px 20px;
+  }
 }
 
-.card.active {
-  transform: scale(1.2);
-}
-
-.card img {
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-}
-
-.card .text {
-  margin-top: 5px;
-  font-size: 14px;
+.slide.active {
+  transform: scale(1.3);
   color: #fff;
 }
 

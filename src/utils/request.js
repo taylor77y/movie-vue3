@@ -26,6 +26,8 @@ service.interceptors.request.use(
 // 响应拦截器
 service.interceptors.response.use(
   (response) => {
+  
+    
     if(response.data.code === 8000){
        // 清理本地 token
       localStorage.removeItem('token')

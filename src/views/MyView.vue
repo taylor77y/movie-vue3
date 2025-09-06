@@ -25,7 +25,7 @@
                             <div class="id">ID:{{ memberInfo.memberCode }}</div>
                         </div>
                         <div class="sign">签名：{{ memberInfo.memberSignature ? memberInfo.memberSignature : '这家伙很懒，什么都没留下'
-                            }}
+                        }}
                         </div>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                     <img src="/proilfe/king.svg" />
                     <div class="go-left-text">
                         <div class="top">VIP限时特惠 畅享全场</div>
-                        <div class="min">开通VIP全场畅看</div>
+                        <div class="min"> {{ vipText }}</div>
                     </div>
                 </div>
                 <div class="go-right" @click="onVip()">会员充值</div>
@@ -93,8 +93,7 @@
 
                             </div>
                             <div class="flex-h-h">
-                                <div class="img"> <img src="/Image/logo.png"
-                                        style="width: 86px;height: 18px;" /> </div>
+                                <div class="img"> <img src="/Image/logo.png" style="width: 86px;height: 18px;" /> </div>
                                 <div class="text">身份证卡</div>
                             </div>
                         </div>
@@ -107,7 +106,7 @@
                                         <image :src="item.src" style="width: 18px;height: 18px;"></image>
                                         <div style="margin-left: 5px;font-size: 14px;color: black;font-weight: bold;">{{
                                             item.name
-                                        }} {{ item.text }}</div>
+                                            }} {{ item.text }}</div>
                                     </div>
                                     <div style="color: #E93C36;font-size: 16px;font-weight: bold;" v-if="index != 0"
                                         @click="onCopyText(item.text)">复制</div>
@@ -123,7 +122,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onBeforeUnmount } from 'vue';
 
 import moment from 'moment'
 import QRCode from 'qrcode'
@@ -136,62 +135,55 @@ import { showToast, showSuccessToast, showFailToast } from 'vant'
 const show = ref<any>(false)
 const qrCodeUrl = ref<any>('')
 const store = useHomeStore()
+const memberInfo = ref(JSON.parse(localStorage.getItem('memberInfo') || '{}'))
+const vipText = ref('开通VIP全场畅看') // 默认未开通
 let list = ref<any>([
-  {
-    name: '账号：',
-    text: '********',
-    src: '/my/me/01.png'
-  },
-  {
-    name: '密码：',
-    text: '********',
-    src: '/my/me/02.png'
-  },
-  {
-    name: '官方网站:',
-    text: 'https://91porn.hk',
-    src: '/my/me/03.png'
-  },
-  {
-    name: '官方邮箱:',
-    text: 'kanbei6688@gmail.com',
-    src: '/my/me/04.png'
-  }
+    {
+        name: '账号：',
+        text: '********',
+        src: '/my/me/01.png'
+    },
+    {
+        name: '密码：',
+        text: '********',
+        src: '/my/me/02.png'
+    },
+    {
+        name: '官方网站:',
+        text: 'https://91porn.hk',
+        src: '/my/me/03.png'
+    },
+    {
+        name: '官方邮箱:',
+        text: 'kanbei6688@gmail.com',
+        src: '/my/me/04.png'
+    }
 ]);
 
 let listgn = ref<any>([
-  { icon: '/icons/1.png', label: '账户管理' },
-  { icon: '/icons/2.png', label: '身份凭证' },
-  { icon: '/icons/3.png', label: '联系客服' },
-  { icon: '/icons/4.png', label: '推广分享' },
-  { icon: '/icons/5.png', label: '浏览记录' },
-  { icon: '/icons/6.png', label: '资金明细' },
-  { icon: '/icons/7.png', label: '商务合作' },
-  { icon: '/icons/8.png', label: '问题反馈' },
-  { icon: '/icons/9.png', label: '更改密码' },
-  { icon: '/icons/11.png', label: '邀请人列表' }
+    { icon: '/icons/1.png', label: '账户管理' },
+    { icon: '/icons/2.png', label: '身份凭证' },
+    { icon: '/icons/3.png', label: '联系客服' },
+    { icon: '/icons/4.png', label: '推广分享' },
+    { icon: '/icons/5.png', label: '浏览记录' },
+    { icon: '/icons/6.png', label: '资金明细' },
+    { icon: '/icons/7.png', label: '商务合作' },
+    { icon: '/icons/8.png', label: '问题反馈' },
+    { icon: '/icons/9.png', label: '更改密码' },
+    { icon: '/icons/11.png', label: '邀请人列表' }
 ]);
 const vipIcons = [
-  '/proilfe/0.png', // V0
-  '/proilfe/1.png', // V1
-  '/proilfe/2.png', // V2
-  '/proilfe/3.png', // V3
-  '/proilfe/4.png', // V4
-  '/proilfe/5.png', // V5
-  '/proilfe/6.png'  // V6
+    '/proilfe/0.png', // V0
+    '/proilfe/1.png', // V1
+    '/proilfe/2.png', // V2
+    '/proilfe/3.png', // V3
+    '/proilfe/4.png', // V4
+    '/proilfe/5.png', // V5
+    '/proilfe/6.png'  // V6
 ];
 
 const vipac = ref<any>('/proilfe/0.png')
-const memberInfo = ref<any>({
-    memberName: '',
-    memberCode: 0,
-    memberAvatar: '',
-    memberSignature: '这家伙很懒，什么都没留下',
-    vipPeriod: 0,
-    vipDate: '2025-06-19 19:34:46',
-    memberCion: 0,
-    balance: 0
-})
+
 const onCopyText = async (text: any) => {
     copyText(text, undefined, (success, event) => {
         if (success) {
@@ -233,28 +225,28 @@ const onGo = (path: any) => {
         path: path,
     })
 }
-const onOpen = async(item: any) => {
-  const res = await post('/renren-api/api/member/meAdClickCount', {
-    id:item.id
-  })
-  if (res.code === 0) {
-    const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
-  }
-  window.open(item.url, '_blank')
+const onOpen = async (item: any) => {
+    const res = await post('/renren-api/api/member/meAdClickCount', {
+        id: item.id
+    })
+    if (res.code === 0) {
+        const data = JSON.parse(AES.decrypt(res.data, 'asdasdsadasdasds', '5245847584125485'))
+    }
+    window.open(item.url, '_blank')
 }
 const onGetVipIcon = () => {
-  const vip = memberInfo.value.vipPeriod;
+    const vip = memberInfo.value.vipPeriod;
     const vipDateStr = memberInfo.value.vipDate;
-       const vipDate = moment(vipDateStr, 'YYYY-MM-DD HH:mm:ss');
-        const now = moment();
-    
-   if(vip>0){
-     return vipIcons[vip] || vipIcons[6];
-   }else if (vip === 0 && !vipDate.isAfter(now)){
-     return vipIcons[0]
-   }else{
-     return vipIcons[6]
-   }
+    const vipDate = moment(vipDateStr, 'YYYY-MM-DD HH:mm:ss');
+    const now = moment();
+
+    if (vip > 0) {
+        return vipIcons[vip] || vipIcons[6];
+    } else if (vip === 0 && !vipDate.isAfter(now)) {
+        return vipIcons[0]
+    } else {
+        return vipIcons[6]
+    }
 };
 const onSign = () => {
     router.push({
@@ -311,10 +303,51 @@ const onSave = () => {
     showToast('请手动截图保存')
 }
 const toggleShow = () => {
-  show.value = !show.value
-  localStorage.setItem("show", String(show.value))
+    show.value = !show.value
+    localStorage.setItem("show", String(show.value))
 }
-onMounted(async() => {
+
+const checkVipStatus = () => {
+    if(memberInfo.value.vipPeriod === 1){
+        vipText.value = '您已经开通月卡'
+        return false
+    }
+    if(memberInfo.value.vipPeriod === 2){
+        vipText.value = '您已经开通季卡'
+           return false
+    }
+
+    if(memberInfo.value.vipPeriod === 3){
+        vipText.value = '您已经开通年卡'
+           return false
+    }
+    const vipDate = memberInfo.value.vipDate
+    if (!vipDate) {
+        vipText.value = '未开通'
+        return
+    }
+    const today = moment().startOf('day') // 今天零点
+    const expireDate = moment(vipDate, 'YYYY-MM-DD HH:mm:ss').startOf('day') // 到期当天零点
+    if (expireDate.isBefore(today)) {
+        vipText.value = '未开通'
+    } else {
+        vipText.value = `会员到期: ${expireDate.format('YYYY-MM-DD')}`
+    }
+}
+
+const handleStorageChange=async(e:any)=> {
+  if (e.key === 'memberInfo' && e.newValue) {
+            memberInfo.value = JSON.parse(e.newValue)
+            console.log('本地用户信息', memberInfo.value)
+            list.value[0].text = memberInfo.value.memberNichen
+            list.value[1].text = memberInfo.value.memberPwdTemp
+            vipac.value = onGetVipIcon()
+          await  onCreateQT()
+            checkVipStatus()
+  }
+}
+
+onMounted(async () => {
     const info = localStorage.getItem('memberInfo')
     if (info) {
         try {
@@ -323,22 +356,30 @@ onMounted(async() => {
             list.value[0].text = memberInfo.value.memberNichen
             list.value[1].text = memberInfo.value.memberPwdTemp
             vipac.value = onGetVipIcon()
-            onCreateQT()
-        } catch (err) {
-            console.error('解析本地用户信息失败', err)
+            checkVipStatus()
+           await onCreateQT()
+        } catch (error) {
+            console.error('解析用户信息失败:', error)
         }
-    } else {
-        console.log('本地没有用户信息')
+    }else { console.log('本地没有用户信息') 
+
     }
+
     await store.getConfig()
     // 第一次进入，localStorage 没有值，就设为 true
-  if (!localStorage.getItem("show")) {
-    localStorage.setItem("show", "true")
-    show.value = true
-  } else {
-    // 后续刷新或再次进入时，用存储的值
-    show.value = localStorage.getItem("show") === "true"
-  }
+    if (!localStorage.getItem("show")) {
+        localStorage.setItem("show", "true")
+        show.value = true
+    } else {
+        // 后续刷新或再次进入时，用存储的值
+        show.value = localStorage.getItem("show") === "true"
+    }
+      // 监听 localStorage 变化
+  window.addEventListener('storage', handleStorageChange)
+})
+// 页面销毁时移除监听，避免内存泄漏
+onBeforeUnmount(() => {
+  window.removeEventListener('storage', handleStorageChange)
 })
 </script>
 <style lang="less" scoped>
@@ -426,7 +467,8 @@ onMounted(async() => {
                     }
 
                     .min {
-                        font-size: 10px;
+                        font-size: 12px;
+                        display: flex;
                     }
                 }
             }

@@ -209,7 +209,7 @@ const onYa = async () => {
     }else{
          showFailToast({
         message: res.msg,
-        duration: 3000 // 3 秒
+        duration: 6000 // 3 秒
       });
     }
 }
@@ -227,9 +227,9 @@ const onJct = async () => {
         const goData = JSON.parse(res.data)
         window.location.href = goData.payurl;
     }else{
-          showFailToast({
+        showFailToast({
         message: res.msg,
-        duration: 3000 // 3 秒
+        duration: 6000 // 3 秒
       });
     }
 }
